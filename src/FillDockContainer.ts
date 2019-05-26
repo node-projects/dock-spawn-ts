@@ -1,0 +1,91 @@
+import { DockManager } from "./DockManager";
+import { Utils } from "./Utils";
+import { ContainerType } from "./ContainerType";
+import { TabHost } from "./TabHost";
+
+export class FillDockContainer {
+    
+    dockManager: DockManager;
+    tabOrientation: TabHostDirection;
+    name: string;
+    element: HTMLDivElement;
+    containerElement: HTMLDivElement;
+    containerType: ContainerType;
+    minimumAllowedChildNodes: number;
+    tabHost: TabHost;
+    tabHostListener: { onChange: (e: any) => void; };
+
+    constructor(dockManager: DockManager, tabStripDirection?: TabHostDirection) {
+        if (tabStripDirection === undefined) {
+            tabStripDirection = TabHostDirection.BOTTOM;
+        }
+
+        this.dockManager = dockManager;
+        this.tabOrientation = tabStripDirection;
+        this.name = Utils.getNextId('fill_');
+        this.element = document.createElement('div');
+        this.containerElement = this.element;
+        this.containerType = ContainerType.fill;
+        this.minimumAllowedChildNodes = 2;
+        this.element.classList.add('dock-container');
+        this.element.classList.add('dock-container-fill');
+        this.tabHost = new TabHost(this.tabOrientation);
+        this.tabHostListener = {
+            onChange: (e) => {
+                this.dockManager._requestTabReorder(this, e);
+            }
+        };
+        this.tabHost.addListener(this.tabHostListener);
+        this.element.appendChild(this.tabHost.hostElement);
+    }
+
+
+    setActiveChild(child) {
+        this.tabHost.setActiveTab(child);
+    }
+
+    resize(width, height) {
+        this.element.style.width = width + 'px';
+        this.element.style.height = height + 'px';
+        this.tabHost.resize(width, height);
+    }
+
+    performLayout(children) {
+        this.tabHost.performLayout(children);
+    }
+
+    destroy() {
+        if (Utils.removeNode(this.element))
+            delete this.element;
+    }
+
+    saveState(state) {
+        state.width = this.width;
+        state.height = this.height;
+    }
+
+    loadState(state) {
+        // this.resize(state.width, state.height);
+        // this.width = state.width;
+        // this.height = state.height;
+        this.state = { width: state.width, height: state.height };
+    }
+
+    get width(): Number {
+        // if(this.element.clientWidth === 0 && this.stateWidth !== 0)
+        //     return this.stateWidth;
+        return this.element.clientWidth;
+    }
+    set width(value: Number) {
+        this.element.style.width = value + 'px'
+    }
+
+    get height(): Number {
+        // if(this.element.clientHeight === 0 && this.stateHeight !== 0)
+        //     return this.stateHeight;
+        return this.element.clientHeight;
+    }
+    set height(value: Number) {
+        this.element.style.height = value + 'px'
+    }
+}

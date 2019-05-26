@@ -1,0 +1,140 @@
+import { IDockContainer } from "./IDockContainer";
+import { EventHandler } from "./EventHandler";
+
+export class SplitterBar {
+    previousContainer: IDockContainer;
+    nextContainer: IDockContainer;
+    stackedVertical: boolean;
+    barElement: HTMLDivElement;
+    mouseDownHandler: EventHandler;
+    touchDownHandler: EventHandler;
+    minPanelSize: number;
+    readyToProcessNextDrag: boolean;
+    dockSpawnResizedEvent: CustomEvent<{}>;
+    previousMouseEvent: any;
+    
+    constructor(previousContainer:IDockContainer, nextContainer:IDockContainer, stackedVertical:boolean) {
+        // The panel to the left/top side of the bar, depending on the bar orientation
+        this.previousContainer = previousContainer;
+        // The panel to the right/bottom side of the bar, depending on the bar orientation
+        this.nextContainer = nextContainer;
+        this.stackedVertical = stackedVertical;
+        this.barElement = document.createElement('div');
+        this.barElement.classList.add(stackedVertical ? 'splitbar-horizontal' : 'splitbar-vertical');
+        this.mouseDownHandler = new EventHandler(this.barElement, 'mousedown', this.onMouseDown.bind(this));
+        this.touchDownHandler = new EventHandler(this.barElement, 'touchstart', this.onMouseDown.bind(this));
+        this.minPanelSize = 50; // TODO: Get from container configuration
+        this.readyToProcessNextDrag = true;
+        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent");
+    }
+
+    onMouseDown(e) {
+        if (e.touches)
+            e = e.touches[0];
+        this._startDragging(e);
+    }
+
+    onMouseUp(e) {
+        this._stopDragging(e);
+    }
+
+    onMouseMoved(e) {
+        if (!this.readyToProcessNextDrag)
+            return;
+        this.readyToProcessNextDrag = false;
+
+        if (e.changedTouches != null) { // TouchMove Event
+            e = e.changedTouches[0];
+        }
+
+        let dockManager = this.previousContainer.dockManager;
+        dockManager.suspendLayout();
+        var dx = e.clientX - this.previousMouseEvent.clientX;
+        var dy = e.clientY - this.previousMouseEvent.clientY;
+        this._performDrag(dx, dy);
+        this.previousMouseEvent = e;
+        this.readyToProcessNextDrag = true;
+        //@ts-ignore
+        dockManager.resumeLayout();
+    }
+
+    _performDrag(dx, dy) {
+        var previousWidth = this.previousContainer.containerElement.clientWidth;
+        var previousHeight = this.previousContainer.containerElement.clientHeight;
+        var nextWidth = this.nextContainer.containerElement.clientWidth;
+        var nextHeight = this.nextContainer.containerElement.clientHeight;
+
+        var previousPanelSize = this.stackedVertical ? previousHeight : previousWidth;
+        var nextPanelSize = this.stackedVertical ? nextHeight : nextWidth;
+        var deltaMovement = this.stackedVertical ? dy : dx;
+        var newPreviousPanelSize = previousPanelSize + deltaMovement;
+        var newNextPanelSize = nextPanelSize - deltaMovement;
+
+        if (newPreviousPanelSize < this.minPanelSize || newNextPanelSize < this.minPanelSize) {
+            // One of the panels is smaller than it should be.
+            // In that case, check if the small panel's size is being increased
+            var continueProcessing = (newPreviousPanelSize < this.minPanelSize && newPreviousPanelSize > previousPanelSize) ||
+                (newNextPanelSize < this.minPanelSize && newNextPanelSize > nextPanelSize);
+
+            if (!continueProcessing)
+                return;
+        }
+
+        if (this.stackedVertical) {
+            this.previousContainer.resize(previousWidth, newPreviousPanelSize);
+            this.nextContainer.resize(nextWidth, newNextPanelSize);
+        }
+        else {
+            this.previousContainer.resize(newPreviousPanelSize, previousHeight);
+            this.nextContainer.resize(newNextPanelSize, nextHeight);
+        }
+
+        document.dispatchEvent(this.dockSpawnResizedEvent);
+    }
+
+    _startDragging(e) {
+        utils.disableGlobalTextSelection();
+        if (this.mouseMovedHandler) {
+            this.mouseMovedHandler.cancel();
+            delete this.mouseMovedHandler;
+        }
+        if (this.touchMovedHandler) {
+            this.touchMovedHandler.cancel();
+            delete this.touchMovedHandler;
+        }
+        if (this.mouseUpHandler) {
+            this.mouseUpHandler.cancel();
+            delete this.mouseUpHandler;
+        }
+        if (this.touchUpHandler) {
+            this.touchUpHandler.cancel();
+            delete this.touchUpHandler;
+        }
+        this.mouseMovedHandler = new EventHandler(window, 'mousemove', this.onMouseMoved.bind(this));
+        this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
+        this.touchMovedHandler = new EventHandler(window, 'touchmove', this.onMouseMoved.bind(this));
+        this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
+        this.previousMouseEvent = e;
+    }
+
+    _stopDragging() {
+        utils.enableGlobalTextSelection();
+        document.body.classList.remove('disable-selection');
+        if (this.mouseMovedHandler) {
+            this.mouseMovedHandler.cancel();
+            delete this.mouseMovedHandler;
+        }
+        if (this.touchMovedHandler) {
+            this.touchMovedHandler.cancel();
+            delete this.touchMovedHandler;
+        }
+        if (this.mouseUpHandler) {
+            this.mouseUpHandler.cancel();
+            delete this.mouseUpHandler;
+        }
+        if (this.touchUpHandler) {
+            this.touchUpHandler.cancel();
+            delete this.touchUpHandler;
+        }
+    }
+}

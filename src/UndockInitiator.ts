@@ -1,0 +1,174 @@
+import { EventHandler } from "./EventHandler";
+import { Point } from "./Point";
+
+/**
+ * Listens for events on the [element] and notifies the [listener]
+ * if an undock event has been invoked.  An undock event is invoked
+ * when the user clicks on the event and drags is beyond the
+ * specified [thresholdPixels]
+ */
+export class UndockInitiator {
+    mouseUpHandler: EventHandler;
+    touchUpHandler: EventHandler;
+    mouseMoveHandler: EventHandler;
+    touchMoveHandler: EventHandler;
+    dragStartPosition: Point;
+    thresholdPixels: number;
+    _enabled: boolean;
+    
+    constructor(element, listener, thresholdPixels?: number) {
+        if (!thresholdPixels) {
+            thresholdPixels = 10;
+        }
+
+        this.element = element;
+        this.listener = listener;
+        this.thresholdPixels = thresholdPixels;
+        this._enabled = false;
+        //this.horizontalChange = true;
+    }
+
+    get enabled() {
+        return this._enabled;
+    }
+    set enabled(value) {
+        this._enabled = value;
+        if (this._enabled) {
+            if (this.mouseDownHandler) {
+                this.mouseDownHandler.cancel();
+                delete this.mouseDownHandler;
+            }
+            if (this.touchDownHandler) {
+                this.touchDownHandler.cancel();
+                delete this.touchDownHandler;
+            }
+
+            this.mouseDownHandler = new EventHandler(this.element, 'mousedown', this.onMouseDown.bind(this));
+            this.touchDownHandler = new EventHandler(this.element, 'touchstart', this.onMouseDown.bind(this));
+        }
+        else {
+            if (this.mouseDownHandler) {
+                this.mouseDownHandler.cancel();
+                delete this.mouseDownHandler;
+            }
+
+            if (this.touchDownHandler) {
+                this.touchDownHandler.cancel();
+                delete this.touchDownHandler;
+            }
+
+            if (this.mouseUpHandler) {
+                this.mouseUpHandler.cancel();
+                delete this.mouseUpHandler;
+            }
+
+            if (this.touchUpHandler) {
+                this.touchUpHandler.cancel();
+                delete this.touchUpHandler;
+            }
+
+            if (this.mouseMoveHandler) {
+                this.mouseMoveHandler.cancel();
+                delete this.mouseMoveHandler;
+            }
+
+            if (this.touchMoveHandler) {
+                this.touchMoveHandler.cancel();
+                delete this.touchMoveHandler;
+            }
+        }
+    }
+
+
+    //UndockInitiator.prototype.setThresholdPixels = function (thresholdPixels, horizontalChange){
+    //     this.horizontalChange = horizontalChange;
+    //     this.thresholdPixels = thresholdPixels;
+    //};
+    onMouseDown(e) {
+        // Make sure we dont do this on floating dialogs
+        if (this.enabled) {
+            if (e.touches)
+                e = e.touches[0];
+
+            if (this.mouseUpHandler) {
+                this.mouseUpHandler.cancel();
+                delete this.mouseUpHandler;
+            }
+
+            if (this.touchUpHandler) {
+                this.touchUpHandler.cancel();
+                delete this.touchUpHandler;
+            }
+
+            if (this.mouseMoveHandler) {
+                this.mouseMoveHandler.cancel();
+                delete this.mouseMoveHandler;
+            }
+
+            if (this.touchMoveHandler) {
+                this.touchMoveHandler.cancel();
+                delete this.touchMoveHandler;
+            }
+
+            this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
+            this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
+            this.mouseMoveHandler = new EventHandler(window, 'mousemove', this.onMouseMove.bind(this));
+            this.touchMoveHandler = new EventHandler(window, 'touchmove', this.onMouseMove.bind(this));
+            this.dragStartPosition = new Point(e.clientX, e.clientY);
+        }
+    }
+
+    onMouseUp() {
+        if (this.mouseUpHandler) {
+            this.mouseUpHandler.cancel();
+            delete this.mouseUpHandler;
+        }
+
+        if (this.touchUpHandler) {
+            this.touchUpHandler.cancel();
+            delete this.touchUpHandler;
+        }
+
+        if (this.mouseMoveHandler) {
+            this.mouseMoveHandler.cancel();
+            delete this.mouseMoveHandler;
+        }
+
+        if (this.touchMoveHandler) {
+            this.touchMoveHandler.cancel();
+            delete this.touchMoveHandler;
+        }
+    }
+
+    onMouseMove(e) {
+        if (e.touches)
+            e = e.touches[0];
+        var position = new Point(e.clientX, e.clientY);
+        //var dx = this.horizontalChange ? position.x - this.dragStartPosition.x : 10;
+        var dx = position.x - this.dragStartPosition.x;
+        var dy = position.y - this.dragStartPosition.y;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > this.thresholdPixels) {
+            this.enabled = false;
+            this._requestUndock(e);
+        }
+    }
+
+    _requestUndock(e) {
+        var top = 0;
+        var left = 0;
+        var currentElement = this.element;
+        do {
+            top += currentElement.offsetTop || 0;
+            left += currentElement.offsetLeft || 0;
+            currentElement = currentElement.offsetParent;
+        } while (currentElement);
+
+
+        var dragOffsetX = this.dragStartPosition.x - left; //this.element.offsetLeft;
+        var dragOffsetY = this.dragStartPosition.y - top; //this.element.offsetTop;
+        var dragOffset = new Point(dragOffsetX, dragOffsetY);
+        this.listener(e, dragOffset);
+    }
+}
