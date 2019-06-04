@@ -1,17 +1,19 @@
 import { DockManager } from "./DockManager";
 import { SplitterPanel } from "./SplitterPanel";
 import { IDockContainer } from "./IDockContainer";
+import { ContainerType } from "./ContainerType";
 
-export class SplitterDockContainer {
+export abstract class SplitterDockContainer {
     name: string;
     dockManager: DockManager;
     minimumAllowedChildNodes: number;
     splitterPanel: SplitterPanel;
-    stackedVertical: Boolean;
+    stackedVertical: boolean;
     containerElement: HTMLDivElement;
     _cachedWidth: number;
     _cachedHeight: number;
     state: { width: any; height: any; };
+    containerType: ContainerType;
     
     constructor(name: string, dockManager: DockManager, childContainers: IDockContainer[]) {
         // for prototype inheritance purposes only

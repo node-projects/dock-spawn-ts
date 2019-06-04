@@ -1,5 +1,6 @@
 import { EventHandler } from "./EventHandler";
 import { Point } from "./Point";
+import { Dialog } from "./Dialog";
 
 /**
  * Listens for events on the [element] and notifies the [listener]
@@ -15,13 +16,17 @@ export class UndockInitiator {
     dragStartPosition: Point;
     thresholdPixels: number;
     _enabled: boolean;
+    mouseDownHandler: EventHandler;
+    touchDownHandler: EventHandler;
+    element: HTMLElement;
+    listener: (e: MouseEvent, dragOffset: Point) => Dialog;
     
-    constructor(element, listener, thresholdPixels?: number) {
+    constructor(element: Element, listener:( e: MouseEvent, dragOffset:Point)=> Dialog, thresholdPixels?: number) {
         if (!thresholdPixels) {
             thresholdPixels = 10;
         }
 
-        this.element = element;
+        this.element = element as HTMLElement;
         this.listener = listener;
         this.thresholdPixels = thresholdPixels;
         this._enabled = false;
@@ -143,11 +148,11 @@ export class UndockInitiator {
     onMouseMove(e) {
         if (e.touches)
             e = e.touches[0];
-        var position = new Point(e.clientX, e.clientY);
+        let position = new Point(e.clientX, e.clientY);
         //var dx = this.horizontalChange ? position.x - this.dragStartPosition.x : 10;
-        var dx = position.x - this.dragStartPosition.x;
-        var dy = position.y - this.dragStartPosition.y;
-        var distance = Math.sqrt(dx * dx + dy * dy);
+        let dx = position.x - this.dragStartPosition.x;
+        let dy = position.y - this.dragStartPosition.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance > this.thresholdPixels) {
             this.enabled = false;
@@ -156,19 +161,19 @@ export class UndockInitiator {
     }
 
     _requestUndock(e) {
-        var top = 0;
-        var left = 0;
-        var currentElement = this.element;
+        let top = 0;
+        let left = 0;
+        let currentElement = this.element;
         do {
             top += currentElement.offsetTop || 0;
             left += currentElement.offsetLeft || 0;
-            currentElement = currentElement.offsetParent;
+            currentElement = currentElement.offsetParent as HTMLElement;
         } while (currentElement);
 
 
-        var dragOffsetX = this.dragStartPosition.x - left; //this.element.offsetLeft;
-        var dragOffsetY = this.dragStartPosition.y - top; //this.element.offsetTop;
-        var dragOffset = new Point(dragOffsetX, dragOffsetY);
+        let dragOffsetX = this.dragStartPosition.x - left; //this.element.offsetLeft;
+        let dragOffsetY = this.dragStartPosition.y - top; //this.element.offsetTop;
+        let dragOffset = new Point(dragOffsetX, dragOffsetY);
         this.listener(e, dragOffset);
     }
 }

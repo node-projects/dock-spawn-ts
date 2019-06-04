@@ -6,8 +6,7 @@ import { ContainerType } from "./ContainerType";
 export class HorizontalDockContainer extends SplitterDockContainer {
 
     stackedVertical: boolean;
-    containerType: ContainerType;
-
+   
     constructor(dockManager: DockManager, childContainers) {
         super(Utils.getNextId('horizontal_splitter_'), dockManager, childContainers)
         

@@ -1,5 +1,6 @@
 import { IDockContainer } from "./IDockContainer";
 import { EventHandler } from "./EventHandler";
+import { Utils } from "./Utils";
 
 export class SplitterBar {
     previousContainer: IDockContainer;
@@ -12,6 +13,10 @@ export class SplitterBar {
     readyToProcessNextDrag: boolean;
     dockSpawnResizedEvent: CustomEvent<{}>;
     previousMouseEvent: any;
+    mouseMovedHandler: EventHandler;
+    mouseUpHandler: EventHandler;
+    touchMovedHandler: EventHandler;
+    touchUpHandler: EventHandler;
     
     constructor(previousContainer:IDockContainer, nextContainer:IDockContainer, stackedVertical:boolean) {
         // The panel to the left/top side of the bar, depending on the bar orientation
@@ -35,7 +40,7 @@ export class SplitterBar {
     }
 
     onMouseUp(e) {
-        this._stopDragging(e);
+        this._stopDragging();
     }
 
     onMouseMoved(e) {
@@ -93,7 +98,7 @@ export class SplitterBar {
     }
 
     _startDragging(e) {
-        utils.disableGlobalTextSelection();
+        Utils.disableGlobalTextSelection();
         if (this.mouseMovedHandler) {
             this.mouseMovedHandler.cancel();
             delete this.mouseMovedHandler;
@@ -118,7 +123,7 @@ export class SplitterBar {
     }
 
     _stopDragging() {
-        utils.enableGlobalTextSelection();
+        Utils.enableGlobalTextSelection();
         document.body.classList.remove('disable-selection');
         if (this.mouseMovedHandler) {
             this.mouseMovedHandler.cancel();

@@ -105,9 +105,9 @@ export class DockGraphDeserializer {
             var containerState = dialogInfo.state;
             var container;
             if (containerType === 'panel') {
-                container = new PanelContainer.loadFromState(containerState, self.dockManager);
+                container = PanelContainer.loadFromState(containerState, self.dockManager);
                 if (container.prepareForDocking) {
-                    utils.removeNode(container.elementPanel);
+                    Utils.removeNode(container.elementPanel);
                     container.isDialog = true;
                     var dialog = new Dialog(container, self.dockManager);
                     if (dialogInfo.position.left > document.body.clientWidth ||

@@ -9,10 +9,10 @@ import { IDockContainer } from "./IDockContainer";
 export class SplitterPanel {
     panelElement: HTMLDivElement;
     spiltterBars: SplitterBar[];
-    stackedVertical: Boolean;
+    stackedVertical: boolean;
     childContainers: IDockContainer[];
 
-    constructor(childContainers: IDockContainer[], stackedVertical: Boolean)
+    constructor(childContainers: IDockContainer[], stackedVertical: boolean)
     {
         this.childContainers = childContainers;
         this.stackedVertical = stackedVertical;

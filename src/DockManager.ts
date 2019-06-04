@@ -10,6 +10,7 @@ import { DockGraphSerializer } from "./DockGraphSerializer";
 import { DockGraphDeserializer } from "./DockGraphDeserializer";
 import { IDockContainer } from "./IDockContainer";
 import { TabPage } from "./TabPage";
+import { SplitterDockContainer } from "./SplitterDockContainer";
 
 /**
 * The Dock Manager notifies the listeners of layout changes so client containers that have
@@ -340,9 +341,9 @@ export class DockManager {
 
     _requestDockContainer(referenceNode, container, layoutDockFunction, ratio?) {
         // Get the active dialog that was dragged on to the dock wheel
-        var newNode = new DockNode(container);
+        let newNode = new DockNode(container);
         if (container.containerType === 'panel') {
-            var panel = container;
+            let panel = container;
             panel.prepareForDocking();
             Utils.removeNode(panel.elementPanel);
         }
@@ -350,7 +351,7 @@ export class DockManager {
 
         if (ratio && newNode.parent &&
             (newNode.parent.container.containerType === 'vertical' || newNode.parent.container.containerType === 'horizontal')) {
-            var splitter = newNode.parent.container;
+            let splitter = newNode.parent.container as SplitterDockContainer;
             splitter.setContainerRatio(container, ratio);
         }
 
@@ -363,7 +364,7 @@ export class DockManager {
     }
 
     _requestTabReorder(container, e) {
-        var node = this._findNodeFromContainer(container);
+        let node = this._findNodeFromContainer(container);
         this.layoutEngine.reorderTabs(node, e.handle, e.state, e.index);
     }
 
@@ -485,9 +486,8 @@ export class DockManager {
     }
 
     suspendLayout() {
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
-            if (listener.onSuspendLayout) listener.onSuspendLayout(self);
+        this.layoutEventListeners.forEach((listener) => {
+            if (listener.onSuspendLayout) listener.onSuspendLayout(this);
         });
     }
 
@@ -507,10 +507,9 @@ export class DockManager {
     }
 
     notifyOnTabsReorder(dockNode) {
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
+        this.layoutEventListeners.forEach((listener) => {
             if (listener.onTabsReorder) {
-                listener.onTabsReorder(self, dockNode);
+                listener.onTabsReorder(this, dockNode);
             }
         });
     }
@@ -518,90 +517,83 @@ export class DockManager {
 
     notifyOnUnDock(dockNode) {
         this._checkShowBackgroundContext();
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
+        this.layoutEventListeners.forEach((listener) => {
             if (listener.onUndock) {
-                listener.onUndock(self, dockNode);
+                listener.onUndock(this, dockNode);
             }
         });
     }
 
     notifyOnClosePanel(panel) {
         this._checkShowBackgroundContext();
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
+        this.layoutEventListeners.forEach((listener) => {
             if (listener.onClosePanel) {
-                listener.onClosePanel(self, panel);
+                listener.onClosePanel(this, panel);
             }
         });
     }
 
 
     notifyOnCreateDialog(dialog) {
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
+        this.layoutEventListeners.forEach((listener) => {
             if (listener.onCreateDialog) {
-                listener.onCreateDialog(self, dialog);
+                listener.onCreateDialog(this, dialog);
             }
         });
     }
 
     notifyOnHideDialog(dialog) {
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
+        this.layoutEventListeners.forEach((listener) => {
             if (listener.onHideDialog) {
-                listener.onHideDialog(self, dialog);
+                listener.onHideDialog(this, dialog);
             }
         });
     }
 
 
     notifyOnShowDialog(dialog) {
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
+        this.layoutEventListeners.forEach((listener) => {
             if (listener.onShowDialog) {
-                listener.onShowDialog(self, dialog);
+                listener.onShowDialog(this, dialog);
             }
         });
     }
 
 
     notifyOnChangeDialogPosition(dialog, x, y) {
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
+        this.layoutEventListeners.forEach((listener) => {
             if (listener.onChangeDialogPosition) {
-                listener.onChangeDialogPosition(self, dialog, x, y);
+                listener.onChangeDialogPosition(this, dialog, x, y);
             }
         });
     }
 
     notifyOnTabChange(tabpage) {
-        var self = this;
-        this.layoutEventListeners.forEach(function (listener) {
+        this.layoutEventListeners.forEach((listener) => {
             if (listener.onTabChanged) {
-                listener.onTabChanged(self, tabpage);
+                listener.onTabChanged(this, tabpage);
             }
         });
     }
 
     saveState() {
-        var serializer = new DockGraphSerializer();
+        let serializer = new DockGraphSerializer();
         return serializer.serialize(this.context.model);
     }
 
     loadState(json) {
-        var deserializer = new DockGraphDeserializer(this);
+        let deserializer = new DockGraphDeserializer(this);
         this.context.model = deserializer.deserialize(json);
         this.setModel(this.context.model);
     }
 
     getPanels() {
-        var panels = [];
+        let panels = [];
         //all visible nodes
         this._allPanels(this.context.model.rootNode, panels);
 
         //all visible or not dialogs
-        this.context.model.dialogs.forEach(function (dialog) {
+        this.context.model.dialogs.forEach((dialog) => {
             //TODO: check visible
             panels.push(dialog.panel);
         });
@@ -611,7 +603,7 @@ export class DockManager {
 
     undockEnabled(state) {
         this._undockEnabled = state;
-        this.getPanels().forEach(function (panel) {
+        this.getPanels().forEach((panel) => {
             panel.canUndock(state);
         });
     }
@@ -622,23 +614,23 @@ export class DockManager {
     }
 
     hideCloseButton(state) {
-        this.getPanels().forEach(function (panel) {
+        this.getPanels().forEach((panel) => {
             panel.hideCloseButton(state);
         });
     }
 
     updatePanels(ids) {
-        var panels = [];
+        let panels = [];
         //all visible nodes
         this._allPanels(this.context.model.rootNode, panels);
         //only remove
-        panels.forEach(function (panel) {
+        panels.forEach((panel) => {
             if (!ids.contains(panel.elementContent.id)) {
                 panel.close();
             }
         });
 
-        this.context.model.dialogs.forEach(function (dialog) {
+        this.context.model.dialogs.forEach((dialog) => {
             if (ids.contains(dialog.panel.elementContent.id)) {
                 dialog.show();
             }
@@ -650,12 +642,12 @@ export class DockManager {
     }
 
     getVisiblePanels() {
-        var panels = [];
+        let panels = [];
         //all visible nodes
         this._allPanels(this.context.model.rootNode, panels);
 
         //all visible
-        this.context.model.dialogs.forEach(function (dialog) {
+        this.context.model.dialogs.forEach((dialog) => {
             if (!dialog.isHidden) {
                 panels.push(dialog.panel);
             }
@@ -665,9 +657,8 @@ export class DockManager {
     }
 
     _allPanels(node, panels) {
-        var self = this;
-        node.children.forEach(function (child) {
-            self._allPanels(child, panels);
+        node.children.forEach((child) => {
+            this._allPanels(child, panels);
         });
         if (node.container.containerType === 'panel') {
             panels.push(node.container);
@@ -678,6 +669,3 @@ export class DockManager {
         this.closeTabIconTemplate = template;
     }
 }
-
-//typedef void LayoutEngineDockFunction(DockNode referenceNode, DockNode newNode);
-

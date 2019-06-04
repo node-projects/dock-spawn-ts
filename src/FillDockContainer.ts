@@ -14,6 +14,7 @@ export class FillDockContainer {
     minimumAllowedChildNodes: number;
     tabHost: TabHost;
     tabHostListener: { onChange: (e: any) => void; };
+    state: { width: number; height: number; };
 
     constructor(dockManager: DockManager, tabStripDirection?: TabHostDirection) {
         if (tabStripDirection === undefined) {

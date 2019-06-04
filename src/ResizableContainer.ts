@@ -1,24 +1,31 @@
 import { Dialog } from "./Dialog";
 import { ResizeHandle } from "./ResizeHandle";
 import { EventHandler } from "./EventHandler";
-import { DraggableContainer } from "./DraggableContainer";
 import { DockManager } from "./DockManager";
 import { IDockContainer } from "./IDockContainer";
 import { ContainerType } from "./ContainerType";
+import { Point } from "./Point";
+import { Utils } from "./Utils";
+import { IThickness } from "./interfaces/IThickness";
 
 /**
  * Decorates a dock container with resizer handles around its base element
  * This enables the container to be resized from all directions
  */
 export class ResizableContainer implements IDockContainer {
-    
+
     topLevelElement: HTMLDivElement;
     dialog: Dialog;
     delegate: IDockContainer;
     dockManager: DockManager;
-    containerElement: HTMLDivElement;
+    containerElement: HTMLElement;
     containerType: ContainerType;
-    
+    minimumAllowedChildNodes: number;
+    readyToProcessNextResize: boolean;
+    dockSpawnResizedEvent: CustomEvent<{}>;
+    resizeHandles: ResizeHandle[];
+    previousMousePosition: Point;
+
     constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement) {
         this.dialog = dialog;
         this.delegate = delegate;
@@ -97,7 +104,7 @@ export class ResizableContainer implements IDockContainer {
     }
 
     get name() {
-        return  this.delegate.name;
+        return this.delegate.name;
     }
     set name(value) {
         if (value)
@@ -140,9 +147,9 @@ export class ResizableContainer implements IDockContainer {
 
         //    window.requestLayoutFrame(() {
         this.dockManager.suspendLayout();
-        var currentMousePosition = new Point(e.clientX, e.clientY);
-        var dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
-        var dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
+        let currentMousePosition = new Point(e.clientX, e.clientY);
+        let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
+        let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
         this._performDrag(handle, dx, dy);
         this.previousMousePosition = currentMousePosition;
         this.readyToProcessNextResize = true;
@@ -172,11 +179,10 @@ export class ResizableContainer implements IDockContainer {
         }
 
         // Create the mouse event handlers
-        var self = this;
-        handle.mouseMoveHandler = new EventHandler(window, 'mousemove', function (e) { self.onMouseMoved(handle, e); });
-        handle.touchMoveHandler = new EventHandler(window, 'touchmove', function (e) { self.onMouseMoved(handle, e); });
-        handle.mouseUpHandler = new EventHandler(window, 'mouseup', function (e) { self.onMouseUp(handle, e); });
-        handle.touchUpHandler = new EventHandler(window, 'touchend', function (e) { self.onMouseUp(handle, e); });
+        handle.mouseMoveHandler = new EventHandler(window, 'mousemove', (e) => { this.onMouseMoved(handle, e); });
+        handle.touchMoveHandler = new EventHandler(window, 'touchmove', (e) => { this.onMouseMoved(handle, e); });
+        handle.mouseUpHandler = new EventHandler(window, 'mouseup', (e) => { this.onMouseUp(handle); });
+        handle.touchUpHandler = new EventHandler(window, 'touchend', (e) => { this.onMouseUp(handle); });
 
         document.body.classList.add('disable-selection');
     }
@@ -195,9 +201,9 @@ export class ResizableContainer implements IDockContainer {
     }
 
     _performDrag(handle, dx, dy) {
-        var bounds = {};
-        bounds.left = utils.getPixels(this.topLevelElement.style.marginLeft);
-        bounds.top = utils.getPixels(this.topLevelElement.style.marginTop);
+        let bounds: IThickness = {};
+        bounds.left = Utils.getPixels(this.topLevelElement.style.marginLeft);
+        bounds.top = Utils.getPixels(this.topLevelElement.style.marginTop);
         bounds.width = this.topLevelElement.clientWidth;
         bounds.height = this.topLevelElement.clientHeight;
 
@@ -223,7 +229,7 @@ export class ResizableContainer implements IDockContainer {
         this._resizeContainer(0, 0, 0, dy, bounds);
     }
 
-    _resizeContainer(leftDelta, topDelta, widthDelta, heightDelta, bounds) {
+    _resizeContainer(leftDelta: number, topDelta: number, widthDelta: number, heightDelta: number, bounds: IThickness) {
         bounds.left += leftDelta;
         bounds.top += topDelta;
         bounds.width += widthDelta;

@@ -2,11 +2,13 @@ import { TabPage } from "./TabPage";
 import { PanelContainer } from "./PanelContainer";
 import { UndockInitiator } from "./UndockInitiator";
 import { EventHandler } from "./EventHandler";
+import { Utils } from "./Utils";
 
 /**
  * A tab handle represents the tab button on the tab strip
  */
 export class TabHandle {
+    
     parent: TabPage;
     elementBase: HTMLDivElement;
     elementText: HTMLDivElement;
@@ -24,6 +26,14 @@ export class TabHandle {
     mouseUpHandler: EventHandler;
     touchUpHandler: EventHandler;
     stargDragPosition: any;
+    dragged: boolean;
+    eventListeners: any[];
+    undockListener: { onDockEnabled: (e: any) => void; onHideCloseButton: (e: any) => void; };
+
+    prev: number;
+    current: number;
+    direction: number;
+
     constructor(parent: TabPage) {
         this.parent = parent;
         var undockHandler = TabHandle.prototype._performUndock.bind(this);
@@ -40,12 +50,11 @@ export class TabHandle {
 
         this.parent.host.tabListElement.appendChild(this.elementBase);
 
-        var panel = parent.container;
-        var title = panel.getRawTitle();
-        var that = this;
+        let panel = parent.container as PanelContainer;
+        let title = panel.getRawTitle();
         this.undockListener = {
-            onDockEnabled: function (e) { that.undockEnabled(e.state); },
-            onHideCloseButton: function (e) { that.hideCloseButton(e.state); }
+            onDockEnabled: (e) => { this.undockEnabled(e.state); },
+            onHideCloseButton: (e) => { this.hideCloseButton(e.state); }
         };
         this.eventListeners = [];
         panel.addListener(this.undockListener);
@@ -86,8 +95,9 @@ export class TabHandle {
         this.undockInitiator.enabled = state;
     }
 
+    //todo...
     oncontextMenuClicked(e) {
-        e.preventDefault();
+        /*e.preventDefault();
 
         if (!this._CtxMenu) {
             let el = newElementFromString(`<div class="context-menu">
@@ -99,7 +109,7 @@ export class TabHandle {
             btn.onclick = () => {
                 let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
 
-                for (i = 0; i < length; i++) {
+                for (let i = 0; i < length; i++) {
                     this.parent.container.dockManager.context.model.documentManagerNode.children[0].container.close();
                 }
                 this._CtxMenu.close();
@@ -109,7 +119,7 @@ export class TabHandle {
             btn.onclick = () => {
                 let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
 
-                for (i = length - 1; i >= 0; i--) {
+                for (let i = length - 1; i >= 0; i--) {
                     if (this.parent.container != this.parent.container.dockManager.context.model.documentManagerNode.children[i].container)
                         this.parent.container.dockManager.context.model.documentManagerNode.children[i].container.close();
                 }
@@ -119,7 +129,7 @@ export class TabHandle {
             this._CtxMenu = contextMenuHelper_showMenu(e, el, true, document.querySelector('#popuplayer'), () => {
                 this._CtxMenu = null;
             });
-        }
+        }*/
     }
 
     onMouseDown(e) {
@@ -190,8 +200,8 @@ export class TabHandle {
             this.prev = this.current;
             this.current = e.clientX;
             this.direction = this.current - this.prev;
-            var tabRect = this.elementBase.getBoundingClientRect();
-            var event = this.direction < 0
+            let tabRect = this.elementBase.getBoundingClientRect();
+            let event = this.direction < 0
                 ? { state: 'left', bound: tabRect.left, rect: tabRect }
                 : { state: 'right', bound: tabRect.right, rect: tabRect };
             if (this.direction !== 0) this.generateMoveTabEvent(event, this.current);
@@ -205,14 +215,14 @@ export class TabHandle {
 
     updateTitle() {
         if (this.parent.container instanceof PanelContainer) {
-            var panel = this.parent.container;
-            var title = panel.getRawTitle();
+            let panel = this.parent.container;
+            let title = panel.getRawTitle();
             this.elementText.innerHTML = title;
         }
     }
 
     destroy() {
-        var panel = this.parent.container;
+        let panel = this.parent.container as PanelContainer;
         panel.removeListener(this.undockListener);
 
         this.mouseClickHandler.cancel();
@@ -230,8 +240,8 @@ export class TabHandle {
             this.contextMenuHandler.cancel();
         }
 
-        utils.removeNode(this.elementBase);
-        utils.removeNode(this.elementCloseButton);
+        Utils.removeNode(this.elementBase);
+        Utils.removeNode(this.elementCloseButton);
         delete this.elementBase;
         delete this.elementCloseButton;
     }
@@ -239,7 +249,7 @@ export class TabHandle {
     _performUndock(e, dragOffset) {
         if (this.parent.container.containerType === 'panel') {
             this.undockInitiator.enabled = false;
-            var panel = this.parent.container;
+            let panel = this.parent.container as PanelContainer;
             return panel.performUndockToDialog(e, dragOffset);
         }
         else
@@ -254,7 +264,8 @@ export class TabHandle {
         if (e.button !== 2) {
             // If the page contains a panel element, undock it and destroy it
             if (this.parent.container.containerType === 'panel') {
-                this.parent.container.close();
+                let panel = this.parent.container as PanelContainer;
+                panel.close();
                 // this.undockInitiator.enabled = false;
                 // var panel = this.parent.container;
                 // panel.performUndock();

@@ -17,7 +17,7 @@ export class PanelContainer implements IDockContainer {
     elementContentHost: HTMLDivElement;
     name: string;
     state: { width: any; height: any; };
-    elementContent: HTMLElement;
+    elementContent: HTMLElement & { resizeHandler?: any };
     dockManager: DockManager;
     title: string;
     containerType: ContainerType;

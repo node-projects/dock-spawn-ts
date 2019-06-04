@@ -4,7 +4,7 @@ import { Utils } from "./Utils";
 import { HorizontalDockContainer } from "./HorizontalDockContainer";
 import { VerticalDockContainer } from "./VerticalDockContainer";
 import { FillDockContainer } from "./FillDockContainer";
-import { Rectangle } from "./Rectangle";
+import { IRectangle } from "./interfaces/IRectangle";
 
 export class DockLayoutEngine {
     
@@ -290,17 +290,17 @@ export class DockLayoutEngine {
      * The state is not modified in this function.  It is used for showing a preview of where
      * the panel would be docked when hovered over a dock wheel button
      */
-    getDockBounds(referenceNode, containerToDock, direction, insertBeforeReference) {
-        var compositeNode; // The node that contains the splitter / fill node
-        var childCount;
-        var childPosition;
-        var bounds;
+    getDockBounds(referenceNode, containerToDock, direction, insertBeforeReference):IRectangle {
+        let compositeNode; // The node that contains the splitter / fill node
+        let childCount;
+        let childPosition;
+        let bounds:IRectangle;
 
         if (direction === 'fill') {
             // Since this is a fill operation, the highlight bounds is the same as the reference node
             // TODO: Create a tab handle highlight to show that it's going to be docked in a tab
             let targetElement = referenceNode.container.containerElement;
-            return  new Rectangle(targetElement.offsetLeft, targetElement.offsetTop, targetElement.clientWidth, targetElement.clientHeight);
+            return {x:targetElement.offsetLeft, y:targetElement.offsetTop, width:targetElement.clientWidth, height:targetElement.clientHeight};
         }
 
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')
@@ -322,18 +322,18 @@ export class DockLayoutEngine {
             hierarchyModified = true;
         }
 
-        var splitBarSize = 5;  // TODO: Get from DOM
-        var targetPanelSize = 0;
-        var targetPanelStart = 0;
+        let splitBarSize = 5;  // TODO: Get from DOM
+        let targetPanelSize = 0;
+        let targetPanelStart = 0;
         if (direction === 'vertical' || direction === 'horizontal') {
             // Existing size of the composite container (without the splitter bars).
             // This will also be the final size of the composite (splitter / fill)
             // container after the new panel has been docked
-            var compositeSize = this._getVaringDimension(compositeNode.container, direction) - (childCount - 1) * splitBarSize;
+            let compositeSize = this._getVaringDimension(compositeNode.container, direction) - (childCount - 1) * splitBarSize;
 
             // size of the newly added panel
-            var newPanelOriginalSize = this._getVaringDimension(containerToDock, direction);
-            var scaleMultiplier = compositeSize / (compositeSize + newPanelOriginalSize);
+            let newPanelOriginalSize = this._getVaringDimension(containerToDock, direction);
+            let scaleMultiplier = compositeSize / (compositeSize + newPanelOriginalSize);
 
             // Size of the panel after it has been docked and scaled
             targetPanelSize = newPanelOriginalSize * scaleMultiplier;
@@ -346,7 +346,7 @@ export class DockLayoutEngine {
             }
         }
 
-        bounds = new Rectangle();
+        bounds = {};
         if (direction === 'vertical') {
             bounds.x = compositeNode.container.containerElement.offsetLeft;
             bounds.y = compositeNode.container.containerElement.offsetTop + targetPanelStart;
