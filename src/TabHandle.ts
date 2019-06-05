@@ -62,6 +62,7 @@ export class TabHandle {
         panel.addListener(this.undockListener);
 
         this.elementText.innerHTML = title;
+        this.elementText.title = this.elementText.innerText;
 
         // Set the close button text (font awesome)
         if (this.parent.container instanceof PanelContainer && this.parent.container.dockManager.closeTabIconTemplate) {

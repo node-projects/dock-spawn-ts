@@ -8,6 +8,8 @@ function refresh() {
     localStorage.setItem(storeKey, '');
     location.reload();
 }
+//@ts-ignore
+window.refresh = refresh;
 
 window.onload = () => {
     // Convert a div to the dock manager. Panels can then be docked on to it
@@ -16,7 +18,6 @@ window.onload = () => {
     dockManager.initialize();
 
     var lastState = localStorage.getItem(storeKey);
-    lastState = null;
     if (lastState) {
         dockManager.loadState(lastState);
     }

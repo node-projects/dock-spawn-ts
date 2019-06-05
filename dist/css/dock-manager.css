@@ -206,6 +206,7 @@
     overflow: hidden;
 	float: left;
 	text-overflow: ellipsis;
+	width: 100%;
 }
 
 .dockspan-tab-handle-close-button {
