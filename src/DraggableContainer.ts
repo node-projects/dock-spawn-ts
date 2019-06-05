@@ -3,7 +3,7 @@ import { DockManager } from "./DockManager.js";
 import { EventHandler } from "./EventHandler.js";
 import { Point } from "./Point.js";
 import { Utils } from "./Utils.js";
-import { IDockContainer } from "./IDockContainer.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
 
 export class DraggableContainer implements IDockContainer {

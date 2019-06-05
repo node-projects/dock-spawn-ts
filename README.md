@@ -8,9 +8,9 @@ it is still alpha, npm packages will follow in the next few weeks
 
 # testing
  - download the project
- - install node packages
- - compile typescript
- - run "npm start"
+ - install node packages ("npm i")
+ - compile typescript ("npm run tsc")
+ - run ("npm start")
  - browse to: http://127.0.0.1:8080/demos/ide/demo.html
 
 # how to use:

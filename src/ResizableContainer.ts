@@ -2,7 +2,7 @@ import { Dialog } from "./Dialog.js";
 import { ResizeHandle } from "./ResizeHandle.js";
 import { EventHandler } from "./EventHandler.js";
 import { DockManager } from "./DockManager.js";
-import { IDockContainer } from "./IDockContainer.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
 import { Point } from "./Point.js";
 import { Utils } from "./Utils.js";

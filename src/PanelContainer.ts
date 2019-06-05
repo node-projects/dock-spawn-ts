@@ -1,5 +1,5 @@
 import { DockManager } from "./DockManager.js";
-import { IDockContainer } from "./IDockContainer.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { Utils } from "./Utils.js";
 import { UndockInitiator } from "./UndockInitiator.js";
 import { ContainerType } from "./ContainerType.js";

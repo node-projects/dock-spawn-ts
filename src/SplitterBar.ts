@@ -1,4 +1,4 @@
-import { IDockContainer } from "./IDockContainer.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { EventHandler } from "./EventHandler.js";
 import { Utils } from "./Utils.js";
 

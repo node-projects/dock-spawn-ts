@@ -116,7 +116,7 @@ export class TabHandle {
             btnCloseAll.onclick = () => {
                 let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
                 for (let i = 0; i < length; i++) {
-                    this.parent.container.dockManager.context.model.documentManagerNode.children[0].container.close();
+                    (<PanelContainer>this.parent.container.dockManager.context.model.documentManagerNode.children[0].container).close();
                 }
                 this._removeCtxMenu();
             };
@@ -125,7 +125,7 @@ export class TabHandle {
                 let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
                 for (let i = length - 1; i >= 0; i--) {
                     if (this.parent.container != this.parent.container.dockManager.context.model.documentManagerNode.children[i].container)
-                        this.parent.container.dockManager.context.model.documentManagerNode.children[i].container.close();
+                        (<PanelContainer>this.parent.container.dockManager.context.model.documentManagerNode.children[i].container).close();
                 }
                 this._removeCtxMenu();
             };
@@ -146,7 +146,7 @@ export class TabHandle {
                 document.body.removeChild(this._ctxMenu);
                 delete this._ctxMenu;
                 window.removeEventListener('mousedown', this._removeCtxMenuBound);
-            },100);
+            }, 100);
         }
     }
 

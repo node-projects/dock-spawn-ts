@@ -1,6 +1,6 @@
 import { SplitterBar } from "./SplitterBar.js";
 import { Utils } from "./Utils.js";
-import { IDockContainer } from "./IDockContainer.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 
 /**
  * A splitter panel manages the child containers inside it with splitter bars.
