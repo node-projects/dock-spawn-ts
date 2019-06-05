@@ -300,7 +300,6 @@ export class DockManager {
             if (container == dialog.panel) {
                 dialog.show(x, y);
                 retdiag = dialog;
-
             }
         });
         if (retdiag)

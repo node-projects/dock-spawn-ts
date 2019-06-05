@@ -1,6 +1,5 @@
 import { DockManager } from "../DockManager.js";
 import { PanelContainer } from "../PanelContainer.js";
-import { Dialog } from "../Dialog.js";
 
 let dockManager : DockManager,
     storeKey = 'lastState';

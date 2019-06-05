@@ -12,7 +12,7 @@ export class DraggableContainer implements IDockContainer {
     delegate: IDockContainer;
     containerElement: HTMLElement;
     dockManager: DockManager;
-    topLevelElement: any;
+    topLevelElement: HTMLElement;
     containerType: ContainerType;
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
@@ -23,7 +23,7 @@ export class DraggableContainer implements IDockContainer {
     mouseUpHandler: EventHandler;
     touchUpHandler: EventHandler;
     
-    constructor(dialog: Dialog, delegate : IDockContainer, topLevelElement, dragHandle) {
+    constructor(dialog: Dialog, delegate : IDockContainer, topLevelElement: HTMLElement, dragHandle) {
         this.dialog = dialog;
         this.delegate = delegate;
         this.containerElement = delegate.containerElement;

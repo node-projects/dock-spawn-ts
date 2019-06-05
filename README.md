@@ -14,36 +14,45 @@ it is still alpha, npm packages will follow in the next few weeks
 # how to use:
 (needs to be changed for typescript)
 ```javascript
+    import { DockManager } from "../DockManager.js";
+    import { PanelContainer } from "../PanelContainer.js";
+
     // Convert a div to a dock manager.  Panels can then be docked on to it
-    dockManager = new DockManager(query("#my_dock_manager"));
+    let dockManager = new DockManager(document.getElementById('my_dock_manager'));
     dockManager.initialize();
 
     // Let the dock manager element fill in the entire screen
-    window.on.resize.add(onResized);
-    onResized(null);
+    window.onresize = function () {
+        dockManager.resize(
+            window.innerWidth - (divDockManager.clientLeft + divDockManager.offsetLeft),
+            window.innerHeight - (divDockManager.clientTop + divDockManager.offsetTop)
+        );
+    };
+    window.onresize(null);
 
     // Convert existing elements on the page into "Panels". 
     // They can then be docked on to the dock manager 
     // Panels get a titlebar and a close button, and can also be 
     // converted to a floating dialog box which can be dragged / resized 
-    var solution = new PanelContainer(query("#solution_window"), dockManager);
-    var output = new PanelContainer(query("#output_window"), dockManager);
-    var properties = new PanelContainer(query("#properties_window"), dockManager);
-    var toolbox = new PanelContainer(query("#toolbox_window"), dockManager);
-    var outline = new PanelContainer(query("#outline_window"), dockManager);
-    var problems = new PanelContainer(query("#problems_window"), dockManager);
-    var editor1 = new PanelContainer(query("#editor1_window"), dockManager);
-    var editor2 = new PanelContainer(query("#editor2_window"), dockManager);
+    let solution = new PanelContainer(document.getElementById("#solution_window"), dockManager);
+    let output = new PanelContainer(document.getElementById("#output_window"), dockManager);
+    let properties = new PanelContainer(document.getElementById("#properties_window"), dockManager);
+    let toolbox = new PanelContainer(document.getElementById("#toolbox_window"), dockManager);
+    let outline = new PanelContainer(document.getElementById("#outline_window"), dockManager);
+    let problems = new PanelContainer(document.getElementById("#problems_window"), dockManager);
+    let editor1 = new PanelContainer(document.getElementById("#editor1_window"), dockManager);
+    let editor2 = new PanelContainer(document.getElementById("#editor2_window"), dockManager);
+    let infovis = new PanelContainer(document.getElementById("infovis"), dockManager);
 
     // Dock the panels on the dock manager
-    DockNode documentNode = dockManager.context.model.documentManagerNode;
-    DockNode solutionNode = dockManager.dockLeft(documentNode, solution, 0.20);
-    DockNode outlineNode = dockManager.dockFill(solutionNode, outline);
-    DockNode propertiesNode = dockManager.dockDown(outlineNode, properties, 0.6);
-    DockNode outputNode = dockManager.dockDown(documentNode, output, 0.4);
-    DockNode problemsNode = dockManager.dockRight(outputNode, problems, 0.40);
-    DockNode toolboxNode = dockManager.dockRight(documentNode, toolbox, 0.20);
-
-    DockNode editor1Node = dockManager.dockFill(documentNode, editor1);
-    DockNode editor2Node = dockManager.dockFill(documentNode, editor2);
+    let documentNode = dockManager.context.model.documentManagerNode;
+    let solutionNode = dockManager.dockLeft(documentNode, solution, 0.20);
+    let outlineNode = dockManager.dockFill(solutionNode, outline);
+    let propertiesNode = dockManager.dockDown(outlineNode, properties, 0.6);
+    let outputNode = dockManager.dockDown(documentNode, output, 0.4);
+    let problemsNode = dockManager.dockRight(outputNode, problems, 0.40);
+    let toolboxNode = dockManager.dockRight(documentNode, toolbox, 0.20);
+    let editor1Node = dockManager.dockFill(documentNode, editor1);
+    let editor2Node = dockManager.dockFill(documentNode, editor2);
+    dockManager.floatDialog(infovis, 50, 50);
 ```

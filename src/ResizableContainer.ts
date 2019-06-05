@@ -14,7 +14,7 @@ import { IThickness } from "./interfaces/IThickness.js";
  */
 export class ResizableContainer implements IDockContainer {
 
-    topLevelElement: HTMLDivElement;
+    topLevelElement: HTMLElement;
     dialog: Dialog;
     delegate: IDockContainer;
     dockManager: DockManager;
@@ -26,7 +26,7 @@ export class ResizableContainer implements IDockContainer {
     resizeHandles: ResizeHandle[];
     previousMousePosition: Point;
 
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement) {
+    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement) {
         this.dialog = dialog;
         this.delegate = delegate;
         this.containerElement = delegate.containerElement;
