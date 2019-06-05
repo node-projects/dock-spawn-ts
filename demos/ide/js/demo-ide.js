@@ -10,6 +10,8 @@ $(function () {
 var editor1 = CodeMirror(document.getElementById("editor1_window"), {
   lineNumbers: true,
   matchBrackets: true,
+  foldGutter: true,
+  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
   mode: "text/x-csrc",
   value: source_steering_h,
   onCursorActivity: function() {
@@ -23,6 +25,8 @@ var editor1 = CodeMirror(document.getElementById("editor1_window"), {
 var editor2 = CodeMirror(document.getElementById("editor2_window"), {
   lineNumbers: true,
   matchBrackets: true,
+  foldGutter: true,
+  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
   mode: "text/x-csrc",
   value: source_steering_cpp,
   onCursorActivity: function() {

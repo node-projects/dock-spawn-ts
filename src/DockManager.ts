@@ -11,6 +11,7 @@ import { DockGraphDeserializer } from "./DockGraphDeserializer.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { TabPage } from "./TabPage.js";
 import { SplitterDockContainer } from "./SplitterDockContainer.js";
+import { PanelContainer } from "./PanelContainer.js";
 
 /**
 * The Dock Manager notifies the listeners of layout changes so client containers that have
@@ -74,7 +75,7 @@ export class DockManager {
         this.layoutEngine = new DockLayoutEngine(this);
         this._undockEnabled = true;
         this.rebuildLayout(this.context.model.rootNode);
-        this.zIndexCounter = 1000;
+        this.zIndexCounter = 1001;
         if (this.backgroundContext != null) {
             this.context.model.rootNode.container.tabHost.hostElement
                 .insertBefore(this.backgroundContext, this.context.model.rootNode.container.tabHost.hostElement.firstChild);
@@ -242,56 +243,56 @@ export class DockManager {
     }
 
     /** Dock the [dialog] to the left of the [referenceNode] node */
-    dockDialogLeft(referenceNode, dialog) {
+    dockDialogLeft(referenceNode: DockNode, dialog: Dialog) {
         return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockLeft.bind(this.layoutEngine));
     }
 
     /** Dock the [dialog] to the right of the [referenceNode] node */
-    dockDialogRight(referenceNode, dialog) {
+    dockDialogRight(referenceNode: DockNode, dialog: Dialog) {
         return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockRight.bind(this.layoutEngine));
     }
 
     /** Dock the [dialog] above the [referenceNode] node */
-    dockDialogUp(referenceNode, dialog) {
+    dockDialogUp(referenceNode: DockNode, dialog: Dialog) {
         return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockUp.bind(this.layoutEngine));
     }
 
     /** Dock the [dialog] below the [referenceNode] node */
-    dockDialogDown(referenceNode, dialog) {
+    dockDialogDown(referenceNode: DockNode, dialog: Dialog) {
         return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockDown.bind(this.layoutEngine));
     }
 
     /** Dock the [dialog] as a tab inside the [referenceNode] node */
-    dockDialogFill(referenceNode, dialog) {
+    dockDialogFill(referenceNode: DockNode, dialog: Dialog) {
         return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockFill.bind(this.layoutEngine));
     }
 
     /** Dock the [container] to the left of the [referenceNode] node */
-    dockLeft(referenceNode, container, ratio) {
+    dockLeft(referenceNode: DockNode, container: PanelContainer, ratio: number) {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockLeft.bind(this.layoutEngine), ratio);
     }
 
     /** Dock the [container] to the right of the [referenceNode] node */
-    dockRight(referenceNode, container, ratio) {
+    dockRight(referenceNode: DockNode, container: PanelContainer, ratio: number) {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockRight.bind(this.layoutEngine), ratio);
     }
 
     /** Dock the [container] above the [referenceNode] node */
-    dockUp(referenceNode, container, ratio) {
+    dockUp(referenceNode: DockNode, container: PanelContainer, ratio: number) {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockUp.bind(this.layoutEngine), ratio);
     }
 
     /** Dock the [container] below the [referenceNode] node */
-    dockDown(referenceNode, container, ratio) {
+    dockDown(referenceNode: DockNode, container: PanelContainer, ratio: number) {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockDown.bind(this.layoutEngine), ratio);
     }
 
     /** Dock the [container] as a tab inside the [referenceNode] node */
-    dockFill(referenceNode, container) {
+    dockFill(referenceNode: DockNode, container: PanelContainer) {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine));
     }
 
-    floatDialog(container, x, y) {
+    floatDialog(container: PanelContainer, x, y) {
         var retdiag = undefined;
 
         //check the dialog do not already exist

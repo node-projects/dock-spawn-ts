@@ -19,7 +19,7 @@ export class Dialog {
     onKeyPressBound: any;
     isHidden: boolean;
 
-    constructor(panel, dockManager: DockManager) {
+    constructor(panel: PanelContainer, dockManager: DockManager) {
         this.panel = panel;
         this.dockManager = dockManager;
         this.eventListener = dockManager;
@@ -139,7 +139,7 @@ export class Dialog {
     }
 
     show() {
-        this.elementDialog.style.zIndex = '1000';
+        this.elementDialog.style.zIndex = '1001';
         this.elementDialog.style.display = 'block';
         if (this.isHidden) {
             this.isHidden = false;

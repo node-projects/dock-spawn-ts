@@ -1,7 +1,8 @@
 import { DockManager } from "../DockManager.js";
 import { PanelContainer } from "../PanelContainer.js";
+import { Dialog } from "../Dialog.js";
 
-var dockManager,
+let dockManager : DockManager,
     storeKey = 'lastState';
 
 function refresh() {
@@ -87,18 +88,20 @@ window.onload = () => {
         let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager);
         let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager);
         let infovis = new PanelContainer(document.getElementById("infovis"), dockManager);
+        //let infovisdlg = new Dialog(infovis, dockManager);
 
         // Dock the panels on the dock manager
         let documentNode = dockManager.context.model.documentManagerNode;
         let outlineNode = dockManager.dockLeft(documentNode, outline, 0.15);
-        let solutionNode = dockManager.dockFill(outlineNode, solution);
-        let propertiesNode = dockManager.dockDown(outlineNode, properties, 0.6);
+        dockManager.dockFill(outlineNode, solution);
+        dockManager.dockDown(outlineNode, properties, 0.6);
         let outputNode = dockManager.dockDown(documentNode, output, 0.2);
-        let problemsNode = dockManager.dockRight(outputNode, problems, 0.40);
-        let toolboxNode = dockManager.dockRight(documentNode, toolbox, 0.20);
-        let editor1Node = dockManager.dockFill(documentNode, editor1);
-        let editor2Node = dockManager.dockFill(documentNode, editor2);
-        let infovisNode = dockManager.dockFill(documentNode, infovis);
+        dockManager.dockRight(outputNode, problems, 0.40);
+        dockManager.dockRight(documentNode, toolbox, 0.20);
+        dockManager.dockFill(documentNode, editor1);
+        dockManager.dockFill(documentNode, editor2);
+        //dockManager.dockFill(documentNode, infovis);
+        dockManager.floatDialog(infovis, 50, 50);
     }
 
     document.getElementById('dock_div').style.opacity = '';
