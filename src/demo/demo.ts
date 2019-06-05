@@ -13,13 +13,13 @@ window.refresh = refresh;
 
 window.onload = () => {
     // Convert a div to the dock manager. Panels can then be docked on to it
-    var divDockManager = document.getElementById('my_dock_manager');
+    let divDockManager = document.getElementById('my_dock_manager');
     dockManager = new DockManager(divDockManager);
     //@ts-ignore
     window.dockManager = dockManager;
     dockManager.initialize();
 
-    var lastState = localStorage.getItem(storeKey);
+    let lastState = localStorage.getItem(storeKey);
     if (lastState) {
         dockManager.loadState(lastState);
     }
@@ -34,40 +34,40 @@ window.onload = () => {
     window.onresize(null);
 
     dockManager.addLayoutListener({
-        onDock: function (self, dockNode) {
-            console.log('onDock: ', self, dockNode);
+        onDock: (dockManager, dockNode) => {
+            console.log('onDock: ', dockManager, dockNode);
             localStorage.setItem(storeKey, dockManager.saveState());
         },
-        onUndock: function (self, dockNode) {
-            console.log('onUndock: ', self, dockNode);
+        onUndock: (dockManager, dockNode) => {
+            console.log('onUndock: ', dockManager, dockNode);
             localStorage.setItem(storeKey, dockManager.saveState());
         },
-        onCreateDialog: function (self, dialog) {
-            console.log('onCreateDialog: ', self, dialog);
+        onCreateDialog: (dockManager, dialog) => {
+            console.log('onCreateDialog: ', dockManager, dialog);
             localStorage.setItem(storeKey, dockManager.saveState());
         },
-        onChangeDialogPosition: function (self, dialog, x, y) {
-            console.log('onCreateDialog: ', self, dialog, x, y);
+        onChangeDialogPosition: (dockManager, dialog, x, y) => {
+            console.log('onCreateDialog: ', dockManager, dialog, x, y);
             localStorage.setItem(storeKey, dockManager.saveState());
         },
-        onResumeLayout: function (self) {
-            console.log('onResumeLayout: ', self);
+        onResumeLayout: (dockManager, panel) => {
+            console.log('onResumeLayout: ', dockManager);
             localStorage.setItem(storeKey, dockManager.saveState());
         },
-        onClosePanel: function (self, panel) {
-            console.log('onClosePanel: ', self, panel);
+        onClosePanel: (dockManager, panel) => {
+            console.log('onClosePanel: ', dockManager, panel);
             localStorage.setItem(storeKey, dockManager.saveState());
         },
-        onHideDialog: function (self, dialog) {
-            console.log('onHideDialog: ', self, dialog);
+        onHideDialog: (dockManager, dialog) => {
+            console.log('onHideDialog: ', dockManager, dialog);
             localStorage.setItem(storeKey, dockManager.saveState());
         },
-        onShowDialog: function (self, dialog) {
-            console.log('onShowDialog: ', self, dialog);
+        onShowDialog: (dockManager, dialog) => {
+            console.log('onShowDialog: ', dockManager, dialog);
             localStorage.setItem(storeKey, dockManager.saveState());
         },
-        onTabsReorder: function (self, dialog) {
-            console.log('onTabsReorder: ', self, dialog);
+        onTabsReorder: (dockManager, dialog) => {
+            console.log('onTabsReorder: ', dockManager, dialog);
             localStorage.setItem(storeKey, dockManager.saveState());
         }
     });

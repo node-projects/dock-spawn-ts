@@ -13,24 +13,9 @@ import { TabPage } from "./TabPage.js";
 import { SplitterDockContainer } from "./SplitterDockContainer.js";
 import { PanelContainer } from "./PanelContainer.js";
 import { FillDockContainer } from "./FillDockContainer.js";
+import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 
-/**
-* The Dock Manager notifies the listeners of layout changes so client containers that have
-* costly layout structures can detach and reattach themself to avoid reflow
-*/
-interface LayoutEventListener {
-    onDock(dockManager: DockManager, dockNode: DockNode);
-    onTabsReorder(dockManager: DockManager, dockNode: DockNode);
-    onUndock(dockManager: DockManager, dockNode: DockNode);
-    onClosePanel(dockManager: DockManager, dockNode: DockNode);
-    onCreateDialog(dockManager: DockManager, dialog: Dialog);
-    onHideDialog(dockManager: DockManager, dialog: Dialog);
-    onShowDialog(dockManager: DockManager, dialog: Dialog);
-    onChangeDialogPosition(dockManager: DockManager, dialog: Dialog, x: number, y: number);
-    onTabChanged(dockManager: DockManager, tabpage: TabPage);
-    onSuspendLayout(dockManager: DockManager);
-    onResumeLayout(dockManager: DockManager, panel: IDockContainer);
-}
+
 
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.
@@ -44,7 +29,7 @@ export class DockManager {
     layoutEngine: DockLayoutEngine;
     mouseMoveHandler: any;
     touchMoveHandler: any;
-    layoutEventListeners: LayoutEventListener[];
+    layoutEventListeners: ILayoutEventListener[];
     defaultDialogPosition: Point;
     backgroundContext: HTMLElement;
     _undockEnabled: boolean;
@@ -472,11 +457,11 @@ export class DockManager {
         throw new Error('Cannot find dock node belonging to the element');
     }
 
-    addLayoutListener(listener) {
+    addLayoutListener(listener: ILayoutEventListener) {
         this.layoutEventListeners.push(listener);
     }
 
-    removeLayoutListener(listener) {
+    removeLayoutListener(listener: ILayoutEventListener) {
         this.layoutEventListeners.splice(this.layoutEventListeners.indexOf(listener), 1);
     }
 

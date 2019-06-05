@@ -35,7 +35,7 @@ it is still alpha, npm packages will follow in the next few weeks
     // Convert existing elements on the page into "Panels". 
     // They can then be docked on to the dock manager 
     // Panels get a titlebar and a close button, and can also be 
-    // converted to a floating dialog box which can be dragged / resized 
+    // converted to a floatingdialog box which can be dragged / resized 
     let solution = new PanelContainer(document.getElementById("#solution_window"), dockManager);
     let output = new PanelContainer(document.getElementById("#output_window"), dockManager);
     let properties = new PanelContainer(document.getElementById("#properties_window"), dockManager);
@@ -57,4 +57,12 @@ it is still alpha, npm packages will follow in the next few weeks
     let editor1Node = dockManager.dockFill(documentNode, editor1);
     let editor2Node = dockManager.dockFill(documentNode, editor2);
     dockManager.floatDialog(infovis, 50, 50);
+
+    // You could listen to callbacks of DockManager like this, there are more event's then close available see ILayoutEventListener
+      dockManager.addLayoutListener({
+         onClosePanel: (dockManager, panel) => {
+            console.log('onClosePanel: ', dockManager, panel);
+            localStorage.setItem(storeKey, dockManager.saveState());
+        }
+    });
 ```
