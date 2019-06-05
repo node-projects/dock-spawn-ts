@@ -4,6 +4,8 @@ A TypeScript Version of dock-spawn (see https://github.com/coderespawn/dock-spaw
 # info
 it is still alpha, npm packages will follow in the next few weeks
 
+![Logo](ide.png)
+
 # testing
  - download the project
  - install node packages
