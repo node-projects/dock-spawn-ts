@@ -1,16 +1,16 @@
-import { DockWheel } from "./DockWheel";
-import { Utils } from "./Utils";
-import { Point } from "./Point";
-import { DockManagerContext } from "./DockManagerContext";
-import { DockNode } from "./DockNode";
-import { DockLayoutEngine } from "./DockLayoutEngine";
-import { EventHandler } from "./EventHandler";
-import { Dialog } from "./Dialog";
-import { DockGraphSerializer } from "./DockGraphSerializer";
-import { DockGraphDeserializer } from "./DockGraphDeserializer";
-import { IDockContainer } from "./IDockContainer";
-import { TabPage } from "./TabPage";
-import { SplitterDockContainer } from "./SplitterDockContainer";
+import { DockWheel } from "./DockWheel.js";
+import { Utils } from "./Utils.js";
+import { Point } from "./Point.js";
+import { DockManagerContext } from "./DockManagerContext.js";
+import { DockNode } from "./DockNode.js";
+import { DockLayoutEngine } from "./DockLayoutEngine.js";
+import { EventHandler } from "./EventHandler.js";
+import { Dialog } from "./Dialog.js";
+import { DockGraphSerializer } from "./DockGraphSerializer.js";
+import { DockGraphDeserializer } from "./DockGraphDeserializer.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { TabPage } from "./TabPage.js";
+import { SplitterDockContainer } from "./SplitterDockContainer.js";
 
 /**
 * The Dock Manager notifies the listeners of layout changes so client containers that have
@@ -625,13 +625,13 @@ export class DockManager {
         this._allPanels(this.context.model.rootNode, panels);
         //only remove
         panels.forEach((panel) => {
-            if (!ids.contains(panel.elementContent.id)) {
+            if (!Utils.arrayContains(ids, panel.elementContent.id)) {
                 panel.close();
             }
         });
 
         this.context.model.dialogs.forEach((dialog) => {
-            if (ids.contains(dialog.panel.elementContent.id)) {
+            if (Utils.arrayContains(ids, dialog.panel.elementContent.id)) {
                 dialog.show();
             }
             else {

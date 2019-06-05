@@ -1,6 +1,6 @@
-import { Utils } from "./Utils";
-import { DockManager } from "./DockManager";
-import { DockWheelItem } from "./DockWheelItem";
+import { Utils } from "./Utils.js";
+import { DockManager } from "./DockManager.js";
+import { DockWheelItem } from "./DockWheelItem.js";
 
 /**
  * Manages the dock overlay buttons that are displayed over the dock manager

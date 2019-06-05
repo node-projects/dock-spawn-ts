@@ -1,9 +1,9 @@
-import { DockManager } from "./DockManager";
-import { IDockContainer } from "./IDockContainer";
-import { Utils } from "./Utils";
-import { UndockInitiator } from "./UndockInitiator";
-import { ContainerType } from "./ContainerType";
-import { EventHandler } from "./EventHandler";
+import { DockManager } from "./DockManager.js";
+import { IDockContainer } from "./IDockContainer.js";
+import { Utils } from "./Utils.js";
+import { UndockInitiator } from "./UndockInitiator.js";
+import { ContainerType } from "./ContainerType.js";
+import { EventHandler } from "./EventHandler.js";
 
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
@@ -33,8 +33,9 @@ export class PanelContainer implements IDockContainer {
     closeButtonClickedHandler: any;
     _cachedWidth: number;
     _cachedHeight: number;
+    _hideCloseButton: boolean;
 
-    constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, hideCloseButton?: Boolean) {
+    constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, hideCloseButton?: boolean) {
         if (!title)
             title = 'Panel';
         this.elementContent = elementContent;
@@ -48,7 +49,7 @@ export class PanelContainer implements IDockContainer {
         this.isDialog = false;
         this._canUndock = dockManager._undockEnabled;
         this.eventListeners = [];
-        this.hideCloseButton(hideCloseButton);
+        this._hideCloseButton = hideCloseButton;
         this._initialize();
 
         //@ts-ignore
@@ -119,12 +120,12 @@ export class PanelContainer implements IDockContainer {
         this.elementTitle = document.createElement('div');
         this.elementTitleText = document.createElement('div');
         this.elementContentHost = document.createElement('div');
-        if (!this.hideCloseButton)
+        if (!this._hideCloseButton)
             this.elementButtonClose = document.createElement('div');
 
         this.elementPanel.appendChild(this.elementTitle);
         this.elementTitle.appendChild(this.elementTitleText);
-        if (!this.hideCloseButton) {
+        if (!this._hideCloseButton) {
             this.elementTitle.appendChild(this.elementButtonClose);
             this.elementButtonClose.innerHTML = '<i class="fa fa-times"></i>';
             this.elementButtonClose.classList.add('panel-titlebar-button-close');
@@ -146,7 +147,7 @@ export class PanelContainer implements IDockContainer {
         // Add the panel to the body
         //document.body.appendChild(this.elementPanel);
 
-        if (!this.hideCloseButton) {
+        if (!this._hideCloseButton) {
             this.closeButtonClickedHandler =
                 new EventHandler(this.elementButtonClose, 'click', this.onCloseButtonClicked.bind(this));
         }

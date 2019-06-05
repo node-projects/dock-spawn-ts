@@ -1,12 +1,12 @@
-import { Dialog } from "./Dialog";
-import { ResizeHandle } from "./ResizeHandle";
-import { EventHandler } from "./EventHandler";
-import { DockManager } from "./DockManager";
-import { IDockContainer } from "./IDockContainer";
-import { ContainerType } from "./ContainerType";
-import { Point } from "./Point";
-import { Utils } from "./Utils";
-import { IThickness } from "./interfaces/IThickness";
+import { Dialog } from "./Dialog.js";
+import { ResizeHandle } from "./ResizeHandle.js";
+import { EventHandler } from "./EventHandler.js";
+import { DockManager } from "./DockManager.js";
+import { IDockContainer } from "./IDockContainer.js";
+import { ContainerType } from "./ContainerType.js";
+import { Point } from "./Point.js";
+import { Utils } from "./Utils.js";
+import { IThickness } from "./interfaces/IThickness.js";
 
 /**
  * Decorates a dock container with resizer handles around its base element

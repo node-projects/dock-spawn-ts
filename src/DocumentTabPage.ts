@@ -1,6 +1,6 @@
-import { TabHost } from "./TabHost";
-import { TabPage } from "./TabPage";
-import { Utils } from "./Utils";
+import { TabHost } from "./TabHost.js";
+import { TabPage } from "./TabPage.js";
+import { Utils } from "./Utils.js";
 
 /**
  * Specialized tab page that doesn't display the panel's frame when docked in a tab page

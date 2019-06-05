@@ -1,5 +1,6 @@
-import { TabPage } from "./TabPage";
-import { Utils } from "./Utils";
+import { TabPage } from "./TabPage.js";
+import { Utils } from "./Utils.js";
+import { TabHostDirection } from "./enums/TabHostDirection.js";
 
 /**
  * Tab Host control contains tabs known as TabPages.

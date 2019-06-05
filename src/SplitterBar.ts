@@ -1,6 +1,6 @@
-import { IDockContainer } from "./IDockContainer";
-import { EventHandler } from "./EventHandler";
-import { Utils } from "./Utils";
+import { IDockContainer } from "./IDockContainer.js";
+import { EventHandler } from "./EventHandler.js";
+import { Utils } from "./Utils.js";
 
 export class SplitterBar {
     previousContainer: IDockContainer;

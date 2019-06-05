@@ -1,6 +1,6 @@
-import { EventHandler } from "./EventHandler";
-import { Point } from "./Point";
-import { Dialog } from "./Dialog";
+import { EventHandler } from "./EventHandler.js";
+import { Point } from "./Point.js";
+import { Dialog } from "./Dialog.js";
 
 /**
  * Listens for events on the [element] and notifies the [listener]

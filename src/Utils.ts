@@ -45,12 +45,28 @@ export class Utils {
 
 
     static orderByIndexes(array, indexes) {
-        var sortedArray = [];
-
-        for (var i = 0; i < indexes.length; i++) {
+        let sortedArray = [];
+        for (let i = 0; i < indexes.length; i++) {
             sortedArray.push(array[indexes[i]]);
         }
-
         return sortedArray;
+    }
+
+    static arrayRemove(array: any[], value: any): any[] | false {
+        let idx = array.indexOf(value);
+        if (idx !== -1) {
+            return array.splice(idx, 1);
+        }
+        return false;
+    }
+
+    static arrayContains(array: any[], value: any): boolean {
+        let i = array.length;
+        while (i--) {
+            if (array[i] === value) {
+                return true;
+            }
+        }
+        return false;
     }
 }

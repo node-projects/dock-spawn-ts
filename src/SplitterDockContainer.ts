@@ -1,7 +1,7 @@
-import { DockManager } from "./DockManager";
-import { SplitterPanel } from "./SplitterPanel";
-import { IDockContainer } from "./IDockContainer";
-import { ContainerType } from "./ContainerType";
+import { DockManager } from "./DockManager.js";
+import { SplitterPanel } from "./SplitterPanel.js";
+import { IDockContainer } from "./IDockContainer.js";
+import { ContainerType } from "./ContainerType.js";
 
 export abstract class SplitterDockContainer {
     name: string;

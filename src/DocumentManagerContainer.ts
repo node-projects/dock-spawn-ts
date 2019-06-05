@@ -1,7 +1,8 @@
-import { FillDockContainer } from "./FillDockContainer";
-import { TabHost } from "./TabHost";
-import { DocumentTabPage } from "./DocumentTabPage";
-import { DockManager } from "./DockManager";
+import { FillDockContainer } from "./FillDockContainer.js";
+import { TabHost } from "./TabHost.js";
+import { DocumentTabPage } from "./DocumentTabPage.js";
+import { DockManager } from "./DockManager.js";
+import { TabHostDirection } from "./enums/TabHostDirection.js";
 
 /**
  * The document manager is then central area of the dock layout hierarchy.

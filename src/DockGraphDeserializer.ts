@@ -1,13 +1,13 @@
-import { DockManager } from "./DockManager";
-import { DockModel } from "./DockModel";
-import { DockNode } from "./DockNode";
-import { PanelContainer } from "./PanelContainer";
-import { HorizontalDockContainer } from "./HorizontalDockContainer";
-import { VerticalDockContainer } from "./VerticalDockContainer";
-import { DocumentManagerContainer } from "./DocumentManagerContainer";
-import { FillDockContainer } from "./FillDockContainer";
-import { Dialog } from "./Dialog";
-import { Utils } from "./Utils";
+import { DockManager } from "./DockManager.js";
+import { DockModel } from "./DockModel.js";
+import { DockNode } from "./DockNode.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { HorizontalDockContainer } from "./HorizontalDockContainer.js";
+import { VerticalDockContainer } from "./VerticalDockContainer.js";
+import { DocumentManagerContainer } from "./DocumentManagerContainer.js";
+import { FillDockContainer } from "./FillDockContainer.js";
+import { Dialog } from "./Dialog.js";
+import { Utils } from "./Utils.js";
 
 /**
  * Deserializes the dock layout hierarchy from JSON and creates a dock hierarhcy graph

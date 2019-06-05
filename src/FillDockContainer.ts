@@ -1,7 +1,8 @@
-import { DockManager } from "./DockManager";
-import { Utils } from "./Utils";
-import { ContainerType } from "./ContainerType";
-import { TabHost } from "./TabHost";
+import { DockManager } from "./DockManager.js";
+import { Utils } from "./Utils.js";
+import { ContainerType } from "./ContainerType.js";
+import { TabHost } from "./TabHost.js";
+import { TabHostDirection } from "./enums/TabHostDirection.js";
 
 export class FillDockContainer {
     

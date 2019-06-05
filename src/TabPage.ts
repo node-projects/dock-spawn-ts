@@ -1,7 +1,7 @@
-import { TabHandle } from "./TabHandle";
-import { PanelContainer } from "./PanelContainer";
-import { IDockContainer } from "./IDockContainer";
-import { TabHost } from "./TabHost";
+import { TabHandle } from "./TabHandle.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { IDockContainer } from "./IDockContainer.js";
+import { TabHost } from "./TabHost.js";
 
 export class TabPage {
 

@@ -1,13 +1,13 @@
-import { DockManager } from "./DockManager";
-import { DockNode } from "./DockNode";
-import { Utils } from "./Utils";
-import { HorizontalDockContainer } from "./HorizontalDockContainer";
-import { VerticalDockContainer } from "./VerticalDockContainer";
-import { FillDockContainer } from "./FillDockContainer";
-import { IRectangle } from "./interfaces/IRectangle";
+import { DockManager } from "./DockManager.js";
+import { DockNode } from "./DockNode.js";
+import { Utils } from "./Utils.js";
+import { HorizontalDockContainer } from "./HorizontalDockContainer.js";
+import { VerticalDockContainer } from "./VerticalDockContainer.js";
+import { FillDockContainer } from "./FillDockContainer.js";
+import { IRectangle } from "./interfaces/IRectangle.js";
 
 export class DockLayoutEngine {
-    
+
     dockManager: DockManager;
 
     constructor(dockManager: DockManager) {
@@ -40,12 +40,12 @@ export class DockLayoutEngine {
     }
 
     undock(node) {
-        var parentNode = node.parent;
+        let parentNode = node.parent;
         if (!parentNode)
             throw new Error('Cannot undock.  panel is not a leaf node');
 
         // Get the position of the node relative to it's siblings
-        var siblingIndex = parentNode.children.indexOf(node);
+        let siblingIndex = parentNode.children.indexOf(node);
 
         // Detach the node from the dock manager's tree hierarchy
         node.detachFromParent();
@@ -54,15 +54,15 @@ export class DockLayoutEngine {
         if (parentNode.children.length < parentNode.container.minimumAllowedChildNodes) {
             // If the child count falls below the minimum threshold, destroy the parent and merge
             // the children with their grandparents
-            var grandParent = parentNode.parent;
-            for (var i = 0; i < parentNode.children.length; i++) {
-                var otherChild = parentNode.children[i];
+            let grandParent = parentNode.parent;
+            for (let i = 0; i < parentNode.children.length; i++) {
+                let otherChild = parentNode.children[i];
                 if (grandParent) {
                     // parent node is not a root node
                     grandParent.addChildAfter(parentNode, otherChild);
                     parentNode.detachFromParent();
-                    var width = parentNode.container.containerElement.clientWidth;
-                    var height = parentNode.container.containerElement.clientHeight;
+                    let width = parentNode.container.containerElement.clientWidth;
+                    let height = parentNode.container.containerElement.clientHeight;
                     parentNode.container.destroy();
 
                     otherChild.container.resize(width, height);
@@ -84,7 +84,7 @@ export class DockLayoutEngine {
 
             // Set the next sibling as the active child (e.g. for a Tab host, it would select it as the active tab)
             if (parentNode.children.length > 0) {
-                var nextActiveSibling = parentNode.children[Math.max(0, siblingIndex - 1)];
+                let nextActiveSibling = parentNode.children[Math.max(0, siblingIndex - 1)];
                 parentNode.container.setActiveChild(nextActiveSibling.container);
             }
         }
@@ -94,21 +94,21 @@ export class DockLayoutEngine {
     }
 
     close(node) {
-        var parentNode = node.parent;
+        let parentNode = node.parent;
         if (!parentNode)
             throw new Error('Cannot undock.  panel is not a leaf node');
 
         //check if closed tab wa sthe active one
-        var activetabClosed = false;
+        let activetabClosed = false;
         if (parentNode.children.length > 0) {
             if (parentNode.container.tabHost != null) {
-                var activeTab = parentNode.container.tabHost.getActiveTab();
+                let activeTab = parentNode.container.tabHost.getActiveTab();
                 activetabClosed = activeTab.panel == node.container;
             }
         }
 
         // Get the position of the node relative to it's siblings
-        var siblingIndex = parentNode.children.indexOf(node);
+        let siblingIndex = parentNode.children.indexOf(node);
 
         // Detach the node from the dock manager's tree hierarchy
         node.detachFromParent();
@@ -116,15 +116,15 @@ export class DockLayoutEngine {
         if (parentNode.children.length < parentNode.container.minimumAllowedChildNodes) {
             // If the child count falls below the minimum threshold, destroy the parent and merge
             // the children with their grandparents
-            var grandParent = parentNode.parent;
-            for (var i = 0; i < parentNode.children.length; i++) {
-                var otherChild = parentNode.children[i];
+            let grandParent = parentNode.parent;
+            for (let i = 0; i < parentNode.children.length; i++) {
+                let otherChild = parentNode.children[i];
                 if (grandParent) {
                     // parent node is not a root node
                     grandParent.addChildAfter(parentNode, otherChild);
                     parentNode.detachFromParent();
-                    var width = parentNode.container.containerElement.clientWidth;
-                    var height = parentNode.container.containerElement.clientHeight;
+                    let width = parentNode.container.containerElement.clientWidth;
+                    let height = parentNode.container.containerElement.clientHeight;
                     parentNode.container.destroy();
 
                     otherChild.container.resize(width, height);
@@ -143,7 +143,7 @@ export class DockLayoutEngine {
             parentNode.performLayout();
 
             if (activetabClosed) {
-                var nextActiveSibling = parentNode.children[Math.max(0, siblingIndex - 1)];
+                let nextActiveSibling = parentNode.children[Math.max(0, siblingIndex - 1)];
                 if (nextActiveSibling != null)
                     parentNode.container.setActiveChild(nextActiveSibling.container);
             }
@@ -154,15 +154,15 @@ export class DockLayoutEngine {
     }
 
     reorderTabs(node, handle, state, index) {
-        var N = node.children.length;
-        var nodeIndexToDelete = state === 'left' ? index : index + 1;
+        let N = node.children.length;
+        let nodeIndexToDelete = state === 'left' ? index : index + 1;
         if (state == 'right' && nodeIndexToDelete >= node.children.length)
             return;
         if (state == 'left' && nodeIndexToDelete == 0)
             return;
 
-        var indexes = Array.apply(null, { length: N }).map(Number.call, Number);
-        var indexValue = indexes.splice(nodeIndexToDelete, 1)[0]; //remove element
+        let indexes = Array.apply(null, { length: N }).map(Number.call, Number);
+        let indexValue = indexes.splice(nodeIndexToDelete, 1)[0]; //remove element
         indexes.splice(state === 'left' ? index - 1 : index, 0, indexValue); //insert
 
         node.children = Utils.orderByIndexes(node.children, indexes); //apply
@@ -186,7 +186,7 @@ export class DockLayoutEngine {
         }
 
         // Check if reference node is root node
-        var model = this.dockManager.context.model,
+        let model = this.dockManager.context.model,
             compositeContainer,
             compositeNode,
             referenceParent;
@@ -217,12 +217,12 @@ export class DockLayoutEngine {
             referenceParent = referenceNode.parent;
 
             // Get the dimensions of the reference node, for resizing later on
-            var referenceNodeWidth = referenceNode.container.containerElement.clientWidth;
-            var referenceNodeHeight = referenceNode.container.containerElement.clientHeight;
+            let referenceNodeWidth = referenceNode.container.containerElement.clientWidth;
+            let referenceNodeHeight = referenceNode.container.containerElement.clientHeight;
 
             // Get the dimensions of the reference node, for resizing later on
-            var referenceNodeParentWidth = referenceParent.container.containerElement.clientWidth;
-            var referenceNodeParentHeight = referenceParent.container.containerElement.clientHeight;
+            let referenceNodeParentWidth = referenceParent.container.containerElement.clientWidth;
+            let referenceNodeParentHeight = referenceParent.container.containerElement.clientHeight;
 
             // Replace the reference node with a new composite node with the reference and new node as it's children
             compositeContainer = this._createDockContainer(direction, newNode, referenceNode);
@@ -260,17 +260,17 @@ export class DockLayoutEngine {
         }
 
         // force resize the panel
-        var containerWidth = newNode.container.containerElement.clientWidth;
-        var containerHeight = newNode.container.containerElement.clientHeight;
+        let containerWidth = newNode.container.containerElement.clientWidth;
+        let containerHeight = newNode.container.containerElement.clientHeight;
         newNode.container.resize(containerWidth, containerHeight);
 
         this.dockManager.invalidate();
         this.dockManager.notifyOnDock(newNode);
     }
 
-    _forceResizeCompositeContainer = function (container) {
-        var width = container.containerElement.clientWidth;
-        var height = container.containerElement.clientHeight;
+    _forceResizeCompositeContainer = (container) => {
+        let width = container.containerElement.clientWidth;
+        let height = container.containerElement.clientHeight;
         container.resize(width, height);
     }
 
@@ -290,17 +290,17 @@ export class DockLayoutEngine {
      * The state is not modified in this function.  It is used for showing a preview of where
      * the panel would be docked when hovered over a dock wheel button
      */
-    getDockBounds(referenceNode, containerToDock, direction, insertBeforeReference):IRectangle {
+    getDockBounds(referenceNode, containerToDock, direction, insertBeforeReference): IRectangle {
         let compositeNode; // The node that contains the splitter / fill node
         let childCount;
         let childPosition;
-        let bounds:IRectangle;
+        let bounds: IRectangle;
 
         if (direction === 'fill') {
             // Since this is a fill operation, the highlight bounds is the same as the reference node
             // TODO: Create a tab handle highlight to show that it's going to be docked in a tab
             let targetElement = referenceNode.container.containerElement;
-            return {x:targetElement.offsetLeft, y:targetElement.offsetTop, width:targetElement.clientWidth, height:targetElement.clientHeight};
+            return { x: targetElement.offsetLeft, y: targetElement.offsetTop, width: targetElement.clientWidth, height: targetElement.clientHeight };
         }
 
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')

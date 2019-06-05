@@ -1,8 +1,8 @@
-import { DockModel } from "./DockModel";
-import { DockNode } from "./DockNode";
-import { ContainerType } from "./ContainerType";
-import { Dialog } from "./Dialog";
-import { Point } from "./Point";
+import { DockModel } from "./DockModel.js";
+import { DockNode } from "./DockNode.js";
+import { ContainerType } from "./ContainerType.js";
+import { Dialog } from "./Dialog.js";
+import { Point } from "./Point.js";
 
 interface INodeInfo {
     containerType: ContainerType;

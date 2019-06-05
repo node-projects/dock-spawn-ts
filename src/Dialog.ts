@@ -1,10 +1,10 @@
-import { DockManager } from "./DockManager";
-import { Point } from "./Point";
-import { PanelContainer } from "./PanelContainer";
-import { DraggableContainer } from "./DraggableContainer";
-import { ResizableContainer } from "./ResizableContainer";
-import { EventHandler } from "./EventHandler";
-import { Utils } from "./Utils";
+import { DockManager } from "./DockManager.js";
+import { Point } from "./Point.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { DraggableContainer } from "./DraggableContainer.js";
+import { ResizableContainer } from "./ResizableContainer.js";
+import { EventHandler } from "./EventHandler.js";
+import { Utils } from "./Utils.js";
 
 export class Dialog {
     elementDialog: HTMLDivElement & { floatingDialog: Dialog };
@@ -98,7 +98,7 @@ export class Dialog {
         Utils.removeNode(this.elementDialog);
         this.draggable.removeDecorator();
         Utils.removeNode(this.panel.elementPanel);
-        this.dockManager.context.model.dialogs.remove(this);
+        Utils.arrayRemove(this.dockManager.context.model.dialogs, this);
         delete this.panel.floatingDialog;
     }
 

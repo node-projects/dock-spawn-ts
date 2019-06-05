@@ -1,6 +1,6 @@
-import { SplitterDockContainer } from "./SplitterDockContainer";
-import { Utils } from "./Utils";
-import { ContainerType } from "./ContainerType";
+import { SplitterDockContainer } from "./SplitterDockContainer.js";
+import { Utils } from "./Utils.js";
+import { ContainerType } from "./ContainerType.js";
 
 export class VerticalDockContainer extends SplitterDockContainer {
     

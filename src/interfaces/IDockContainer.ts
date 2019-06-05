@@ -1,5 +1,5 @@
-import { ContainerType } from "./ContainerType";
-import { DockManager } from "./DockManager";
+import { ContainerType } from "../ContainerType.js";
+import { DockManager } from "../DockManager.js";
 
 export interface IDockContainer {
     readonly dockManager: DockManager;
