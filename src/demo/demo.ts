@@ -15,6 +15,8 @@ window.onload = () => {
     // Convert a div to the dock manager. Panels can then be docked on to it
     var divDockManager = document.getElementById('my_dock_manager');
     dockManager = new DockManager(divDockManager);
+    //@ts-ignore
+    window.dockManager = dockManager;
     dockManager.initialize();
 
     var lastState = localStorage.getItem(storeKey);

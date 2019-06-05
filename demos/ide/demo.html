@@ -9,11 +9,25 @@
     <link rel="stylesheet" href="../../dist/css/dock-manager-style.css">
     <link rel="stylesheet" href="demo.css">
 
+    <script src="js/jquery-3.4.1.min.js"></script>
+
+     <!-- Code Mirror Source Code Editor -->
+    <link rel="stylesheet" href="./codemirror/codemirror.css">
+    <style>
+        .CodeMirror {height: 100%;}
+    </style>
+    <script src="./codemirror/codemirror.js"></script>
+    <script src="./codemirror/clike.js"></script>
+    
+    <!-- JS Tree -->
+    <script type="text/javascript" src="./jstree/jstree.min.js"></script>
+    <link rel="stylesheet" href="./jstree/themes/default/style.min.css">
+
     <!-- Info Vis graphing lib. Used for dock tree visualization -->
-    <!--<link type="text/css" rel="stylesheet" href="infovis/jit-base.css" /> -->
-    <!--<link type="text/css" rel="stylesheet" href="infovis/Spacetree.css" /> -->
-    <!--<script language="javascript" type="text/javascript" src="infovis/jit.js"></script> -->
-    <!--<script language="javascript" type="text/javascript" src="infovis/dock_tree_vis.js"></script> -->
+    <link type="text/css" rel="stylesheet" href="infovis/jit-base.css" />
+    <link type="text/css" rel="stylesheet" href="infovis/Spacetree.css" />
+    <script language="javascript" type="text/javascript" src="infovis/jit.js"></script>
+    <script language="javascript" type="text/javascript" src="infovis/dock_tree_vis.js"></script>
 </head>
 
 <body>
@@ -59,7 +73,15 @@
         </div>
     </div>
     <script type="module" src="../../dist/demo/demo.js"></script>
-
+    <script src="js/sample-source.js"></script>
+    <script src="js/demo-ide.js"></script>
+    <script>
+    // Initialize infovis (for dock tree visualization)
+    setTimeout(() => {
+        InitDebugTreeVis(window.dockManager);
+    }, 2000);
+	
+    </script>
 </body>
 
 </html>
