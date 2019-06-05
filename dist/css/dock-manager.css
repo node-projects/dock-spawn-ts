@@ -13,6 +13,10 @@
 	float: left;
 	padding-left:10px;
 	padding-top:5px;
+	text-overflow: ellipsis;
+    overflow: hidden;
+    width: calc(100% - 30px);
+    white-space: nowrap;
 }
 
 .panel-titlebar-button-close {
@@ -199,8 +203,9 @@
 	margin-left: 6px;
 	margin-right: 6px;
 	white-space: nowrap;
-        overflow: hidden;
+    overflow: hidden;
 	float: left;
+	text-overflow: ellipsis;
 }
 
 .dockspan-tab-handle-close-button {
@@ -221,6 +226,26 @@
 
 .dockspan-tab-handle-content-seperator {
 	height: 4px;
+}
+
+.dockspab-tab-handle-context-menu {
+	position: absolute;
+	z-index: 10000000;
+	background-color: white;
+	border: white;
+	border: black solid 2px;
+    padding: 5px;
+}
+
+.dockspab-tab-handle-context-menu > div {
+	cursor: pointer;
+	padding: 2px;
+}
+
+.dockspab-tab-handle-context-menu > div:hover {
+	background-color: gray;
+	cursor: pointer;
+	padding: 2px;
 }
 
 /*************************** Text Selection **************************/

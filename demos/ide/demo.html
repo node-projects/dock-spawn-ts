@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title></title>
     <link rel="stylesheet" href="../../node_modules/@fortawesome/fontawesome-free/css/all.css">
@@ -7,12 +8,12 @@
     <link rel="stylesheet" href="../../dist/css/dock-wheel.css">
     <link rel="stylesheet" href="../../dist/css/dock-manager-style.css">
     <link rel="stylesheet" href="demo.css">
-    
-	<!-- Info Vis graphing lib. Used for dock tree visualization -->
-	<!--<link type="text/css" rel="stylesheet" href="infovis/jit-base.css" /> -->
-	<!--<link type="text/css" rel="stylesheet" href="infovis/Spacetree.css" /> -->
-	<!--<script language="javascript" type="text/javascript" src="infovis/jit.js"></script> -->
-	<!--<script language="javascript" type="text/javascript" src="infovis/dock_tree_vis.js"></script> -->
+
+    <!-- Info Vis graphing lib. Used for dock tree visualization -->
+    <!--<link type="text/css" rel="stylesheet" href="infovis/jit-base.css" /> -->
+    <!--<link type="text/css" rel="stylesheet" href="infovis/Spacetree.css" /> -->
+    <!--<script language="javascript" type="text/javascript" src="infovis/jit.js"></script> -->
+    <!--<script language="javascript" type="text/javascript" src="infovis/dock_tree_vis.js"></script> -->
 </head>
 
 <body>
@@ -23,38 +24,42 @@
             <a href="javascript:refresh()" style="text-decoration: none; color: white;">Refresh</a>
         </div>
     </div>
-    <div id="my_dock_manager" class="my-dock-manager"></div>
-    <div id="solution_window" data-panel-caption="Solution Explorer" data-panel-icon="fa fa-arrow-right" class="solution-window">
-        <ul>
-            <li id="solution_window_1">
-                <a href="#">Test Project</a>
-                <ul>
-                    <li id="phtml_2"><a href="#">Source File 1</a></li>
-                    <li id="phtml_3"><a href="#">Header File 1</a></li>
-                </ul>
-            </li>
-            <li id="solution_window_2">
-                <a href="#">My Project 2</a>
-            </li>
-        </ul>
-    </div>
-    <div id="properties_window" data-panel-caption="Properties" class="properties-window"></div>
-    <div id="problems_window" data-panel-caption="Problems" class="problems-window"></div>
-    <div id="editor1_window" data-panel-caption="Steering.h" class="editor1-window editor-host"></div>
-    <div id="editor2_window" data-panel-caption="Steering.cpp" class="editor2-window editor-host"></div>
-    <div id="infovis" data-panel-caption="Dock Tree Visualizer" class="editor2-window editor-host"></div>
-    <div id="output_window" data-panel-caption="Output" class="output-window editor-host"></div>
-    <div id="outline_window" data-panel-caption="Outline" class="outline-window"></div>
-    <div id="toolbox_window" data-panel-caption="Toolbox" class="toolbox-window">
-        <ul>
-            <li id="toolbox_window_1"><a href="#">Tool 1</a></li>
-            <li id="toolbox_window_2"><a href="#">Tool 2</a></li>
-            <li id="toolbox_window_3"><a href="#">Tool 3</a></li>
-            <li id="toolbox_window_4"><a href="#">Tool 4</a></li>
-            <li id="toolbox_window_5"><a href="#">Tool 5</a></li>
-        </ul>
+    <div id="dock_div" style="opacity: 0;">
+        <div id="my_dock_manager" class="my-dock-manager"></div>
+        <div id="solution_window" data-panel-caption="Solution Explorer" data-panel-icon="fa fa-arrow-right"
+            class="solution-window">
+            <ul>
+                <li id="solution_window_1">
+                    <a href="#">Test Project</a>
+                    <ul>
+                        <li id="phtml_2"><a href="#">Source File 1</a></li>
+                        <li id="phtml_3"><a href="#">Header File 1</a></li>
+                    </ul>
+                </li>
+                <li id="solution_window_2">
+                    <a href="#">My Project 2</a>
+                </li>
+            </ul>
+        </div>
+        <div id="properties_window" data-panel-caption="Properties" class="properties-window"></div>
+        <div id="problems_window" data-panel-caption="Problems" class="problems-window"></div>
+        <div id="editor1_window" data-panel-caption="Steering.h" class="editor1-window editor-host"></div>
+        <div id="editor2_window" data-panel-caption="Steering.cpp" class="editor2-window editor-host"></div>
+        <div id="infovis" data-panel-caption="Dock Tree Visualizer" class="editor2-window editor-host"></div>
+        <div id="output_window" data-panel-caption="Output" class="output-window editor-host"></div>
+        <div id="outline_window" data-panel-caption="Outline" class="outline-window"></div>
+        <div id="toolbox_window" data-panel-caption="Toolbox" class="toolbox-window">
+            <ul>
+                <li id="toolbox_window_1"><a href="#">Tool 1</a></li>
+                <li id="toolbox_window_2"><a href="#">Tool 2</a></li>
+                <li id="toolbox_window_3"><a href="#">Tool 3</a></li>
+                <li id="toolbox_window_4"><a href="#">Tool 4</a></li>
+                <li id="toolbox_window_5"><a href="#">Tool 5</a></li>
+            </ul>
+        </div>
     </div>
     <script type="module" src="../../dist/demo/demo.js"></script>
 
 </body>
+
 </html>

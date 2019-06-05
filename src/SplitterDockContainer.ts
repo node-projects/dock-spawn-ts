@@ -15,7 +15,7 @@ export abstract class SplitterDockContainer {
     state: { width: any; height: any; };
     containerType: ContainerType;
     
-    constructor(name: string, dockManager: DockManager, childContainers: IDockContainer[]) {
+    constructor(name: string, dockManager: DockManager, childContainers: IDockContainer[], stackedVertical : boolean) {
         // for prototype inheritance purposes only
         if (arguments.length === 0) {
             return;
@@ -23,6 +23,7 @@ export abstract class SplitterDockContainer {
 
         this.name = name;
         this.dockManager = dockManager;
+        this.stackedVertical = stackedVertical;
         this.splitterPanel = new SplitterPanel(childContainers, this.stackedVertical);
         this.containerElement = this.splitterPanel.panelElement;
         this.minimumAllowedChildNodes = 2;

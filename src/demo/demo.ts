@@ -16,6 +16,7 @@ window.onload = () => {
     dockManager.initialize();
 
     var lastState = localStorage.getItem(storeKey);
+    lastState = null;
     if (lastState) {
         dockManager.loadState(lastState);
     }
@@ -96,4 +97,6 @@ window.onload = () => {
         let editor2Node = dockManager.dockFill(documentNode, editor2);
         let infovisNode = dockManager.dockFill(documentNode, infovis);
     }
+
+    document.getElementById('dock_div').style.opacity = '';
 };

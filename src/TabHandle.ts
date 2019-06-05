@@ -8,7 +8,7 @@ import { Utils } from "./Utils.js";
  * A tab handle represents the tab button on the tab strip
  */
 export class TabHandle {
-    
+
     parent: TabPage;
     elementBase: HTMLDivElement;
     elementText: HTMLDivElement;
@@ -33,6 +33,8 @@ export class TabHandle {
     prev: number;
     current: number;
     direction: number;
+    _ctxMenu: HTMLDivElement;
+    _removeCtxMenuBound: any;
 
     constructor(parent: TabPage) {
         this.parent = parent;
@@ -95,41 +97,56 @@ export class TabHandle {
         this.undockInitiator.enabled = state;
     }
 
-    //todo...
-    oncontextMenuClicked(e) {
-        /*e.preventDefault();
+    oncontextMenuClicked(e: MouseEvent) {
+        e.preventDefault();
 
-        if (!this._CtxMenu) {
-            let el = newElementFromString(`<div class="context-menu">
-    <div id="btnclose" class="context-menu-selected"><t-t>STD_CloseAllTabs</t-t></div>
-    <div id="btnclosebut" class="context-menu-selected"><t-t>STD_CloseAllTabsButNotThis</t-t></div>
-</div>
-`);
-            let btn = el.querySelector('#btnclose');
-            btn.onclick = () => {
+        if (!this._ctxMenu) {
+            this._ctxMenu = document.createElement('div');
+            this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
+
+            let btnCloseAll = document.createElement('div');
+            btnCloseAll.innerText = 'Close All Tabs';
+            this._ctxMenu.append(btnCloseAll);
+
+            let btnCloseAllButThis = document.createElement('div');
+            btnCloseAllButThis.innerText = 'Close All Tabs but this';
+            this._ctxMenu.append(btnCloseAllButThis);
+
+            btnCloseAll.onclick = () => {
                 let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
-
                 for (let i = 0; i < length; i++) {
                     this.parent.container.dockManager.context.model.documentManagerNode.children[0].container.close();
                 }
-                this._CtxMenu.close();
+                this._removeCtxMenu();
             };
 
-            btn = el.querySelector('#btnclosebut');
-            btn.onclick = () => {
+            btnCloseAllButThis.onclick = () => {
                 let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
-
                 for (let i = length - 1; i >= 0; i--) {
                     if (this.parent.container != this.parent.container.dockManager.context.model.documentManagerNode.children[i].container)
                         this.parent.container.dockManager.context.model.documentManagerNode.children[i].container.close();
                 }
-                if (this._CtxMenu)
-                    this._CtxMenu.close();
+                this._removeCtxMenu();
             };
-            this._CtxMenu = contextMenuHelper_showMenu(e, el, true, document.querySelector('#popuplayer'), () => {
-                this._CtxMenu = null;
-            });
-        }*/
+
+            this._ctxMenu.style.left = e.pageX + "px";
+            this._ctxMenu.style.top = e.pageY + "px";
+            document.body.appendChild(this._ctxMenu);
+            this._removeCtxMenuBound = this._removeCtxMenu.bind(this)
+            window.addEventListener('mousedown', this._removeCtxMenuBound);
+        } else {
+            this._removeCtxMenu();
+        }
+    }
+
+    _removeCtxMenu() {
+        if (this._ctxMenu) {
+            setTimeout(() => {
+                document.body.removeChild(this._ctxMenu);
+                delete this._ctxMenu;
+                window.removeEventListener('mousedown', this._removeCtxMenuBound);
+            },100);
+        }
     }
 
     onMouseDown(e) {

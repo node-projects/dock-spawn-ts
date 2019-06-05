@@ -4,11 +4,8 @@ import { ContainerType } from "./ContainerType.js";
 
 export class VerticalDockContainer extends SplitterDockContainer {
     
-    stackedVertical: boolean;
-
     constructor(dockManager, childContainers) {
-        super(Utils.getNextId('vertical_splitter_'), dockManager, childContainers)
-        this.stackedVertical = true;
+        super(Utils.getNextId('vertical_splitter_'), dockManager, childContainers, true)
         this.containerType = ContainerType.vertical;
     }
 }
