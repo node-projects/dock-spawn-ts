@@ -17,7 +17,7 @@ export class PanelContainer implements IDockContainer {
     elementContentHost: HTMLDivElement;
     name: string;
     state: { width: any; height: any; };
-    elementContent: HTMLElement & { resizeHandler?: any };
+    elementContent: HTMLElement & { resizeHandler?: any, _dockSpawnPanelContainer: PanelContainer };
     dockManager: DockManager;
     title: string;
     containerType: ContainerType;
@@ -38,7 +38,7 @@ export class PanelContainer implements IDockContainer {
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, hideCloseButton?: boolean) {
         if (!title)
             title = 'Panel';
-        this.elementContent = elementContent;
+        this.elementContent = Object.assign(elementContent, { _dockSpawnPanelContainer: this });
         this.dockManager = dockManager;
         this.title = title;
         this.containerType = ContainerType.panel;
@@ -51,9 +51,6 @@ export class PanelContainer implements IDockContainer {
         this.eventListeners = [];
         this._hideCloseButton = hideCloseButton;
         this._initialize();
-
-        //@ts-ignore
-        elementContent._dockSpawnPanelContainer = this;
     }
 
     canUndock(state) {

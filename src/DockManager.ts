@@ -12,6 +12,7 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { TabPage } from "./TabPage.js";
 import { SplitterDockContainer } from "./SplitterDockContainer.js";
 import { PanelContainer } from "./PanelContainer.js";
+import { FillDockContainer } from "./FillDockContainer.js";
 
 /**
 * The Dock Manager notifies the listeners of layout changes so client containers that have
@@ -38,14 +39,14 @@ interface LayoutEventListener {
  */
 export class DockManager {
     element: HTMLDivElement;
-    context: any;
+    context: DockManagerContext;
     dockWheel: DockWheel;
     layoutEngine: DockLayoutEngine;
     mouseMoveHandler: any;
     touchMoveHandler: any;
     layoutEventListeners: LayoutEventListener[];
     defaultDialogPosition: Point;
-    backgroundContext: any;
+    backgroundContext: HTMLElement;
     _undockEnabled: boolean;
     zIndexCounter: number;
     closeTabIconTemplate: any;
@@ -62,9 +63,9 @@ export class DockManager {
 
 
     initialize() {
-        this.backgroundContext = this.element.children[0];
+        this.backgroundContext = this.element.children[0] as HTMLElement;
         this.context = new DockManagerContext(this);
-        var documentNode = new DockNode(this.context.documentManagerView);
+        let documentNode = new DockNode(this.context.documentManagerView);
         this.context.model.rootNode = documentNode;
         this.context.model.documentManagerNode = documentNode;
         this.context.model.dialogs = [];
@@ -77,8 +78,8 @@ export class DockManager {
         this.rebuildLayout(this.context.model.rootNode);
         this.zIndexCounter = 1001;
         if (this.backgroundContext != null) {
-            this.context.model.rootNode.container.tabHost.hostElement
-                .insertBefore(this.backgroundContext, this.context.model.rootNode.container.tabHost.hostElement.firstChild);
+            (<FillDockContainer>this.context.model.rootNode.container).tabHost.hostElement
+                .insertBefore(this.backgroundContext, (<FillDockContainer>this.context.model.rootNode.container).tabHost.hostElement.firstChild);
         }
     }
 
@@ -104,9 +105,9 @@ export class DockManager {
     }
 
     checkYBounds(container, currentMousePosition, previousMousePosition) {
-        var dy = Math.floor(currentMousePosition.y - previousMousePosition.y);
-        var topBounds = container.offsetTop + dy < 0;
-        var bottomBounds = container.offsetTop + dy > (window.innerHeight - 16);
+        let dy = Math.floor(currentMousePosition.y - previousMousePosition.y);
+        let topBounds = container.offsetTop + dy < 0;
+        let bottomBounds = container.offsetTop + dy > (window.innerHeight - 16);
         if (topBounds) {
             previousMousePosition.y = currentMousePosition.y;
             dy = 0;
@@ -121,9 +122,8 @@ export class DockManager {
     }
 
     rebuildLayout(node) {
-        var self = this;
-        node.children.forEach(function (child) {
-            self.rebuildLayout(child);
+        node.children.forEach((child) => {
+            this.rebuildLayout(child);
         });
         node.performLayout();
     }
@@ -132,7 +132,7 @@ export class DockManager {
         this.resize(this.element.clientWidth, this.element.clientHeight);
     }
 
-    resize(width, height) {
+    resize(width: number, height: number) {
         this.element.style.width = width + 'px';
         this.element.style.height = height + 'px';
         this.context.model.rootNode.container.resize(width, height);
@@ -152,9 +152,8 @@ export class DockManager {
     }
 
     loadResize(node) {
-        var self = this;
-        node.children.reverse().forEach(function (child) {
-            self.loadResize(child);
+        node.children.reverse().forEach((child) => {
+            this.loadResize(child);
             node.container.setActiveChild(child.container);
         });
         node.children.reverse();
@@ -176,7 +175,7 @@ export class DockManager {
         this.element.appendChild(node.container.containerElement);
     }
 
-    onDialogDragStarted(sender, e) {
+    _onDialogDragStarted(sender, e) {
         this.dockWheel.activeNode = this._findNodeOnPoint(e.clientX, e.clientY);
         this.dockWheel.activeDialog = sender;
         if (sender.noDocking == null || sender.noDocking !== true)
@@ -189,11 +188,11 @@ export class DockManager {
             this.touchMoveHandler.cancel();
             delete this.touchMoveHandler;
         }
-        this.mouseMoveHandler = new EventHandler(window, 'mousemove', this.onMouseMoved.bind(this));
-        this.touchMoveHandler = new EventHandler(window, 'touchmove', this.onMouseMoved.bind(this));
+        this.mouseMoveHandler = new EventHandler(window, 'mousemove', this._onMouseMoved.bind(this));
+        this.touchMoveHandler = new EventHandler(window, 'touchmove', this._onMouseMoved.bind(this));
     }
 
-    onDialogDragEnded(sender, e) {
+    _onDialogDragEnded(sender, e) {
         if (this.mouseMoveHandler) {
             this.mouseMoveHandler.cancel();
             delete this.mouseMoveHandler;
@@ -209,8 +208,7 @@ export class DockManager {
         sender.saveState(sender.elementDialog.offsetLeft, sender.elementDialog.offsetTop);
     }
 
-    onMouseMoved(e) {
-
+    private _onMouseMoved(e) {
         if (e.changedTouches != null) { // TouchMove Event
             e = e.changedTouches[0];
         }
@@ -223,7 +221,7 @@ export class DockManager {
      * that is under the mouse cursor
      * Retuns null if no node is found under this point
      */
-    _findNodeOnPoint(x, y) {
+    private _findNodeOnPoint(x, y) {
         var stack = [];
         stack.push(this.context.model.rootNode);
         var bestMatch;
@@ -292,13 +290,14 @@ export class DockManager {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine));
     }
 
-    floatDialog(container: PanelContainer, x, y) {
+    floatDialog(container: PanelContainer, x: number, y: number) {
         var retdiag = undefined;
 
         //check the dialog do not already exist
-        this.context.model.dialogs.forEach(function (dialog) {
+        this.context.model.dialogs.forEach((dialog) => {
             if (container == dialog.panel) {
-                dialog.show(x, y);
+                dialog.show();
+                dialog.setPosition(x, y);
                 retdiag = dialog;
             }
         });
@@ -318,7 +317,7 @@ export class DockManager {
         return dialog;
     }
 
-    _requestDockDialog(referenceNode, dialog, layoutDockFunction) {
+    private _requestDockDialog(referenceNode, dialog: Dialog, layoutDockFunction) {
         // Get the active dialog that was dragged on to the dock wheel
         var panel = dialog.panel;
         var newNode = new DockNode(panel);
@@ -329,7 +328,7 @@ export class DockManager {
         return newNode;
     }
 
-    _checkShowBackgroundContext() {
+    private _checkShowBackgroundContext() {
         if (this.backgroundContext != null) {
             if (this.context.model.documentManagerNode.children.length > 0) {
                 this.backgroundContext.style.display = "none";
@@ -339,7 +338,7 @@ export class DockManager {
         }
     }
 
-    _requestDockContainer(referenceNode, container, layoutDockFunction, ratio?) {
+    private _requestDockContainer(referenceNode, container, layoutDockFunction, ratio?) {
         // Get the active dialog that was dragged on to the dock wheel
         let newNode = new DockNode(container);
         if (container.containerType === 'panel') {
@@ -363,7 +362,7 @@ export class DockManager {
         return newNode;
     }
 
-    _requestTabReorder(container, e) {
+    _requestTabReorder(container: IDockContainer, e) {
         let node = this._findNodeFromContainer(container);
         this.layoutEngine.reorderTabs(node, e.handle, e.state, e.index);
     }
@@ -372,7 +371,7 @@ export class DockManager {
      * Undocks a panel and converts it into a floating dialog window
      * It is assumed that only leaf nodes (panels) can be undocked
      */
-    requestUndockToDialog(container, event, dragOffset) {
+    requestUndockToDialog(container: PanelContainer, event, dragOffset) {
         var node = this._findNodeFromContainer(container);
         this.layoutEngine.undock(node);
 
@@ -395,7 +394,7 @@ export class DockManager {
     /**
     * closes a Panel
     */
-    requestClose(container) {
+    requestClose(container: PanelContainer) {
         var node = this._findNodeFromContainer(container);
         this.layoutEngine.close(node);
     }
@@ -404,7 +403,7 @@ export class DockManager {
      * Opens a Elemnt in a Dialog
      * It is assumed that only leaf nodes (panels) can be undocked
      */
-    openInDialog(container, event, dragOffset) {
+    openInDialog(container: PanelContainer, event, dragOffset) {
         // Create a new dialog window for the undocked panel
         var dialog = new Dialog(container, this);
 
@@ -424,7 +423,7 @@ export class DockManager {
     /** Undocks a panel and converts it into a floating dialog window
      * It is assumed that only leaf nodes (panels) can be undocked
      */
-    requestUndock(container) {
+    requestUndock(container: PanelContainer) {
         var node = this._findNodeFromContainer(container);
         this.layoutEngine.undock(node);
     }
@@ -433,7 +432,7 @@ export class DockManager {
      * Removes a dock container from the dock layout hierarcy
      * Returns the node that was removed from the dock tree
      */
-    requestRemove(container) {
+    requestRemove(container: PanelContainer) {
         var node = this._findNodeFromContainer(container);
         var parent = node.parent;
         node.detachFromParent();
@@ -443,10 +442,8 @@ export class DockManager {
     }
 
     /** Finds the node that owns the specified [container] */
-    _findNodeFromContainer(container) {
-        //this.context.model.rootNode.debugDumpTree();
-
-        var stack = [];
+    private _findNodeFromContainer(container: IDockContainer) {
+        let stack = [];
         stack.push(this.context.model.rootNode);
 
         while (stack.length > 0) {
@@ -461,9 +458,7 @@ export class DockManager {
     }
 
     findNodeFromContainerElement(containerElm) {
-        //this.context.model.rootNode.debugDumpTree();
-
-        var stack = [];
+        let stack = [];
         stack.push(this.context.model.rootNode);
 
         while (stack.length > 0) {
@@ -534,7 +529,7 @@ export class DockManager {
     }
 
 
-    notifyOnCreateDialog(dialog) {
+    notifyOnCreateDialog(dialog: Dialog) {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onCreateDialog) {
                 listener.onCreateDialog(this, dialog);
@@ -542,7 +537,7 @@ export class DockManager {
         });
     }
 
-    notifyOnHideDialog(dialog) {
+    notifyOnHideDialog(dialog: Dialog) {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onHideDialog) {
                 listener.onHideDialog(this, dialog);
@@ -551,7 +546,7 @@ export class DockManager {
     }
 
 
-    notifyOnShowDialog(dialog) {
+    notifyOnShowDialog(dialog: Dialog) {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onShowDialog) {
                 listener.onShowDialog(this, dialog);
@@ -560,7 +555,7 @@ export class DockManager {
     }
 
 
-    notifyOnChangeDialogPosition(dialog, x, y) {
+    notifyOnChangeDialogPosition(dialog: Dialog, x: number, y: number) {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onChangeDialogPosition) {
                 listener.onChangeDialogPosition(this, dialog, x, y);
@@ -568,7 +563,7 @@ export class DockManager {
         });
     }
 
-    notifyOnTabChange(tabpage) {
+    notifyOnTabChange(tabpage: TabPage) {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onTabChanged) {
                 listener.onTabChanged(this, tabpage);
@@ -581,7 +576,7 @@ export class DockManager {
         return serializer.serialize(this.context.model);
     }
 
-    loadState(json) {
+    loadState(json: string) {
         let deserializer = new DockGraphDeserializer(this);
         this.context.model = deserializer.deserialize(json);
         this.setModel(this.context.model);

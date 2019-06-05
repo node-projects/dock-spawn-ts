@@ -1,8 +1,8 @@
 import { EventHandler } from "./EventHandler.js";
 
 export class ResizeHandle {
-    
-    element: any;
+
+    element: HTMLElement;
     handleSize: number;
     cornerSize: number;
     east: boolean;
@@ -12,7 +12,7 @@ export class ResizeHandle {
     corner: boolean;
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
-    
+
     constructor() {
         this.element = undefined;
         this.handleSize = 6;   // TODO: Get this from DOM
@@ -24,7 +24,7 @@ export class ResizeHandle {
         this.corner = false;
     }
 
-    adjustSize(container, clientWidth, clientHeight) {
+    adjustSize(clientWidth: number, clientHeight: number) {
         if (this.corner) {
             if (this.west) this.element.style.left = '0px';
             if (this.east) this.element.style.left = (clientWidth - this.cornerSize) + 'px';

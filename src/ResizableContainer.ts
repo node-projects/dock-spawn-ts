@@ -118,9 +118,8 @@ export class ResizableContainer implements IDockContainer {
     }
 
     _adjustResizeHandles(width, height) {
-        var self = this;
-        this.resizeHandles.forEach(function (handle) {
-            handle.adjustSize(self.topLevelElement, width, height);
+        this.resizeHandles.forEach((handle) => {
+            handle.adjustSize(width, height);
         });
     }
 

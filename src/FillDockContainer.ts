@@ -3,9 +3,10 @@ import { Utils } from "./Utils.js";
 import { ContainerType } from "./ContainerType.js";
 import { TabHost } from "./TabHost.js";
 import { TabHostDirection } from "./enums/TabHostDirection.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 
-export class FillDockContainer {
-    
+export class FillDockContainer implements IDockContainer {
+
     dockManager: DockManager;
     tabOrientation: TabHostDirection;
     name: string;
@@ -73,21 +74,21 @@ export class FillDockContainer {
         this.state = { width: state.width, height: state.height };
     }
 
-    get width(): Number {
+    get width(): number {
         // if(this.element.clientWidth === 0 && this.stateWidth !== 0)
         //     return this.stateWidth;
         return this.element.clientWidth;
     }
-    set width(value: Number) {
+    set width(value: number) {
         this.element.style.width = value + 'px'
     }
 
-    get height(): Number {
+    get height(): number {
         // if(this.element.clientHeight === 0 && this.stateHeight !== 0)
         //     return this.stateHeight;
         return this.element.clientHeight;
     }
-    set height(value: Number) {
+    set height(value: number) {
         this.element.style.height = value + 'px'
     }
 }

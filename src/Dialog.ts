@@ -41,10 +41,8 @@ export class Dialog {
 
     _initialize() {
         this.panel.floatingDialog = this;
-        //@ts-ignore
-        this.elementDialog = document.createElement('div');
+        this.elementDialog = Object.assign(document.createElement('div'), { floatingDialog: this });
         this.elementDialog.appendChild(this.panel.elementPanel);
-        this.elementDialog.floatingDialog = this;
         this.draggable = new DraggableContainer(this, this.panel, this.elementDialog, this.panel.elementTitle);
         this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement);
 

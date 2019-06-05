@@ -59,8 +59,7 @@ export class SplitterBar {
         this._performDrag(dx, dy);
         this.previousMouseEvent = e;
         this.readyToProcessNextDrag = true;
-        //@ts-ignore
-        dockManager.resumeLayout();
+        dockManager.resumeLayout(null);
     }
 
     _performDrag(dx, dy) {

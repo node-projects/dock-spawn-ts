@@ -22,8 +22,8 @@ export class DraggableContainer implements IDockContainer {
     touchMoveHandler: EventHandler;
     mouseUpHandler: EventHandler;
     touchUpHandler: EventHandler;
-    
-    constructor(dialog: Dialog, delegate : IDockContainer, topLevelElement: HTMLElement, dragHandle) {
+
+    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, dragHandle) {
         this.dialog = dialog;
         this.delegate = delegate;
         this.containerElement = delegate.containerElement;
@@ -62,7 +62,7 @@ export class DraggableContainer implements IDockContainer {
     }
 
     get name() {
-        return  this.delegate.name;
+        return this.delegate.name;
     }
     set name(value) {
         if (value)
@@ -131,26 +131,26 @@ export class DraggableContainer implements IDockContainer {
 
     _startDragging(event) {
         if (this.dialog.eventListener)
-            this.dialog.eventListener.onDialogDragStarted(this.dialog, event);
+            this.dialog.eventListener._onDialogDragStarted(this.dialog, event);
         document.body.classList.add('disable-selection');
     }
 
     _stopDragging(event) {
         if (this.dialog.eventListener)
-            this.dialog.eventListener.onDialogDragEnded(this.dialog, event);
+            this.dialog.eventListener._onDialogDragEnded(this.dialog, event);
         document.body.classList.remove('disable-selection');
     }
 
-    onMouseMove(event) {
+    onMouseMove(event: TouchEvent | MouseEvent) {
         let br = document.body.getBoundingClientRect();
-        if (event.touches != null) {
+        if ((<TouchEvent>event).touches != null) {
             for (let w in this.dockManager.dockWheel.wheelItems) {
-                var item = this.dockManager.dockWheel.wheelItems[w];
-                var offset = item.element.getBoundingClientRect();
-                if (event.touches[0].clientX > (offset.left - br.left) &&
-                    event.touches[0].clientX < (offset.left + item.element.clientWidth - br.left) &&
-                    event.touches[0].clientY > (offset.top - br.top) &&
-                    event.touches[0].clientY < (offset.top + item.element.clientHeight - br.top)) {
+                let item = this.dockManager.dockWheel.wheelItems[w];
+                let offset = item.element.getBoundingClientRect();
+                if ((<TouchEvent>event).touches[0].clientX > (offset.left - br.left) &&
+                    (<TouchEvent>event).touches[0].clientX < (offset.left + item.element.clientWidth - br.left) &&
+                    (<TouchEvent>event).touches[0].clientY > (offset.top - br.top) &&
+                    (<TouchEvent>event).touches[0].clientY < (offset.top + item.element.clientHeight - br.top)) {
                     item.onMouseMoved(event);
                 } else {
                     item.onMouseOut(event);
@@ -158,21 +158,21 @@ export class DraggableContainer implements IDockContainer {
             }
         }
 
-        if (event.changedTouches != null) { // TouchMove Event
-            event = event.changedTouches[0];
+        if ((<TouchEvent>event).changedTouches != null) { // TouchMove Event
+            event = <any>(<TouchEvent>event).changedTouches[0];
         }
 
-        var currentMousePosition = new Point(event.clientX, event.clientY);
+        let currentMousePosition = new Point((<MouseEvent>event).clientX, (<MouseEvent>event).clientY);
 
-        var dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
-        var dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
+        let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
+        let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
         this._performDrag(dx, dy);
         this.previousMousePosition = currentMousePosition;
     }
 
-    _performDrag(dx, dy) {
-        var left = dx + Utils.getPixels(this.topLevelElement.style.marginLeft);
-        var top = dy + Utils.getPixels(this.topLevelElement.style.marginTop);
+    _performDrag(dx: number, dy: number) {
+        let left = dx + Utils.getPixels(this.topLevelElement.style.marginLeft);
+        let top = dy + Utils.getPixels(this.topLevelElement.style.marginTop);
         this.topLevelElement.style.marginLeft = left + 'px';
         this.topLevelElement.style.marginTop = top + 'px';
     }
