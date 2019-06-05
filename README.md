@@ -1,8 +1,18 @@
 # dock-spawn-ts
 A TypeScript Version of dock-spawn (see https://github.com/coderespawn/dock-spawn)
 
-# how to use:
+# info
+it is still alpha, npm packages will follow in the next few weeks
 
+# testing
+ - download the project
+ - install node packages
+ - compile typescript
+ - run "npm start"
+ - browse to: http://127.0.0.1:8080/demos/ide/demo.html
+
+# how to use:
+(needs to be changed for typescript)
 ```javascript
     // Convert a div to a dock manager.  Panels can then be docked on to it
     dockManager = new DockManager(query("#my_dock_manager"));
