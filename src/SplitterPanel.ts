@@ -167,7 +167,9 @@ export class SplitterPanel {
         // Update the size with this multiplier
         let updatedTotalChildPanelSize = 0;
         for (i = 0; i < this.childContainers.length; i++) {
-            let child = this.childContainers[i];           
+            let child = this.childContainers[i];
+            if (child.containerElement.style.display == 'none')
+                child.containerElement.style.display = 'block';
             let original = this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth;
             let newSize = scaleMultiplier > 1 ? Math.floor(original * scaleMultiplier) : Math.ceil(original * scaleMultiplier);
             updatedTotalChildPanelSize += newSize;
