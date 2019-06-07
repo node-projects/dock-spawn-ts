@@ -1,6 +1,9 @@
 # dock-spawn-ts
 A TypeScript Version of dock-spawn (see https://github.com/coderespawn/dock-spawn)
 
+[![NPM version](http://img.shields.io/npm/v/dock-spawn-ts.svg)](https://www.npmjs.com/package/dock-spawn-ts)
+[![Downloads](https://img.shields.io/npm/dm/dock-spawn-ts.svg)](https://www.npmjs.com/package/dock-spawn-ts)
+
 # info
 it is still alpha, npm packages will follow in the next few weeks
 
