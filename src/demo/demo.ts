@@ -86,8 +86,7 @@ window.onload = () => {
         let output = new PanelContainer(document.getElementById("output_window"), dockManager);
         let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager);
         let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager);
-        //let infovis = new PanelContainer(document.getElementById("infovis"), dockManager);
-        //let infovisdlg = new Dialog(infovis, dockManager);
+        let infovis = new PanelContainer(document.getElementById("infovis"), dockManager);        
 
         // Dock the panels on the dock manager
         let documentNode = dockManager.context.model.documentManagerNode;
@@ -100,7 +99,7 @@ window.onload = () => {
         dockManager.dockFill(documentNode, editor1);
         dockManager.dockFill(documentNode, editor2);
         //dockManager.dockFill(documentNode, infovis);
-        //dockManager.floatDialog(infovis, 50, 50);
+        dockManager.floatDialog(infovis, 50, 50);
     }
 
     document.getElementById('dock_div').style.opacity = '';
