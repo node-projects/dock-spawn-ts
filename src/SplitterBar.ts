@@ -62,22 +62,22 @@ export class SplitterBar {
         dockManager.resumeLayout(null);
     }
 
-    _performDrag(dx, dy) {
-        var previousWidth = this.previousContainer.containerElement.clientWidth;
-        var previousHeight = this.previousContainer.containerElement.clientHeight;
-        var nextWidth = this.nextContainer.containerElement.clientWidth;
-        var nextHeight = this.nextContainer.containerElement.clientHeight;
+    _performDrag(dx: number, dy: number) {
+        let previousWidth = this.previousContainer.containerElement.clientWidth;
+        let previousHeight = this.previousContainer.containerElement.clientHeight;
+        let nextWidth = this.nextContainer.containerElement.clientWidth;
+        let nextHeight = this.nextContainer.containerElement.clientHeight;
 
-        var previousPanelSize = this.stackedVertical ? previousHeight : previousWidth;
-        var nextPanelSize = this.stackedVertical ? nextHeight : nextWidth;
-        var deltaMovement = this.stackedVertical ? dy : dx;
-        var newPreviousPanelSize = previousPanelSize + deltaMovement;
-        var newNextPanelSize = nextPanelSize - deltaMovement;
+        let previousPanelSize = this.stackedVertical ? previousHeight : previousWidth;
+        let nextPanelSize = this.stackedVertical ? nextHeight : nextWidth;
+        let deltaMovement = this.stackedVertical ? dy : dx;
+        let newPreviousPanelSize = previousPanelSize + deltaMovement;
+        let newNextPanelSize = nextPanelSize - deltaMovement;
 
         if (newPreviousPanelSize < this.minPanelSize || newNextPanelSize < this.minPanelSize) {
             // One of the panels is smaller than it should be.
             // In that case, check if the small panel's size is being increased
-            var continueProcessing = (newPreviousPanelSize < this.minPanelSize && newPreviousPanelSize > previousPanelSize) ||
+            let continueProcessing = (newPreviousPanelSize < this.minPanelSize && newPreviousPanelSize > previousPanelSize) ||
                 (newNextPanelSize < this.minPanelSize && newNextPanelSize > nextPanelSize);
 
             if (!continueProcessing)
@@ -96,7 +96,7 @@ export class SplitterBar {
         document.dispatchEvent(this.dockSpawnResizedEvent);
     }
 
-    _startDragging(e) {
+    _startDragging(e : MouseEvent & TouchEvent) {
         Utils.disableGlobalTextSelection();
         if (this.mouseMovedHandler) {
             this.mouseMovedHandler.cancel();

@@ -7,6 +7,7 @@ import { FillDockContainer } from "./FillDockContainer.js";
 import { IRectangle } from "./interfaces/IRectangle.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { PanelContainer } from "./PanelContainer.js";
+import { TabHandle } from "./TabHandle.js";
 
 export class DockLayoutEngine {
 
@@ -17,31 +18,31 @@ export class DockLayoutEngine {
     }
 
     /** docks the [newNode] to the left of [referenceNode] */
-    dockLeft(referenceNode, newNode) {
+    dockLeft(referenceNode: DockNode, newNode: DockNode) {
         this._performDock(referenceNode, newNode, 'horizontal', true);
     }
 
     /** docks the [newNode] to the right of [referenceNode] */
-    dockRight(referenceNode, newNode) {
+    dockRight(referenceNode: DockNode, newNode: DockNode) {
         this._performDock(referenceNode, newNode, 'horizontal', false);
     }
 
     /** docks the [newNode] to the top of [referenceNode] */
-    dockUp(referenceNode, newNode) {
+    dockUp(referenceNode: DockNode, newNode: DockNode) {
         this._performDock(referenceNode, newNode, 'vertical', true);
     }
 
     /** docks the [newNode] to the bottom of [referenceNode] */
-    dockDown(referenceNode, newNode) {
+    dockDown(referenceNode: DockNode, newNode: DockNode) {
         this._performDock(referenceNode, newNode, 'vertical', false);
     }
 
     /** docks the [newNode] by creating a new tab inside [referenceNode] */
-    dockFill(referenceNode, newNode) {
+    dockFill(referenceNode: DockNode, newNode: DockNode) {
         this._performDock(referenceNode, newNode, 'fill', false);
     }
 
-    undock(node) {
+    undock(node: DockNode) {
         let parentNode = node.parent;
         if (!parentNode)
             throw new Error('Cannot undock.  panel is not a leaf node');
@@ -68,7 +69,7 @@ export class DockLayoutEngine {
                     parentNode.container.destroy();
 
                     otherChild.container.resize(width, height);
-                    grandParent.performLayout();
+                    grandParent.performLayout(false);
                 }
                 else {
                     // Parent is a root node.
@@ -82,7 +83,7 @@ export class DockLayoutEngine {
         else {
             // the node to be removed has 2 or more other siblings. So it is safe to continue
             // using the parent composite container.
-            parentNode.performLayout();
+            parentNode.performLayout(false);
 
             // Set the next sibling as the active child (e.g. for a Tab host, it would select it as the active tab)
             if (parentNode.children.length > 0) {
@@ -95,17 +96,17 @@ export class DockLayoutEngine {
         this.dockManager.notifyOnUnDock(node);
     }
 
-    close(node) {
+    close(node: DockNode) {
         let parentNode = node.parent;
         if (!parentNode)
             throw new Error('Cannot undock.  panel is not a leaf node');
 
-        //check if closed tab wa sthe active one
+        //check if closed tab was the active one
         let activetabClosed = false;
         if (parentNode.children.length > 0) {
-            if (parentNode.container.tabHost != null) {
-                let activeTab = parentNode.container.tabHost.getActiveTab();
-                activetabClosed = activeTab.panel == node.container;
+            if ((<FillDockContainer>parentNode.container).tabHost != null) {
+                let activeTab = (<FillDockContainer>parentNode.container).tabHost.getActiveTab();
+                activetabClosed = activeTab.container == node.container;
             }
         }
 
@@ -130,7 +131,7 @@ export class DockLayoutEngine {
                     parentNode.container.destroy();
 
                     otherChild.container.resize(width, height);
-                    grandParent.performLayout();
+                    grandParent.performLayout(false);
                 } else {
                     // Parent is a root node.
                     // Make the other child the root node
@@ -142,7 +143,7 @@ export class DockLayoutEngine {
         } else {
             // the node to be removed has 2 or more other siblings. So it is safe to continue
             // using the parent composite container.
-            parentNode.performLayout();
+            parentNode.performLayout(false);
 
             if (activetabClosed) {
                 let nextActiveSibling = parentNode.children[Math.max(0, siblingIndex - 1)];
@@ -155,7 +156,7 @@ export class DockLayoutEngine {
         this.dockManager.notifyOnUnDock(node);
     }
 
-    reorderTabs(node, handle, state, index) {
+    reorderTabs(node: DockNode, handle: TabHandle, state: string, index: number) {
         let N = node.children.length;
         let nodeIndexToDelete = state === 'left' ? index : index + 1;
         if (state == 'right' && nodeIndexToDelete >= node.children.length)
@@ -168,11 +169,11 @@ export class DockLayoutEngine {
         indexes.splice(state === 'left' ? index - 1 : index, 0, indexValue); //insert
 
         node.children = Utils.orderByIndexes(node.children, indexes); //apply
-        node.container.tabHost.performTabsLayout(indexes);
+        (<FillDockContainer>node.container).tabHost.performTabsLayout(indexes);
         this.dockManager.notifyOnTabsReorder(node);
     }
 
-    _performDock(referenceNode: DockNode, newNode: DockNode, direction, insertBeforeReference: boolean) {
+    _performDock(referenceNode: DockNode, newNode: DockNode, direction: string, insertBeforeReference: boolean) {
         (<PanelContainer>newNode.container).elementPanel.style.position = "relative";
 
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')

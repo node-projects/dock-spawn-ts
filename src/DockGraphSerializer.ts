@@ -19,10 +19,9 @@ export class DockGraphSerializer {
         let nodeState = new Map<string, object>();
         node.container.saveState(nodeState);
 
-        let childrenInfo = [];
-        let self = this;
-        node.children.forEach(function (childNode) {
-            childrenInfo.push(self._buildGraphInfo(childNode));
+        let childrenInfo: INodeInfo[] = [];
+        node.children.forEach((childNode) => {
+            childrenInfo.push(this._buildGraphInfo(childNode));
         });
 
         let nodeInfo: INodeInfo = {

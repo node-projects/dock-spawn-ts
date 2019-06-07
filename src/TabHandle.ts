@@ -94,7 +94,7 @@ export class TabHandle {
         this.eventListeners.splice(this.eventListeners.indexOf(listener), 1);
     }
 
-    undockEnabled(state) {
+    undockEnabled(state: boolean) {
         this.undockInitiator.enabled = state;
     }
 
@@ -201,7 +201,7 @@ export class TabHandle {
     }
 
     moveTabEvent(that, state) {
-        that.eventListeners.forEach(function (listener) {
+        that.eventListeners.forEach((listener) => {
             if (listener.onMoveTab) {
                 listener.onMoveTab({ self: that, state: state });
             }
@@ -292,14 +292,14 @@ export class TabHandle {
     }
 
     setSelected(selected) {
-        var selectedClassName = 'dockspan-tab-handle-selected';
+        let selectedClassName = 'dockspan-tab-handle-selected';
         if (selected)
             this.elementBase.classList.add(selectedClassName);
         else
             this.elementBase.classList.remove(selectedClassName);
     }
 
-    setZIndex(zIndex) {
+    setZIndex(zIndex: number) {
         this.elementBase.style.zIndex = zIndex;
     }
 

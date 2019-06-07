@@ -38,7 +38,7 @@ export class TabPage {
         this.handle.destroy();
 
         if (this.container instanceof PanelContainer) {
-            var panel = this.container;
+            let panel = this.container;
             delete panel.onTitleChanged;
         }
     }
@@ -46,7 +46,7 @@ export class TabPage {
     onSelected() {
         this.host.onTabPageSelected(this);
         if (this.container instanceof PanelContainer) {
-            var panel = this.container;
+            let panel = this.container;
             panel.dockManager.notifyOnTabChange(this);
         }
 
@@ -71,7 +71,7 @@ export class TabPage {
         }
     }
 
-    resize(width, height) {
+    resize(width: number, height: number) {
         this.container.resize(width, height);
     }
 }

@@ -111,13 +111,13 @@ export class ResizableContainer implements IDockContainer {
             this.delegate.name = value;
     }
 
-    resize(width, height) {
+    resize(width: number, height: number) {
         this.delegate.resize(width, height);
         this._adjustResizeHandles(width, height);
         document.dispatchEvent(this.dockSpawnResizedEvent);
     }
 
-    _adjustResizeHandles(width, height) {
+    _adjustResizeHandles(width: number, height: number) {
         this.resizeHandles.forEach((handle) => {
             handle.adjustSize(width, height);
         });
@@ -199,7 +199,7 @@ export class ResizableContainer implements IDockContainer {
         document.body.classList.remove('disable-selection');
     }
 
-    _performDrag(handle, dx, dy) {
+    _performDrag(handle, dx: number, dy: number) {
         let bounds: IThickness = {};
         bounds.left = Utils.getPixels(this.topLevelElement.style.marginLeft);
         bounds.top = Utils.getPixels(this.topLevelElement.style.marginTop);
@@ -212,19 +212,19 @@ export class ResizableContainer implements IDockContainer {
         if (handle.south) this._resizeSouth(dy, bounds);
     }
 
-    _resizeWest(dx, bounds) {
+    _resizeWest(dx: number, bounds) {
         this._resizeContainer(dx, 0, -dx, 0, bounds);
     }
 
-    _resizeEast(dx, bounds) {
+    _resizeEast(dx: number, bounds) {
         this._resizeContainer(0, 0, dx, 0, bounds);
     }
 
-    _resizeNorth(dy, bounds) {
+    _resizeNorth(dy: number, bounds) {
         this._resizeContainer(0, dy, 0, -dy, bounds);
     }
 
-    _resizeSouth(dy, bounds) {
+    _resizeSouth(dy: number, bounds) {
         this._resizeContainer(0, 0, 0, dy, bounds);
     }
 
