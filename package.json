@@ -18,5 +18,6 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0"
   },
-  "files": ["lib/**/*"]
+  "files": ["lib/**/*"],
+  "homepage": "https://github.com/node-projects/dock-spawn-ts"
 }
