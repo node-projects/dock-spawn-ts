@@ -357,15 +357,18 @@ export class DockManager {
      * It is assumed that only leaf nodes (panels) can be undocked
      */
     requestUndockToDialog(container: PanelContainer, event, dragOffset) {
-        var node = this._findNodeFromContainer(container);
+        let node = this._findNodeFromContainer(container);
         this.layoutEngine.undock(node);
 
+        let panelContainer = (<PanelContainer>node.container);
+        panelContainer.elementPanel.style.display = 'block';
+
         // Create a new dialog window for the undocked panel
-        var dialog = new Dialog(node.container, this);
+        let dialog = new Dialog(panelContainer, this);
 
         if (event !== undefined) {
             // Adjust the relative position
-            var dialogWidth = dialog.elementDialog.clientWidth;
+            let dialogWidth = dialog.elementDialog.clientWidth;
             if (dragOffset.x > dialogWidth)
                 dragOffset.x = 0.75 * dialogWidth;
             dialog.setPosition(
@@ -427,7 +430,7 @@ export class DockManager {
     }
 
     /** Finds the node that owns the specified [container] */
-    private _findNodeFromContainer(container: IDockContainer) {
+    private _findNodeFromContainer(container: IDockContainer): DockNode {
         let stack = [];
         stack.push(this.context.model.rootNode);
 
