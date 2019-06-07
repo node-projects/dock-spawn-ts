@@ -6,6 +6,7 @@ import { VerticalDockContainer } from "./VerticalDockContainer.js";
 import { FillDockContainer } from "./FillDockContainer.js";
 import { IRectangle } from "./interfaces/IRectangle.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { PanelContainer } from "./PanelContainer.js";
 
 export class DockLayoutEngine {
 
@@ -171,15 +172,15 @@ export class DockLayoutEngine {
         this.dockManager.notifyOnTabsReorder(node);
     }
 
-    _performDock(referenceNode, newNode, direction, insertBeforeReference) {
-        newNode.container.elementPanel.style.position = "relative";
+    _performDock(referenceNode: DockNode, newNode: DockNode, direction, insertBeforeReference: boolean) {
+        (<PanelContainer>newNode.container).elementPanel.style.position = "relative";
 
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')
             referenceNode = referenceNode.parent;
 
         if (direction === 'fill' && referenceNode.container.containerType === 'fill') {
             referenceNode.addChild(newNode);
-            referenceNode.performLayout();
+            referenceNode.performLayout(false);
             referenceNode.container.setActiveChild(newNode.container);
             this.dockManager.invalidate();
             this.dockManager.notifyOnDock(newNode);
@@ -188,9 +189,9 @@ export class DockLayoutEngine {
 
         // Check if reference node is root node
         let model = this.dockManager.context.model,
-            compositeContainer,
-            compositeNode,
-            referenceParent;
+            compositeContainer: IDockContainer,
+            compositeNode: DockNode,
+            referenceParent: DockNode;
 
         if (referenceNode === model.rootNode) {
             compositeContainer = this._createDockContainer(direction, newNode, referenceNode);
@@ -242,8 +243,8 @@ export class DockLayoutEngine {
                 compositeNode.addChild(newNode);
             }
 
-            referenceParent.performLayout();
-            compositeNode.performLayout();
+            referenceParent.performLayout(false);
+            compositeNode.performLayout(true);
 
             compositeNode.container.setActiveChild(newNode.container);
             compositeNode.container.resize(referenceNodeWidth, referenceNodeHeight);
@@ -256,7 +257,7 @@ export class DockLayoutEngine {
                 referenceParent.addChildBefore(referenceNode, newNode);
             else
                 referenceParent.addChildAfter(referenceNode, newNode);
-            referenceParent.performLayout();
+            referenceParent.performLayout(false);
             referenceParent.container.setActiveChild(newNode.container);
         }
 
@@ -291,7 +292,7 @@ export class DockLayoutEngine {
      * The state is not modified in this function.  It is used for showing a preview of where
      * the panel would be docked when hovered over a dock wheel button
      */
-    getDockBounds(referenceNode:DockNode, containerToDock:IDockContainer, direction, insertBeforeReference:boolean): IRectangle {
+    getDockBounds(referenceNode: DockNode, containerToDock: IDockContainer, direction, insertBeforeReference: boolean): IRectangle {
         let compositeNode; // The node that contains the splitter / fill node
         let childCount;
         let childPosition;
@@ -300,9 +301,9 @@ export class DockLayoutEngine {
         if (direction === 'fill') {
             // Since this is a fill operation, the highlight bounds is the same as the reference node
             // TODO: Create a tab handle highlight to show that it's going to be docked in a tab
-            let targetElement = referenceNode.container.containerElement;            
+            let targetElement = referenceNode.container.containerElement;
             let targetElementRect = targetElement.getBoundingClientRect();
-            return { x: targetElementRect.left , y: targetElementRect.top, width: targetElement.clientWidth, height: targetElement.clientHeight };
+            return { x: targetElementRect.left, y: targetElementRect.top, width: targetElement.clientWidth, height: targetElement.clientHeight };
         }
 
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')

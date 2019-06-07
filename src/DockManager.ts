@@ -302,10 +302,10 @@ export class DockManager {
         return dialog;
     }
 
-    private _requestDockDialog(referenceNode, dialog: Dialog, layoutDockFunction) {
+    private _requestDockDialog(referenceNode: DockNode, dialog: Dialog, layoutDockFunction) {
         // Get the active dialog that was dragged on to the dock wheel
-        var panel = dialog.panel;
-        var newNode = new DockNode(panel);
+        let panel = dialog.panel;
+        let newNode = new DockNode(panel);
         panel.prepareForDocking();
         dialog.destroy();
         layoutDockFunction(referenceNode, newNode);

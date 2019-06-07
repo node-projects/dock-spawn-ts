@@ -60,9 +60,9 @@ export class DockNode {
         Array.prototype.push.apply(this.children, postList);
     }
 
-    performLayout() {
+    performLayout(relayoutEvenIfEqual : boolean) {
         var childContainers = this.children.map((childNode) => { return childNode.container; });
-        this.container.performLayout(childContainers);
+        this.container.performLayout(childContainers, relayoutEvenIfEqual);
     }
 
     debugDumpTree(indent) {

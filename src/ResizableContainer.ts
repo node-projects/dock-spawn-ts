@@ -124,7 +124,7 @@ export class ResizableContainer implements IDockContainer {
     }
 
     performLayout(children) {
-        this.delegate.performLayout(children);
+        this.delegate.performLayout(children, false);
     }
 
     destroy() {

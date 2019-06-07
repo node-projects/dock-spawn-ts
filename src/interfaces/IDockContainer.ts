@@ -4,7 +4,7 @@ import { DockManager } from "../DockManager.js";
 export interface IDockContainer {
     readonly dockManager: DockManager;
     resize(_width: number, _height: number): void;
-    performLayout(children: IDockContainer[]): void;
+    performLayout(children: IDockContainer[], relayoutEvenIfEqual : boolean): void;
     destroy(): void;
     setActiveChild(child: IDockContainer): void;
     saveState(state: Map<String, Object>): void;

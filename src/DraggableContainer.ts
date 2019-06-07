@@ -74,7 +74,7 @@ export class DraggableContainer implements IDockContainer {
     }
 
     performLayout(children) {
-        this.delegate.performLayout(children);
+        this.delegate.performLayout(children, false);
     }
 
     removeDecorator() {

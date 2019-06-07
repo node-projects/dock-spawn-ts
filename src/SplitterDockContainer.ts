@@ -39,8 +39,8 @@ export abstract class SplitterDockContainer {
         this._cachedHeight = height;
     }
 
-    performLayout(childContainers) {
-        this.splitterPanel.performLayout(childContainers);
+    performLayout(childContainers: IDockContainer[], relayoutEvenIfEqual : boolean = false) {
+        this.splitterPanel.performLayout(childContainers, relayoutEvenIfEqual);
     }
 
     setActiveChild(/*child*/) {

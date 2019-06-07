@@ -48,7 +48,7 @@ export class DockWheel {
 
 
     /** The node over which the dock wheel is being displayed on */
-    get activeNode() : DockNode {
+    get activeNode(): DockNode {
         return this._activeNode;
     }
     set activeNode(value: DockNode) {
@@ -176,7 +176,7 @@ export class DockWheel {
     /**
      * Returns the wheel item which has the mouse cursor on top of it
      */
-    _getActiveWheelItem() {
+    _getActiveWheelItem(): DockWheelItem {
         for (let wheelType in this.wheelItems) {
             let wheelItem = this.wheelItems[wheelType];
             if (wheelItem.active)

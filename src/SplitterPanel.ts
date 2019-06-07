@@ -25,10 +25,10 @@ export class SplitterPanel {
             throw new Error('Splitter panel should contain atleast 2 panels');
 
         this.spiltterBars = [];
-        for (var i = 0; i < this.childContainers.length - 1; i++) {
-            var previousContainer = this.childContainers[i];
-            var nextContainer = this.childContainers[i + 1];
-            var splitterBar = new SplitterBar(previousContainer, nextContainer, this.stackedVertical);
+        for (let i = 0; i < this.childContainers.length - 1; i++) {
+            let previousContainer = this.childContainers[i];
+            let nextContainer = this.childContainers[i + 1];
+            let splitterBar = new SplitterBar(previousContainer, nextContainer, this.stackedVertical);
             this.spiltterBars.push(splitterBar);
 
             // Add the container and split bar to the panel's base div element
@@ -38,9 +38,9 @@ export class SplitterPanel {
         this._insertContainerIntoPanel(this.childContainers.slice(-1)[0]);
     }
 
-    performLayout(children) {
-        var containersEqual = this.arraysEqual(this.childContainers, children);
-        if (!containersEqual) {
+    performLayout(children, relayoutEvenIfEqual : boolean) {
+        let containersEqual = this.arraysEqual(this.childContainers, children);        
+        if (!containersEqual || relayoutEvenIfEqual) {
             this.removeFromDOM();
 
             // rebuild
