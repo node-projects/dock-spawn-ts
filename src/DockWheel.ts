@@ -1,6 +1,8 @@
 import { Utils } from "./Utils.js";
 import { DockManager } from "./DockManager.js";
 import { DockWheelItem } from "./DockWheelItem.js";
+import { WheelTypes } from "./enums/WheelTypes.js";
+import { Dialog } from "./Dialog.js";
 
 /**
  * Manages the dock overlay buttons that are displayed over the dock manager
@@ -9,7 +11,7 @@ export class DockWheel {
     dockManager: DockManager;
     elementMainWheel: HTMLDivElement;
     elementSideWheel: HTMLDivElement;
-    wheelItems: {};
+    wheelItems: { [index in WheelTypes]?: DockWheelItem; };
     elementPanelPreview: HTMLDivElement;
     activeDialog: any;
     _activeNode: any;
@@ -20,29 +22,24 @@ export class DockWheel {
         this.elementMainWheel = document.createElement('div');    // Contains the main wheel's 5 dock buttons
         this.elementSideWheel = document.createElement('div');    // Contains the 4 buttons on the side
         this.wheelItems = {};
-        var wheelTypes = [
-            'left', 'right', 'top', 'down', 'fill',     // Main dock wheel buttons
-            'left-s', 'right-s', 'top-s', 'down-s'      // Buttons on the extreme 4 sides
-        ];
-        var self = this;
-        wheelTypes.forEach((wheelType) => {
-            self.wheelItems[wheelType] = new DockWheelItem(self, wheelType);
+        for (let wheelType of Object.values(WheelTypes)) {
+            this.wheelItems[wheelType] = new DockWheelItem(this, wheelType);
             if (wheelType.substr(-2, 2) === '-s')
                 // Side button
-                self.elementSideWheel.appendChild(self.wheelItems[wheelType].element);
+                this.elementSideWheel.appendChild(this.wheelItems[wheelType].element);
             else
                 // Main dock wheel button
-                self.elementMainWheel.appendChild(self.wheelItems[wheelType].element);
-        });
+                this.elementMainWheel.appendChild(this.wheelItems[wheelType].element);
+        };
 
         var zIndex = 9000000;
         this.elementMainWheel.classList.add('dock-wheel-base');
         this.elementSideWheel.classList.add('dock-wheel-base');
         this.elementMainWheel.style.zIndex = String(zIndex + 1);
-        this.elementSideWheel.style.zIndex =  String(zIndex);
+        this.elementSideWheel.style.zIndex = String(zIndex);
         this.elementPanelPreview = document.createElement('div');
         this.elementPanelPreview.classList.add('dock-wheel-panel-preview');
-        this.elementPanelPreview.style.zIndex =  String(zIndex - 1);
+        this.elementPanelPreview.style.zIndex = String(zIndex - 1);
         this.activeDialog = undefined;  // The dialog being dragged, when the wheel is visible
         this._activeNode = undefined;
         this._visible = false;
@@ -54,7 +51,7 @@ export class DockWheel {
         return this._activeNode;
     }
     set activeNode(value) {
-        var previousValue = this._activeNode;
+        let previousValue = this._activeNode;
         this._activeNode = value;
 
         if (previousValue !== this._activeNode) {
@@ -86,7 +83,7 @@ export class DockWheel {
         let sideMargin = 20;
         let dockManagerWidth = this.dockManager.element.clientWidth;
         let dockManagerHeight = this.dockManager.element.clientHeight;
-        
+
         Utils.removeNode(this.elementMainWheel);
         Utils.removeNode(this.elementSideWheel);
         element.appendChild(this.elementMainWheel);
@@ -99,12 +96,12 @@ export class DockWheel {
     }
 
     _setWheelButtonPosition(wheelId, left, top) {
-        var item = this.wheelItems[wheelId];
-        var itemHalfWidth = item.element.clientWidth / 2;
-        var itemHalfHeight = item.element.clientHeight / 2;
+        let item = this.wheelItems[wheelId];
+        let itemHalfWidth = item.element.clientWidth / 2;
+        let itemHalfHeight = item.element.clientHeight / 2;
 
-        var x = Math.floor(left - itemHalfWidth);
-        var y = Math.floor(top - itemHalfHeight);
+        let x = Math.floor(left - itemHalfWidth);
+        let y = Math.floor(top - itemHalfHeight);
         //    item.element.style.left = '${x}px';
         //    item.element.style.top = '${y}px';
         item.element.style.marginLeft = x + 'px';
@@ -128,8 +125,8 @@ export class DockWheel {
             return;
 
         // Display the preview panel to show where the panel would be docked
-        var rootNode = this.dockManager.context.model.rootNode;
-        var bounds;
+        let rootNode = this.dockManager.context.model.rootNode;
+        let bounds;
         if (wheelItem.id === 'top') {
             bounds = this.dockManager.layoutEngine.getDockBounds(this.activeNode, this.activeDialog.panel, 'vertical', true);
         } else if (wheelItem.id === 'down') {
@@ -170,7 +167,7 @@ export class DockWheel {
      */
     onDialogDropped(dialog) {
         // Check if the dialog was dropped in one of the wheel items
-        var wheelItem = this._getActiveWheelItem();
+        let wheelItem = this._getActiveWheelItem();
         if (wheelItem)
             this._handleDockRequest(wheelItem, dialog);
     }
@@ -179,15 +176,15 @@ export class DockWheel {
      * Returns the wheel item which has the mouse cursor on top of it
      */
     _getActiveWheelItem() {
-        for (var wheelType in this.wheelItems) {
-            var wheelItem = this.wheelItems[wheelType];
+        for (let wheelType in this.wheelItems) {
+            let wheelItem = this.wheelItems[wheelType];
             if (wheelItem.active)
                 return wheelItem;
         }
         return undefined;
     }
 
-    _handleDockRequest(wheelItem, dialog) {
+    _handleDockRequest(wheelItem: DockWheelItem, dialog: Dialog) {
         wheelItem.active = false;
         wheelItem.element.classList.remove(wheelItem.hoverIconClass);
 

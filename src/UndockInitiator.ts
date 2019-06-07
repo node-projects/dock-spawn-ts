@@ -20,8 +20,8 @@ export class UndockInitiator {
     touchDownHandler: EventHandler;
     element: HTMLElement;
     listener: (e: MouseEvent, dragOffset: Point) => Dialog;
-    
-    constructor(element: Element, listener:( e: MouseEvent, dragOffset:Point)=> Dialog, thresholdPixels?: number) {
+
+    constructor(element: Element, listener: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number) {
         if (!thresholdPixels) {
             thresholdPixels = 10;
         }
@@ -33,10 +33,10 @@ export class UndockInitiator {
         //this.horizontalChange = true;
     }
 
-    get enabled() {
+    get enabled(): boolean {
         return this._enabled;
     }
-    set enabled(value) {
+    set enabled(value: boolean) {
         this._enabled = value;
         if (this._enabled) {
             if (this.mouseDownHandler) {
@@ -89,7 +89,7 @@ export class UndockInitiator {
     //     this.horizontalChange = horizontalChange;
     //     this.thresholdPixels = thresholdPixels;
     //};
-    onMouseDown(e) {
+    onMouseDown(e:any) {
         // Make sure we dont do this on floating dialogs
         if (this.enabled) {
             if (e.touches)

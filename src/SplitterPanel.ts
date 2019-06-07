@@ -12,8 +12,7 @@ export class SplitterPanel {
     stackedVertical: boolean;
     childContainers: IDockContainer[];
 
-    constructor(childContainers: IDockContainer[], stackedVertical: boolean)
-    {
+    constructor(childContainers: IDockContainer[], stackedVertical: boolean) {
         this.childContainers = childContainers;
         this.stackedVertical = stackedVertical;
         this.panelElement = document.createElement('div');
@@ -21,8 +20,7 @@ export class SplitterPanel {
         this._buildSplitterDOM();
     }
 
-    _buildSplitterDOM()
-    {
+    _buildSplitterDOM() {
         if (this.childContainers.length <= 1)
             throw new Error('Splitter panel should contain atleast 2 panels');
 
@@ -62,8 +60,7 @@ export class SplitterPanel {
         return true;
     }
 
-    removeFromDOM()
-    {
+    removeFromDOM() {
         this.childContainers.forEach((container) => {
             if (container.containerElement) {
                 container.containerElement.classList.remove('splitter-container-vertical');
@@ -74,14 +71,12 @@ export class SplitterPanel {
         this.spiltterBars.forEach((bar) => { Utils.removeNode(bar.barElement); });
     }
 
-    destroy()
-    {
+    destroy() {
         this.removeFromDOM();
         this.panelElement.parentNode.removeChild(this.panelElement);
     }
 
-    _insertContainerIntoPanel(container)
-    {
+    _insertContainerIntoPanel(container) {
         if (!container) {
             console.log('undefined');
         }
@@ -97,8 +92,7 @@ export class SplitterPanel {
      * Sets the percentage of space the specified [container] takes in the split panel
      * The percentage is specified in [ratio] and is between 0..1
      */
-    setContainerRatio(container, ratio)
-    {
+    setContainerRatio(container, ratio) {
         var splitPanelSize = this.stackedVertical ? this.panelElement.clientHeight : this.panelElement.clientWidth;
         var newContainerSize = splitPanelSize * ratio;
         var barSize = this.stackedVertical ?
@@ -124,23 +118,22 @@ export class SplitterPanel {
         }
     }
 
-    resize(width, height)
-    {
+    resize(width, height) {
         if (this.childContainers.length <= 1)
             return;
 
-        var i;
+        let i;
 
         // Adjust the fixed dimension that is common to all (i.e. width, if stacked vertical; height, if stacked horizontally)
         for (i = 0; i < this.childContainers.length; i++) {
-            var childContainer = this.childContainers[i];
+            let childContainer = this.childContainers[i];
             if (this.stackedVertical)
                 childContainer.resize(width, childContainer.height);
             else
                 childContainer.resize(childContainer.width, height);
 
             if (i < this.spiltterBars.length) {
-                var splitBar = this.spiltterBars[i];
+                let splitBar = this.spiltterBars[i];
                 if (this.stackedVertical)
                     splitBar.barElement.style.width = width + 'px';
                 else
@@ -149,39 +142,34 @@ export class SplitterPanel {
         }
 
         // Adjust the varying dimension
-        var totalChildPanelSize = 0;
+        let totalChildPanelSize = 0;
         // Find out how much space existing child containers take up (excluding the splitter bars)
-        var self = this;
-        this.childContainers.forEach(function (container) {
-            var size = self.stackedVertical ?
+        this.childContainers.forEach((container) => {
+            let size = this.stackedVertical ?
                 container.height :
                 container.width;
             totalChildPanelSize += size;
         });
 
         // Get the thickness of the bar
-        var barSize = this.stackedVertical ?
+        let barSize = this.stackedVertical ?
             this.spiltterBars[0].barElement.clientHeight : this.spiltterBars[0].barElement.clientWidth;
 
         // Find out how much space existing child containers will take after being resized (excluding the splitter bars)
-        var targetTotalChildPanelSize = this.stackedVertical ? height : width;
+        let targetTotalChildPanelSize = this.stackedVertical ? height : width;
         targetTotalChildPanelSize -= barSize * this.spiltterBars.length;
 
         // Get the scale multiplier
         totalChildPanelSize = Math.max(totalChildPanelSize, 1);
-        var scaleMultiplier = targetTotalChildPanelSize / totalChildPanelSize;
+        let scaleMultiplier = targetTotalChildPanelSize / totalChildPanelSize;
 
 
         // Update the size with this multiplier
-        var updatedTotalChildPanelSize = 0;
+        let updatedTotalChildPanelSize = 0;
         for (i = 0; i < this.childContainers.length; i++) {
-            var child = this.childContainers[i];
-            var original = this.stackedVertical ?
-                child.containerElement.clientHeight :
-                child.containerElement.clientWidth;
-
-            var newSize = scaleMultiplier > 1 ? Math.floor(original * scaleMultiplier) :
-                Math.ceil(original * scaleMultiplier);
+            let child = this.childContainers[i];           
+            let original = this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth;
+            let newSize = scaleMultiplier > 1 ? Math.floor(original * scaleMultiplier) : Math.ceil(original * scaleMultiplier);
             updatedTotalChildPanelSize += newSize;
 
             // If this is the last node, add any extra pixels to fix the rounding off errors and match the requested size

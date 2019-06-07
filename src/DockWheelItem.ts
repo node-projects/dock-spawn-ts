@@ -1,16 +1,18 @@
 import { EventHandler } from "./EventHandler.js";
+import { DockWheel } from "./DockWheel.js";
+import { WheelTypes } from "./enums/WheelTypes.js";
 
 export class DockWheelItem {
 
-    wheel: any;
-    id: any;
+    wheel: DockWheel;
+    id: WheelTypes;
     element: HTMLDivElement;
     hoverIconClass: string;
     mouseOverHandler: EventHandler;
     mouseOutHandler: EventHandler;
     active: boolean;
 
-    constructor(wheel, id) {
+    constructor(wheel: DockWheel, id: WheelTypes) {
         this.wheel = wheel;
         this.id = id;
         let wheelType = id.replace('-s', '');
@@ -28,12 +30,12 @@ export class DockWheelItem {
     onMouseMoved(e) {
         this.active = true;
         this.element.classList.add(this.hoverIconClass);
-        this.wheel.onMouseOver(this, e);
+        this.wheel.onMouseOver(this);
     }
 
     onMouseOut(e) {
         this.active = false;
         this.element.classList.remove(this.hoverIconClass);
-        this.wheel.onMouseOut(this, e);
+        this.wheel.onMouseOut();
     }
 }

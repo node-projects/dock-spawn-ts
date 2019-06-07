@@ -13,7 +13,7 @@ window.refresh = refresh;
 
 window.onload = () => {
     // Convert a div to the dock manager. Panels can then be docked on to it
-    let divDockManager = document.getElementById('my_dock_manager');
+    let divDockManager = <HTMLDivElement>document.getElementById('my_dock_manager');
     dockManager = new DockManager(divDockManager);
     //@ts-ignore
     window.dockManager = dockManager;
@@ -25,7 +25,7 @@ window.onload = () => {
     }
 
     // Let the dock manager element fill in the entire screen
-    window.onresize = function () {
+    window.onresize = () => {
         dockManager.resize(
             window.innerWidth - (divDockManager.clientLeft + divDockManager.offsetLeft),
             window.innerHeight - (divDockManager.clientTop + divDockManager.offsetTop)
@@ -86,7 +86,7 @@ window.onload = () => {
         let output = new PanelContainer(document.getElementById("output_window"), dockManager);
         let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager);
         let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager);
-        let infovis = new PanelContainer(document.getElementById("infovis"), dockManager);
+        //let infovis = new PanelContainer(document.getElementById("infovis"), dockManager);
         //let infovisdlg = new Dialog(infovis, dockManager);
 
         // Dock the panels on the dock manager
@@ -100,7 +100,7 @@ window.onload = () => {
         dockManager.dockFill(documentNode, editor1);
         dockManager.dockFill(documentNode, editor2);
         //dockManager.dockFill(documentNode, infovis);
-        dockManager.floatDialog(infovis, 50, 50);
+        //dockManager.floatDialog(infovis, 50, 50);
     }
 
     document.getElementById('dock_div').style.opacity = '';

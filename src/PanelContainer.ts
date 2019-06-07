@@ -53,7 +53,7 @@ export class PanelContainer implements IDockContainer {
         this._initialize();
     }
 
-    canUndock(state) {
+    canUndock(state: boolean) {
         this._canUndock = state;
         this.undockInitiator.enabled = state;
         this.eventListeners.forEach((listener) => {

@@ -30,13 +30,13 @@ export class Dialog {
         panel.isDialog = true;
     }
 
-    saveState(x, y) {
+    saveState(x:number, y:number) {
         this.position = new Point(x, y);
         this.dockManager.notifyOnChangeDialogPosition(this, x, y);
     }
 
-    static fromElement(id, dockManager: DockManager) {
-        return new Dialog(new PanelContainer(document.getElementById(id), dockManager), dockManager);
+    static fromElement(id:string, dockManager: DockManager) {
+        return new Dialog(new PanelContainer(<HTMLElement>document.getElementById(id), dockManager), dockManager);
     }
 
     _initialize() {
@@ -60,7 +60,7 @@ export class Dialog {
         this.bringToFront();
     }
 
-    setPosition(x, y) {
+    setPosition(x:number, y:number) {
         this.position = new Point(x, y);
         this.elementDialog.style.left = x + 'px';
         this.elementDialog.style.top = y + 'px';
@@ -71,7 +71,7 @@ export class Dialog {
         return new Point(this.position ? this.position.x : 0, this.position ? this.position.y : 0);
     }
 
-    onKeyPress(e) {
+    onKeyPress(e: KeyboardEvent) {
         if (e.key == "Escape") {
             this.close();
         }
@@ -100,15 +100,15 @@ export class Dialog {
         delete this.panel.floatingDialog;
     }
 
-    resize(width, height) {
+    resize(width:number, height:number) {
         this.resizable.resize(width, height);
     }
 
-    setTitle(title) {
+    setTitle(title: string) {
         this.panel.setTitle(title);
     }
 
-    setTitleIcon(iconName) {
+    setTitleIcon(iconName: string) {
         this.panel.setTitleIcon(iconName);
     }
 

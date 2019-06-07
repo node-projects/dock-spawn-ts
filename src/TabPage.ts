@@ -10,7 +10,7 @@ export class TabPage {
     container: IDockContainer;
     handle: TabHandle;
     containerElement: HTMLElement;
-    _initContent: any;
+    _initContent: boolean;
 
     constructor(host, container) {
         if (arguments.length === 0) {

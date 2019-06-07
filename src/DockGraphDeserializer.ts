@@ -20,20 +20,19 @@ export class DockGraphDeserializer {
         this.dockManager = dockManager;
     }
 
-    deserialize(_json) : DockModel {
-        var info = JSON.parse(_json);
-        var model = new DockModel();
+    deserialize(_json: string) : DockModel {
+        let info = JSON.parse(_json);
+        let model = new DockModel();
         model.rootNode = this._buildGraph(info.graphInfo);
         model.dialogs = this._buildDialogs(info.dialogsInfo);
         return model;
     }
 
     _buildGraph(nodeInfo) {
-        var childrenInfo = nodeInfo.children;
-        var children = [];
-        var self = this;
-        childrenInfo.forEach(function (childInfo) {
-            var childNode = self._buildGraph(childInfo);
+        let childrenInfo = nodeInfo.children;
+        let children = [];
+        childrenInfo.forEach((childInfo) => {
+            var childNode = this._buildGraph(childInfo);
             if (childNode !== null) {
                 children.push(childNode);
             }
@@ -47,7 +46,7 @@ export class DockGraphDeserializer {
         // Build the node for this container and attach it's children
         var node = new DockNode(container);
         node.children = children;
-        node.children.reverse().forEach(function (childNode) {
+        node.children.reverse().forEach((childNode) => {
             childNode.parent = node;
         });
         node.children.reverse();
@@ -56,11 +55,11 @@ export class DockGraphDeserializer {
     }
 
     _createContainer(nodeInfo, children) {
-        var containerType = nodeInfo.containerType;
-        var containerState = nodeInfo.state;
-        var container;
+        let containerType = nodeInfo.containerType;
+        let containerState = nodeInfo.state;
+        let container;
 
-        var childContainers = [];
+        let childContainers = [];
         children.forEach((childNode) => { childContainers.push(childNode.container); });
 
 
@@ -98,18 +97,17 @@ export class DockGraphDeserializer {
     }
 
     _buildDialogs(dialogsInfo) {
-        var dialogs = [];
-        var self = this;
-        dialogsInfo.forEach(function (dialogInfo) {
+        let dialogs = [];
+        dialogsInfo.forEach((dialogInfo) => {
             var containerType = dialogInfo.containerType;
             var containerState = dialogInfo.state;
             var container;
             if (containerType === 'panel') {
-                container = PanelContainer.loadFromState(containerState, self.dockManager);
+                container = PanelContainer.loadFromState(containerState, this.dockManager);
                 if (container.prepareForDocking) {
                     Utils.removeNode(container.elementPanel);
                     container.isDialog = true;
-                    var dialog = new Dialog(container, self.dockManager);
+                    var dialog = new Dialog(container, this.dockManager);
                     if (dialogInfo.position.left > document.body.clientWidth ||
                         dialogInfo.position.top > document.body.clientHeight - 70) {
                         dialogInfo.position.left = 20;
