@@ -1,21 +1,8 @@
 import { DockModel } from "./DockModel.js";
 import { DockNode } from "./DockNode.js";
-import { ContainerType } from "./ContainerType.js";
 import { Dialog } from "./Dialog.js";
-import { Point } from "./Point.js";
-
-interface INodeInfo {
-    containerType: ContainerType;
-    state: Map<string, object>;
-    children: INodeInfo[]
-}
-
-interface IPanelInfo {
-    containerType :ContainerType;
-        state: Map<string, object>;
-        position: Point;
-        isHidden: boolean;
-}
+import { IPanelInfo } from "./interfaces/IPanelInfo.js";
+import { INodeInfo } from "./interfaces/INodeInfo.js";
 
 /**
  * The serializer saves / loads the state of the dock layout hierarchy

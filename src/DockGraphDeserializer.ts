@@ -8,6 +8,7 @@ import { DocumentManagerContainer } from "./DocumentManagerContainer.js";
 import { FillDockContainer } from "./FillDockContainer.js";
 import { Dialog } from "./Dialog.js";
 import { Utils } from "./Utils.js";
+import { IPanelInfo } from "./interfaces/IPanelInfo.js";
 
 /**
  * Deserializes the dock layout hierarchy from JSON and creates a dock hierarhcy graph
@@ -96,7 +97,7 @@ export class DockGraphDeserializer {
         return container;
     }
 
-    _buildDialogs(dialogsInfo) {
+    _buildDialogs(dialogsInfo: IPanelInfo[]) {
         let dialogs = [];
         dialogsInfo.forEach((dialogInfo) => {
             var containerType = dialogInfo.containerType;
@@ -108,12 +109,12 @@ export class DockGraphDeserializer {
                     Utils.removeNode(container.elementPanel);
                     container.isDialog = true;
                     var dialog = new Dialog(container, this.dockManager);
-                    if (dialogInfo.position.left > document.body.clientWidth ||
-                        dialogInfo.position.top > document.body.clientHeight - 70) {
-                        dialogInfo.position.left = 20;
-                        dialogInfo.position.top = 70;
+                    if (dialogInfo.position.x > document.body.clientWidth ||
+                        dialogInfo.position.y > document.body.clientHeight - 70) {
+                        dialogInfo.position.x = 20;
+                        dialogInfo.position.y = 70;
                     }
-                    dialog.setPosition(dialogInfo.position.left, dialogInfo.position.top);
+                    dialog.setPosition(dialogInfo.position.x, dialogInfo.position.y);
                     dialog.isHidden = dialogInfo.isHidden;
                     if (dialog.isHidden)
                         dialog.hide();
