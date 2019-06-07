@@ -1,7 +1,7 @@
-import { DockManager } from "../DockManager.js";
-import { PanelContainer } from "../PanelContainer.js";
+import { DockManager } from "../../lib/js/DockManager.js";
+import { PanelContainer } from "../../lib/js/PanelContainer.js";
 
-let dockManager : DockManager,
+let dockManager,
     storeKey = 'lastState';
 
 function refresh() {
@@ -13,7 +13,7 @@ window.refresh = refresh;
 
 window.onload = () => {
     // Convert a div to the dock manager. Panels can then be docked on to it
-    let divDockManager = <HTMLDivElement>document.getElementById('my_dock_manager');
+    let divDockManager = document.getElementById('my_dock_manager');
     dockManager = new DockManager(divDockManager);
     //@ts-ignore
     window.dockManager = dockManager;

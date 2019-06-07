@@ -14,7 +14,6 @@ it is still alpha, npm packages will follow in the next few weeks
  - browse to: http://127.0.0.1:8080/demos/ide/demo.html
 
 # how to use:
-(needs to be changed for typescript)
 ```javascript
     import { DockManager } from "../DockManager.js";
     import { PanelContainer } from "../PanelContainer.js";

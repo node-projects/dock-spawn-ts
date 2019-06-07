@@ -1,7 +1,9 @@
 {
-  "name": "dockspawn-ts-ui",
-  "description": "DockSpawn",
-  "private": true,
+  "name": "dock-spawn-ts",
+  "version": "1.0.0",
+  "description": "DockSpawn Typescript Version",
+  "license": "MIT",
+  "author": "jochen.kuehner@gmx.de",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
@@ -15,5 +17,6 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0"
-  }
+  },
+  "files": ["lib/**/*"]
 }
