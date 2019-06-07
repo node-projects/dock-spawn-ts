@@ -3,6 +3,7 @@ import { DockManager } from "./DockManager.js";
 import { DockWheelItem } from "./DockWheelItem.js";
 import { WheelTypes } from "./enums/WheelTypes.js";
 import { Dialog } from "./Dialog.js";
+import { DockNode } from "./DockNode.js";
 
 /**
  * Manages the dock overlay buttons that are displayed over the dock manager
@@ -13,8 +14,8 @@ export class DockWheel {
     elementSideWheel: HTMLDivElement;
     wheelItems: { [index in WheelTypes]?: DockWheelItem; };
     elementPanelPreview: HTMLDivElement;
-    activeDialog: any;
-    _activeNode: any;
+    activeDialog: Dialog;
+    _activeNode?: DockNode;
     _visible: boolean;
 
     constructor(dockManager: DockManager) {
@@ -47,10 +48,10 @@ export class DockWheel {
 
 
     /** The node over which the dock wheel is being displayed on */
-    get activeNode() {
+    get activeNode() : DockNode {
         return this._activeNode;
     }
-    set activeNode(value) {
+    set activeNode(value: DockNode) {
         let previousValue = this._activeNode;
         this._activeNode = value;
 

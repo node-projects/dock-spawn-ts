@@ -5,6 +5,7 @@ import { HorizontalDockContainer } from "./HorizontalDockContainer.js";
 import { VerticalDockContainer } from "./VerticalDockContainer.js";
 import { FillDockContainer } from "./FillDockContainer.js";
 import { IRectangle } from "./interfaces/IRectangle.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 
 export class DockLayoutEngine {
 
@@ -290,7 +291,7 @@ export class DockLayoutEngine {
      * The state is not modified in this function.  It is used for showing a preview of where
      * the panel would be docked when hovered over a dock wheel button
      */
-    getDockBounds(referenceNode, containerToDock, direction, insertBeforeReference): IRectangle {
+    getDockBounds(referenceNode:DockNode, containerToDock:IDockContainer, direction, insertBeforeReference:boolean): IRectangle {
         let compositeNode; // The node that contains the splitter / fill node
         let childCount;
         let childPosition;
@@ -299,8 +300,9 @@ export class DockLayoutEngine {
         if (direction === 'fill') {
             // Since this is a fill operation, the highlight bounds is the same as the reference node
             // TODO: Create a tab handle highlight to show that it's going to be docked in a tab
-            let targetElement = referenceNode.container.containerElement;
-            return { x: targetElement.offsetLeft, y: targetElement.offsetTop, width: targetElement.clientWidth, height: targetElement.clientHeight };
+            let targetElement = referenceNode.container.containerElement;            
+            let targetElementRect = targetElement.getBoundingClientRect();
+            return { x: targetElementRect.left , y: targetElementRect.top, width: targetElement.clientWidth, height: targetElement.clientHeight };
         }
 
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')
