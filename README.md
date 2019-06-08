@@ -9,7 +9,7 @@ it is still alpha, npm packages will follow in the next few weeks
 
 ![Logo](ide.png)
 
-# differneces to original docksapwn
+# differences to original docksapwn
  - typescript
  - save/resotre fixed and saveing/restoring of dialogs
  - touch support (works on ipad/iphone and android devices)
@@ -23,6 +23,12 @@ it is still alpha, npm packages will follow in the next few weeks
  - browse to: http://127.0.0.1:8080/demos/ide/demo.html
 
 # how to use:
+
+```html
+   dockspawn div container needs position absolute or relative 
+
+```
+
 ```javascript
     import { DockManager } from "../DockManager.js";
     import { PanelContainer } from "../PanelContainer.js";
