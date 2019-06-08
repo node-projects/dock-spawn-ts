@@ -11,8 +11,8 @@ import { IState } from "./interfaces/IState.js";
 export class DockGraphSerializer {
 
     serialize(model: DockModel) {
-        var graphInfo = this._buildGraphInfo(model.rootNode);
-        var dialogs = this._buildDialogsInfo(model.dialogs.sort((x,y)=><number><any>x.elementDialog.style.zIndex-<number><any>y.elementDialog.style.zIndex));
+        let graphInfo = this._buildGraphInfo(model.rootNode);
+        let dialogs = this._buildDialogsInfo(model.dialogs.sort((x,y)=><number><any>x.elementDialog.style.zIndex-<number><any>y.elementDialog.style.zIndex));
         return JSON.stringify({ graphInfo: graphInfo, dialogsInfo: dialogs });
     }
 

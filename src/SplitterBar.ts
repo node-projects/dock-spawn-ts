@@ -55,8 +55,8 @@ export class SplitterBar {
 
         let dockManager = this.previousContainer.dockManager;
         dockManager.suspendLayout();
-        var dx = e.clientX - this.previousMouseEvent.clientX;
-        var dy = e.clientY - this.previousMouseEvent.clientY;
+        let dx = e.clientX - this.previousMouseEvent.clientX;
+        let dy = e.clientY - this.previousMouseEvent.clientY;
         this._performDrag(dx, dy);
         this.previousMouseEvent = e;
         this.readyToProcessNextDrag = true;

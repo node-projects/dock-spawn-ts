@@ -281,7 +281,7 @@ export class TabHandle {
                 let panel = this.parent.container as PanelContainer;
                 panel.close();
                 // this.undockInitiator.enabled = false;
-                // var panel = this.parent.container;
+                // let panel = this.parent.container;
                 // panel.performUndock();
             }
         }

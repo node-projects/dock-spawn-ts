@@ -85,7 +85,7 @@ export class PanelContainer implements IDockContainerWithSize {
     }
     set floatingDialog(value) {
         this._floatingDialog = value;
-        var canUndock = (this._floatingDialog === undefined);
+        let canUndock = (this._floatingDialog === undefined);
         this.undockInitiator.enabled = canUndock;
     }
 
@@ -292,8 +292,8 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContent.style.width = width + 'px';
         this.elementPanel.style.width = width + 'px';
 
-        var titleBarHeight = this.elementTitle.clientHeight;
-        var contentHeight = height - titleBarHeight;
+        let titleBarHeight = this.elementTitle.clientHeight;
+        let contentHeight = height - titleBarHeight;
         this.elementContentHost.style.height = contentHeight + 'px';
         this.elementContent.style.height = contentHeight + 'px';
         this.elementPanel.style.height = height + 'px';

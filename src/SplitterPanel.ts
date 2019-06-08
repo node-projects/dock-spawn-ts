@@ -91,9 +91,9 @@ export class SplitterPanel {
         let otherPanelSizeQuota = splitPanelSize - newContainerSize - barSize * this.spiltterBars.length;
         let otherPanelScaleMultipler = otherPanelSizeQuota / splitPanelSize;
 
-        for (var i = 0; i < this.childContainers.length; i++) {
-            var child = this.childContainers[i];
-            var size;
+        for (let i = 0; i < this.childContainers.length; i++) {
+            let child = this.childContainers[i];
+            let size;
             if (child !== container) {
                 size = this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth;
                 size *= otherPanelScaleMultipler;

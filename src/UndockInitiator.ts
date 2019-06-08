@@ -145,7 +145,7 @@ export class UndockInitiator {
         if (e.touches)
             e = e.touches[0];
         let position = new Point(e.clientX, e.clientY);
-        //var dx = this.horizontalChange ? position.x - this.dragStartPosition.x : 10;
+        //let dx = this.horizontalChange ? position.x - this.dragStartPosition.x : 10;
         let dx = position.x - this.dragStartPosition.x;
         let dy = position.y - this.dragStartPosition.y;
         let distance = Math.sqrt(dx * dx + dy * dy);

@@ -84,9 +84,9 @@ export class DockManager {
     }
 
     checkXBounds(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point) {
-        var dx = Math.floor(currentMousePosition.x - previousMousePosition.x);
-        var leftBounds = container.offsetLeft + container.offsetWidth + dx < 40; // || (container.offsetLeft + container.offsetWidth + dx - 40 ) < 0;
-        var rightBounds = container.offsetLeft + dx > (window.innerWidth - 40);
+        let dx = Math.floor(currentMousePosition.x - previousMousePosition.x);
+        let leftBounds = container.offsetLeft + container.offsetWidth + dx < 40; // || (container.offsetLeft + container.offsetWidth + dx - 40 ) < 0;
+        let rightBounds = container.offsetLeft + dx > (window.innerWidth - 40);
         if (leftBounds) {
             previousMousePosition.x = currentMousePosition.x;
             dx = 0;
@@ -294,7 +294,7 @@ export class DockManager {
     }
 
     floatDialog(container: PanelContainer, x: number, y: number) {
-        var retdiag = undefined;
+        let retdiag = undefined;
 
         //check the dialog do not already exist
         this.context.model.dialogs.forEach((dialog) => {
@@ -308,14 +308,14 @@ export class DockManager {
             return retdiag;
         //try to undock just in case
         try {
-            var node = this._findNodeFromContainer(container);
+            let node = this._findNodeFromContainer(container);
             this.layoutEngine.undock(node);
         } catch (err) { }
 
-        var panel = container;
+        let panel = container;
         Utils.removeNode(panel.elementPanel);
         panel.isDialog = true;
-        var dialog = new Dialog(panel, this);
+        let dialog = new Dialog(panel, this);
         dialog.setPosition(x, y);
         return dialog;
     }

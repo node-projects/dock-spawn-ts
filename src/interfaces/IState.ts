@@ -7,5 +7,5 @@ export interface IState {
     element?: string;
     canUndock?: boolean;
     hideCloseButton?: boolean;
-    panelType: PanelType;
+    panelType?: PanelType;
 }

@@ -165,8 +165,8 @@ export class TabHost {
         let scaleMultiplier = width / tabListWidth;
         if (scaleMultiplier > 1.2) return; //with a reserve
         this.pages.forEach((page, index) => {
-            var handle = page.handle;
-            var newSize = scaleMultiplier * handle.elementBase.clientWidth;
+            let handle = page.handle;
+            let newSize = scaleMultiplier * handle.elementBase.clientWidth;
             if (index === this.pages.length - 1)
                 newSize = newSize - 5;
             handle.elementBase.style.width = newSize + 'px';
@@ -182,7 +182,7 @@ export class TabHost {
             if (!children.some((x) => x == tab.container)) {
                 tab.handle.removeListener(this.tabHandleListener);
                 tab.destroy();
-                var index = this.pages.indexOf(tab);
+                let index = this.pages.indexOf(tab);
                 if (index > -1) {
                     this.pages.splice(index, 1);
                 }
@@ -234,7 +234,7 @@ export class TabHost {
     onTabPageSelected(page: TabPage) {
         this.activeTab = page;
         this.pages.forEach((tabPage) => {
-            var selected = (tabPage === page);
+            let selected = (tabPage === page);
             tabPage.setSelected(selected);
         });
 
@@ -243,7 +243,7 @@ export class TabHost {
         let zIndex = 1000;
         this.pages.forEach((tabPage) => {
             tabPage.handle.setZIndex(zIndex);
-            var selected = (tabPage === page);
+            let selected = (tabPage === page);
             if (selected)
                 zIndexDelta = -1;
             zIndex += zIndexDelta;

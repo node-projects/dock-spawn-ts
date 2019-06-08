@@ -58,7 +58,7 @@ export class ResizableContainer implements IDockContainer {
     }
 
     _buildResizeHandle(east:boolean, west:boolean, north:boolean, south:boolean) {
-        var handle = new ResizeHandle();
+        let handle = new ResizeHandle();
         handle.east = east;
         handle.west = west;
         handle.north = north;
@@ -234,8 +234,8 @@ export class ResizableContainer implements IDockContainer {
         bounds.width += widthDelta;
         bounds.height += heightDelta;
 
-        var minWidth = 50;  // TODO: Move to external configuration
-        var minHeight = 50;  // TODO: Move to external configuration
+        let minWidth = 50;  // TODO: Move to external configuration
+        let minHeight = 50;  // TODO: Move to external configuration
         bounds.width = Math.max(bounds.width, minWidth);
         bounds.height = Math.max(bounds.height, minHeight);
 

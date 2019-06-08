@@ -82,7 +82,6 @@ window.onload = () => {
         }
     });
 
-
     if (!lastState) {
         // Convert existing elements on the page into "Panels".
         // They can then be docked on to the dock manager

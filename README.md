@@ -5,15 +5,13 @@ A TypeScript Version of dock-spawn (see https://github.com/coderespawn/dock-spaw
 [![Downloads](https://img.shields.io/npm/dm/dock-spawn-ts.svg)](https://www.npmjs.com/package/dock-spawn-ts)
 
 # info
-it is still alpha, npm packages will follow in the next few weeks
-
 ![Logo](ide.png)
 
 # differences to original docksapwn
  - typescript
  - save/resotre fixed and saveing/restoring of dialogs
  - touch support (works on ipad/iphone and android devices)
- - perfromance fixes (unnessecary removeig and adding to dom reduced, not needed elements are hidden, not removed from dom)
+ - performance fixes (unnessecary removeig and adding to dom reduced, not needed elements are hidden, not removed from dom)
  - multiple dockspawn in one page
  - removed font-awesome dependency
 

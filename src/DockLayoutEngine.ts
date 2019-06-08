@@ -344,7 +344,7 @@ export class DockLayoutEngine {
             if (hierarchyModified)
                 targetPanelStart = insertBeforeReference ? 0 : compositeSize * scaleMultiplier;
             else {
-                for (var i = 0; i < childPosition; i++)
+                for (let i = 0; i < childPosition; i++)
                     targetPanelStart += this._getVaringDimension(compositeNode.children[i].container, direction);
                 targetPanelStart *= scaleMultiplier;
             }
