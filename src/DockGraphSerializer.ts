@@ -36,7 +36,7 @@ export class DockGraphSerializer {
     _buildDialogsInfo(dialogs: Dialog[]): IPanelInfo[] {
         let dialogsInfo: IPanelInfo[] = [];
         dialogs.forEach((dialog) => {
-            let panelState = new Map<string, object>();
+            let panelState: IState = {};
             let panelContainer = dialog.panel;
             panelContainer.saveState(panelState);
 

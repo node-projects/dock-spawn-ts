@@ -3,6 +3,7 @@ import { PanelContainer } from "./PanelContainer.js";
 import { UndockInitiator } from "./UndockInitiator.js";
 import { EventHandler } from "./EventHandler.js";
 import { Utils } from "./Utils.js";
+import { PanelType } from "./enums/PanelType.js";
 
 /**
  * A tab handle represents the tab button on the tab strip
@@ -99,17 +100,19 @@ export class TabHandle {
             this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
 
             let btnCloseAll = document.createElement('div');
-            btnCloseAll.innerText = 'Close All Tabs';
+            btnCloseAll.innerText = 'Close all documents';
             this._ctxMenu.append(btnCloseAll);
 
             let btnCloseAllButThis = document.createElement('div');
-            btnCloseAllButThis.innerText = 'Close All Tabs but this';
+            btnCloseAllButThis.innerText = 'Close all documents but this';
             this._ctxMenu.append(btnCloseAllButThis);
 
             btnCloseAll.onclick = () => {
                 let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
-                for (let i = 0; i < length; i++) {
-                    (<PanelContainer>this.parent.container.dockManager.context.model.documentManagerNode.children[0].container).close();
+                for (let i = length - 1; i >= 0; i--) {
+                    let panel = (<PanelContainer>this.parent.container.dockManager.context.model.documentManagerNode.children[i].container);
+                    if (panel.panelType == PanelType.document)
+                        panel.close();
                 }
                 this._removeCtxMenu();
             };
@@ -117,8 +120,9 @@ export class TabHandle {
             btnCloseAllButThis.onclick = () => {
                 let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
                 for (let i = length - 1; i >= 0; i--) {
-                    if (this.parent.container != this.parent.container.dockManager.context.model.documentManagerNode.children[i].container)
-                        (<PanelContainer>this.parent.container.dockManager.context.model.documentManagerNode.children[i].container).close();
+                    let panel = (<PanelContainer>this.parent.container.dockManager.context.model.documentManagerNode.children[i].container);
+                    if (this.parent.container != panel && panel.panelType == PanelType.document)
+                        panel.close();
                 }
                 this._removeCtxMenu();
             };

@@ -8,6 +8,7 @@ export class TabPage {
     selected: boolean;
     host: TabHost;
     container: IDockContainer;
+    panel?: PanelContainer;
     handle: TabHandle;
     containerElement: HTMLElement;
     _initContent: boolean;
@@ -25,8 +26,8 @@ export class TabPage {
         this.containerElement = container.containerElement;
 
         if (container instanceof PanelContainer) {
-            let panel = container;
-            panel.onTitleChanged = this.onTitleChanged.bind(this);
+            this.panel = container;
+            this.panel.onTitleChanged = this.onTitleChanged.bind(this);
         }
     }
 

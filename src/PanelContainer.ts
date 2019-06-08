@@ -8,6 +8,7 @@ import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
 import { IState } from "./interfaces/IState.js";
 import { Point } from "./Point.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { PanelType } from "./enums/PanelType.js";
 
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
@@ -39,10 +40,14 @@ export class PanelContainer implements IDockContainerWithSize {
     _hideCloseButton: boolean;
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
+    panelType: PanelType;
 
-    constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, hideCloseButton?: boolean) {
+    constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
         if (!title)
             title = 'Panel';
+        if (!panelType)
+            panelType = PanelType.panel;
+        this.panelType = panelType;
         this.elementContent = Object.assign(elementContent, { _dockSpawnPanelContainer: this });
         this.dockManager = dockManager;
         this.title = title;
@@ -65,7 +70,6 @@ export class PanelContainer implements IDockContainerWithSize {
                 listener.onDockEnabled({ self: this, state: state });
             }
         });
-
     }
 
     addListener(listener) {
@@ -100,12 +104,18 @@ export class PanelContainer implements IDockContainerWithSize {
         state.element = this.elementContent.id;
         state.width = this.width;
         state.height = this.height;
+        state.canUndock = this._canUndock;
+        state.hideCloseButton = this._hideCloseButton;
+        state.panelType = this.panelType;
     }
 
     loadState(state: IState) {
         this.width = state.width;
         this.height = state.height;
         this.state = { width: state.width, height: state.height };
+        this.canUndock(state.canUndock)
+        this.hideCloseButton(state.hideCloseButton);
+        this.panelType = state.panelType;
     }
 
     setActiveChild(/*child*/) {
@@ -129,7 +139,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementTitle.appendChild(this.elementButtonClose);
         this.elementButtonClose.classList.add('panel-titlebar-button-close');
         this.elementButtonClose.style.display = this._hideCloseButton ? 'none' : 'block';
-        
+
         this.elementPanel.appendChild(this.elementContentHost);
 
         this.elementPanel.classList.add('panel-base');
@@ -167,6 +177,8 @@ export class PanelContainer implements IDockContainerWithSize {
 
         this.mouseDownHandler = new EventHandler(this.elementPanel, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementPanel, 'touchstart', this.onMouseDown.bind(this));
+
+        this.elementContent.removeAttribute("hidden");
     }
 
     onMouseDown() {

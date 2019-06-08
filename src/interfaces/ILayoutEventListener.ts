@@ -21,4 +21,5 @@ export interface ILayoutEventListener {
     onTabChanged?(dockManager: DockManager, tabpage: TabPage): void;
     onSuspendLayout?(dockManager: DockManager): void;
     onResumeLayout?(dockManager: DockManager, panel: IDockContainer): void;
+    onActivePanelChange?(dockManager: DockManager, panel: PanelContainer): void;
 }

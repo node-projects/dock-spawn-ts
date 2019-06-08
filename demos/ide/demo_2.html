@@ -13,13 +13,13 @@
     <div class="demo-header" id="header" style="width:100%">
         <div class="demo-header-title">Dock Spawn Demo</div>
     </div>
-    <div id="dock_div1" style="opacity:0;height:500px;width:500px;top:150px;left:100px;position:absolute;">
+    <div id="dock_div1" style="height:500px;width:500px;top:150px;left:100px;position:absolute;">
         <div id="my_dock_manager1" class="my-dock-manager" style="position: relative;"></div>
         <div id="edt1_1" data-panel-caption="Steering.h" style="background: lightcoral"></div>
         <div id="edt2_1" data-panel-caption="Steering.cpp" style="background: lightgoldenrodyellow"></div>
     </div>
 
-    <div id="dock_div2" style="opacity:0;height:500px;width:500px;top:150px;left:700px;position:absolute;">
+    <div id="dock_div2" style="height:500px;width:500px;top:150px;left:700px;position:absolute;">
         <div id="my_dock_manager2" class="my-dock-manager" style="position: relative;"></div>
         <div id="edt1_2" data-panel-caption="Steering.h" style="background: lightblue"></div>
         <div id="edt2_2" data-panel-caption="Steering.cpp" style="background: lightgreen"></div>
@@ -57,9 +57,6 @@
             let documentNode2 = dockManager2.context.model.documentManagerNode;
             dockManager2.dockFill(documentNode2, editor1_2);
             dockManager2.dockFill(documentNode2, editor2_2);
-
-            document.getElementById('dock_div1').style.opacity = '';
-            document.getElementById('dock_div2').style.opacity = '';
         };
     </script>
 </body>

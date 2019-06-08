@@ -573,6 +573,14 @@ export class DockManager {
         });
     }
 
+    notifyOnActivePanelChange(panel: PanelContainer) {
+        this.layoutEventListeners.forEach((listener) => {
+            if (listener.onActivePanelChange) {
+                listener.onActivePanelChange(this, panel);
+            }
+        });
+    }
+
     saveState() {
         let serializer = new DockGraphSerializer();
         return serializer.serialize(this.context.model);
@@ -668,7 +676,7 @@ export class DockManager {
     set activePanel(value:PanelContainer) {
         if (value !== this._activePanel) {
             this._activePanel = value;
-            console.warn("Active Panel:", this._activePanel);
+            this.notifyOnActivePanelChange(value);
         }
     }
 }

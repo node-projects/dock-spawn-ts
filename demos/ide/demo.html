@@ -14,7 +14,9 @@
     <!-- Code Mirror Source Code Editor -->
     <link rel="stylesheet" href="./codemirror/codemirror.css">
     <style>
-        .CodeMirror {height: 100%;}
+        .CodeMirror {
+            height: 100%;
+        }
     </style>
     <link rel="stylesheet" href="./codemirror/addon/fold/foldgutter.css">
     <script src="./codemirror/codemirror.js"></script>
@@ -23,7 +25,7 @@
     <script src="./codemirror/addon/fold/brace-fold.js"></script>
     <script src="./codemirror/addon/fold/comment-fold.js"></script>
     <script src="./codemirror/modes/clike/clike.js"></script>
-    
+
     <!-- JS Tree -->
     <script type="text/javascript" src="./jstree/jstree.min.js"></script>
     <link rel="stylesheet" href="./jstree/themes/default/style.min.css">
@@ -43,10 +45,10 @@
             <a href="javascript:refresh()" style="text-decoration: none; color: white;">Refresh</a>
         </div>
     </div>
-    <div id="dock_div" style="opacity: 0; height: calc(100% - 45px);">
+    <div id="dock_div" style="height: calc(100% - 45px);">
         <div id="my_dock_manager" class="my-dock-manager" style="position: relative;"></div>
         <div id="solution_window" data-panel-caption="Solution Explorer" data-panel-icon="test.png"
-            class="solution-window">
+            class="solution-window" hidden>
             <ul>
                 <li id="solution_window_1">
                     <a href="#">Test Project</a>
@@ -60,14 +62,14 @@
                 </li>
             </ul>
         </div>
-        <div id="properties_window" data-panel-caption="Properties" class="properties-window"></div>
-        <div id="problems_window" data-panel-caption="Problems" class="problems-window"></div>
-        <div id="editor1_window" data-panel-caption="Steering.h" class="editor1-window editor-host"></div>
-        <div id="editor2_window" data-panel-caption="Steering.cpp" class="editor2-window editor-host"></div>
-        <div id="infovis" data-panel-caption="Dock Tree Visualizer" class="editor2-window editor-host"></div>
-        <div id="output_window" data-panel-caption="Output" class="output-window editor-host"></div>
-        <div id="outline_window" data-panel-caption="Outline" class="outline-window"></div>
-        <div id="toolbox_window" data-panel-caption="Toolbox" class="toolbox-window">
+        <div id="properties_window" data-panel-caption="Properties" class="properties-window" hidden></div>
+        <div id="problems_window" data-panel-caption="Problems" class="problems-window" hidden></div>
+        <div id="editor1_window" data-panel-caption="Steering.h" class="editor1-window editor-host" hidden></div>
+        <div id="editor2_window" data-panel-caption="Steering.cpp" class="editor2-window editor-host" hidden></div>
+        <div id="infovis" data-panel-caption="Dock Tree Visualizer" class="editor2-window editor-host" hidden></div>
+        <div id="output_window" data-panel-caption="Output" class="output-window editor-host" hidden></div>
+        <div id="outline_window" data-panel-caption="Outline" class="outline-window" hidden></div>
+        <div id="toolbox_window" data-panel-caption="Toolbox" class="toolbox-window" hidden>
             <ul>
                 <li id="toolbox_window_1"><a href="#">Tool 1</a></li>
                 <li id="toolbox_window_2"><a href="#">Tool 2</a></li>
@@ -79,15 +81,6 @@
     </div>
 
     <script type="module" src="demo.js"></script>
-    <script src="js/sample-source.js"></script>
-    <script src="js/demo-ide.js"></script>
-    <script>
-    // Initialize infovis (for dock tree visualization)
-    setTimeout(() => {
-        InitDebugTreeVis(window.dockManager);
-    }, 2000);
-	
-    </script>
 </body>
 
 </html>

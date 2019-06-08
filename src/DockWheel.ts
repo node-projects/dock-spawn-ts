@@ -24,7 +24,7 @@ export class DockWheel {
         this.elementSideWheel = document.createElement('div');    // Contains the 4 buttons on the side
         this.wheelItems = {};
         for (let wheelType in WheelTypes) {
-            this.wheelItems[wheelType] = new DockWheelItem(this, wheelType);
+            this.wheelItems[wheelType] = new DockWheelItem(this, <WheelTypes>wheelType);
             if (wheelType.substr(-2, 2) === '-s')
                 // Side button
                 this.elementSideWheel.appendChild(this.wheelItems[wheelType].element);

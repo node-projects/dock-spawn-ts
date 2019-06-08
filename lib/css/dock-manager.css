@@ -29,15 +29,22 @@
 }
 
 .panel-titlebar-button-close {
-	font-weight: bold;
+	display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
 }
 
 .panel-titlebar-button-close::after {
 	float: right;
 	cursor: pointer;
-	padding-top: 5px;
 	padding-right: 8px;
-	content: 'X';
+	content: 'x';
+	font-weight: normal;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	display: flex;
+	height: 100%;
+	align-items: center;
 }
 
 .panel-titlebar-button-close:hover {
@@ -281,17 +288,20 @@
 }
 
 .dockspan-tab-handle-close-button {
-	font-weight: bold;
 }
 
 .dockspan-tab-handle-close-button::after {
-	margin-top: 3px;
 	margin-right: 5px;
 	float: right;
 	position: absolute;
 	right: 0;
-	content: 'X';
+	content: 'x';
+	font-weight: normal;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
 	cursor: pointer;
+	display: flex;
+	height: 100%;
+	align-items: center;
 }
 
 .dockspan-tab-handle-close-button:hover {
