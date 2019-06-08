@@ -2,8 +2,8 @@ import { TabPage } from "./TabPage.js";
 import { Utils } from "./Utils.js";
 import { TabHostDirection } from "./enums/TabHostDirection.js";
 import { TabHandle } from "./TabHandle.js";
-import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { DockManager } from "./DockManager.js";
 
 /**
  * Tab Host control contains tabs known as TabPages.
@@ -11,6 +11,7 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
  */
 export class TabHost {
     displayCloseButton: boolean;
+    dockManager: DockManager;
     tabStripDirection: TabHostDirection;
     hostElement: HTMLDivElement;
     tabListElement: HTMLDivElement;
@@ -19,11 +20,11 @@ export class TabHost {
     createTabPage: (tabHost: any, container: any) => any;
     timeoutPerform: NodeJS.Timeout;
     tabHandleListener: { onMoveTab: (e: any) => void; };
-    eventListeners: ILayoutEventListener[];
+    eventListeners: any[];
     pages: TabPage[];
     activeTab: TabPage;
 
-    constructor(tabStripDirection: TabHostDirection, displayCloseButton?: boolean) {
+    constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean) {
         /**
          * Create a tab host with the tab strip aligned in the [tabStripDirection] direciton
          * Only TabHost.DIRECTION_BOTTOM and TabHost.DIRECTION_TOP are supported
@@ -36,6 +37,7 @@ export class TabHost {
             displayCloseButton = false;
         }
 
+        this.dockManager = dockManager;
         this.tabStripDirection = tabStripDirection;
         this.displayCloseButton = displayCloseButton; // Indicates if the close button next to the tab handle should be displayed
         this.pages = [];

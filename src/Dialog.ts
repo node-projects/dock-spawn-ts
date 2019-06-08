@@ -19,6 +19,7 @@ export class Dialog {
     onKeyPressBound: any;
     noDocking: boolean;
     isHidden: boolean;
+    keyPressHandler: EventHandler;
 
     constructor(panel: PanelContainer, dockManager: DockManager) {
         this.panel = panel;
@@ -43,6 +44,7 @@ export class Dialog {
     _initialize() {
         this.panel.floatingDialog = this;
         this.elementDialog = Object.assign(document.createElement('div'), { floatingDialog: this });
+        this.elementDialog.tabIndex = 0;
         this.elementDialog.appendChild(this.panel.elementPanel);
         this.draggable = new DraggableContainer(this, this.panel, this.elementDialog, this.panel.elementTitle);
         this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement);
@@ -54,8 +56,7 @@ export class Dialog {
 
         this.mouseDownHandler = new EventHandler(this.elementDialog, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementDialog, 'touchstart', this.onMouseDown.bind(this));
-        this.onKeyPressBound = this.onKeyPress.bind(this);
-        window.addEventListener('keydown', this.onKeyPressBound);
+        this.keyPressHandler = new EventHandler(this.elementDialog, 'keypress', this.dockManager.onKeyPress, true);
         this.resize(this.panel.elementPanel.clientWidth, this.panel.elementPanel.clientHeight);
         this.isHidden = false;
         this.bringToFront();
@@ -72,12 +73,6 @@ export class Dialog {
         return new Point(this.position ? this.position.x : 0, this.position ? this.position.y : 0);
     }
 
-    onKeyPress(e: KeyboardEvent) {
-        if (e.key == "Escape") {
-            this.close();
-        }
-    }
-
     onMouseDown() {
         this.bringToFront();
     }
@@ -90,6 +85,10 @@ export class Dialog {
         if (this.touchDownHandler) {
             this.touchDownHandler.cancel();
             delete this.touchDownHandler;
+        }
+        if (this.keyPressHandler) {
+            this.keyPressHandler.cancel();
+            delete this.keyPressHandler;
         }
         window.removeEventListener('keydown', this.onKeyPressBound);
         //this.elementDialog.classList.remove('rounded-corner-top');
@@ -115,6 +114,7 @@ export class Dialog {
 
     bringToFront() {
         this.elementDialog.style.zIndex = <any>this.dockManager.zIndexCounter++;
+        this.dockManager.activePanel = this.panel;
     }
 
     hide() {

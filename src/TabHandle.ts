@@ -38,7 +38,7 @@ export class TabHandle {
 
     constructor(parent: TabPage) {
         this.parent = parent;
-        var undockHandler = TabHandle.prototype._performUndock.bind(this);
+        let undockHandler = TabHandle.prototype._performUndock.bind(this);
         this.elementBase = document.createElement('div');
         this.elementText = document.createElement('div');
         this.elementCloseButton = document.createElement('div');
@@ -49,7 +49,8 @@ export class TabHandle {
         this.elementBase.appendChild(this.elementText);
         if (this.parent.host.displayCloseButton)
             this.elementBase.appendChild(this.elementCloseButton);
-
+        if ((<PanelContainer>this.parent.container)._hideCloseButton)
+            this.elementCloseButton.style.display = 'none';
         this.parent.host.tabListElement.appendChild(this.elementBase);
 
         let panel = parent.container as PanelContainer;
@@ -63,14 +64,6 @@ export class TabHandle {
 
         this.elementText.innerHTML = title;
         this.elementText.title = this.elementText.innerText;
-
-        // Set the close button text (font awesome)
-        if (this.parent.container instanceof PanelContainer && this.parent.container.dockManager.closeTabIconTemplate) {
-            this.elementCloseButton.innerHTML = this.parent.container.dockManager.closeTabIconTemplate;
-        }
-        else {
-            this.elementCloseButton.innerHTML = '<i class="fa fa-times"></i>';
-        }
 
         this._bringToFront(this.elementBase);
 
@@ -299,7 +292,7 @@ export class TabHandle {
     }
 
     setZIndex(zIndex: number) {
-        this.elementBase.style.zIndex = zIndex;
+        this.elementBase.style.zIndex = <string><any>zIndex;
     }
 
     _bringToFront(element) {

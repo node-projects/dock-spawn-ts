@@ -34,7 +34,7 @@ export class FillDockContainer implements IDockContainerWithSize {
         this.minimumAllowedChildNodes = 2;
         this.element.classList.add('dock-container');
         this.element.classList.add('dock-container-fill');
-        this.tabHost = new TabHost(this.tabOrientation);
+        this.tabHost = new TabHost(dockManager, this.tabOrientation);
         this.tabHostListener = {
             onChange: (e) => {
                 this.dockManager._requestTabReorder(this, e);

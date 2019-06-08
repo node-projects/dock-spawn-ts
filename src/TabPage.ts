@@ -62,9 +62,10 @@ export class TabPage {
         if (this.selected) {
             this.containerElement.style.display = 'block';
             // force a resize again
-            var width = this.host.contentElement.clientWidth;
-            var height = this.host.contentElement.clientHeight;
+            let width = this.host.contentElement.clientWidth;
+            let height = this.host.contentElement.clientHeight;
             this.container.resize(width, height);
+            this.host.dockManager.activePanel = this.container as PanelContainer;
         }
         else {
             this.containerElement.style.display = 'none';

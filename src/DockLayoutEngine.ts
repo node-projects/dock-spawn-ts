@@ -6,7 +6,6 @@ import { VerticalDockContainer } from "./VerticalDockContainer.js";
 import { FillDockContainer } from "./FillDockContainer.js";
 import { IRectangle } from "./interfaces/IRectangle.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
-import { PanelContainer } from "./PanelContainer.js";
 import { TabHandle } from "./TabHandle.js";
 
 export class DockLayoutEngine {

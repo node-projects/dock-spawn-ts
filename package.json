@@ -15,9 +15,6 @@
     "typescript": "^3.3.4000",
     "yarn": "^1.16.0"
   },
-  "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.9.0"
-  },
   "files": ["lib/**/*"],
   "homepage": "https://github.com/node-projects/dock-spawn-ts"
 }

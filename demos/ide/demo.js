@@ -88,6 +88,7 @@ window.onload = () => {
         let output = new PanelContainer(document.getElementById("output_window"), dockManager);
         let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager);
         let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager);
+        editor2.hideCloseButton(true);
         let infovis = new PanelContainer(document.getElementById("infovis"), dockManager);        
 
         // Dock the panels on the dock manager

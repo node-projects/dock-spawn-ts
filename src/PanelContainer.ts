@@ -25,8 +25,7 @@ export class PanelContainer implements IDockContainerWithSize {
     dockManager: DockManager;
     title: string;
     containerType: ContainerType;
-    iconName: string;
-    iconTemplate: any;
+    icon: string;
     minimumAllowedChildNodes: number;
     _floatingDialog: any;
     isDialog: boolean;
@@ -38,6 +37,8 @@ export class PanelContainer implements IDockContainerWithSize {
     _cachedWidth: number;
     _cachedHeight: number;
     _hideCloseButton: boolean;
+    mouseDownHandler: EventHandler;
+    touchDownHandler: EventHandler;
 
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, hideCloseButton?: boolean) {
         if (!title)
@@ -46,8 +47,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this.dockManager = dockManager;
         this.title = title;
         this.containerType = ContainerType.panel;
-        this.iconName = 'fa fa-arrow-circle-right';
-        this.iconTemplate = null;
+        this.icon = null;
         this.minimumAllowedChildNodes = 0;
         this._floatingDialog = undefined;
         this.isDialog = false;
@@ -118,19 +118,18 @@ export class PanelContainer implements IDockContainerWithSize {
     _initialize() {
         this.name = Utils.getNextId('panel_');
         this.elementPanel = document.createElement('div');
+        this.elementPanel.tabIndex = 0;
         this.elementTitle = document.createElement('div');
         this.elementTitleText = document.createElement('div');
         this.elementContentHost = document.createElement('div');
-        if (!this._hideCloseButton)
-            this.elementButtonClose = document.createElement('div');
+        this.elementButtonClose = document.createElement('div');
 
         this.elementPanel.appendChild(this.elementTitle);
         this.elementTitle.appendChild(this.elementTitleText);
-        if (!this._hideCloseButton) {
-            this.elementTitle.appendChild(this.elementButtonClose);
-            this.elementButtonClose.innerHTML = '<i class="fa fa-times"></i>';
-            this.elementButtonClose.classList.add('panel-titlebar-button-close');
-        }
+        this.elementTitle.appendChild(this.elementButtonClose);
+        this.elementButtonClose.classList.add('panel-titlebar-button-close');
+        this.elementButtonClose.style.display = this._hideCloseButton ? 'none' : 'block';
+        
         this.elementPanel.appendChild(this.elementContentHost);
 
         this.elementPanel.classList.add('panel-base');
@@ -160,15 +159,22 @@ export class PanelContainer implements IDockContainerWithSize {
         let contentTitle = this.elementContent.dataset.panelCaption;
         let contentIcon = this.elementContent.dataset.panelIcon;
         if (contentTitle) this.title = contentTitle;
-        if (contentIcon) this.iconName = contentIcon;
+        if (contentIcon) this.icon = contentIcon;
         this._updateTitle();
 
         this.undockInitiator = new UndockInitiator(this.elementTitle, this.performUndockToDialog.bind(this));
         delete this.floatingDialog;
+
+        this.mouseDownHandler = new EventHandler(this.elementPanel, 'mousedown', this.onMouseDown.bind(this));
+        this.touchDownHandler = new EventHandler(this.elementPanel, 'touchstart', this.onMouseDown.bind(this));
     }
 
+    onMouseDown() {
+        this.dockManager.activePanel = this;
+    }
 
-    hideCloseButton(state: Boolean) {
+    hideCloseButton(state: boolean) {
+        this._hideCloseButton = state;
         this.elementButtonClose.style.display = state ? 'none' : 'block';
         this.eventListeners.forEach((listener) => {
             if (listener.onHideCloseButton) {
@@ -177,8 +183,16 @@ export class PanelContainer implements IDockContainerWithSize {
         });
     }
 
-
     destroy() {
+        if (this.mouseDownHandler) {
+            this.mouseDownHandler.cancel();
+            delete this.mouseDownHandler;
+        }
+        if (this.touchDownHandler) {
+            this.touchDownHandler.cancel();
+            delete this.touchDownHandler;
+        }
+
         Utils.removeNode(this.elementPanel);
         if (this.closeButtonClickedHandler) {
             this.closeButtonClickedHandler.cancel();
@@ -280,15 +294,8 @@ export class PanelContainer implements IDockContainerWithSize {
             this.onTitleChanged(this, title);
     }
 
-    setTitleIcon(iconName: string) {
-        this.iconName = iconName;
-        this._updateTitle();
-        if (this.onTitleChanged)
-            this.onTitleChanged(this, this.title);
-    }
-
-    setTitleIconTemplate(iconTemplate: string) {
-        this.iconTemplate = iconTemplate;
+    setTitleIcon(icon: string) {
+        this.icon = icon;
         this._updateTitle();
         if (this.onTitleChanged)
             this.onTitleChanged(this, this.title);
@@ -299,11 +306,11 @@ export class PanelContainer implements IDockContainerWithSize {
     }
 
     _updateTitle() {
-        if (this.iconTemplate !== null) {
-            this.elementTitleText.innerHTML = this.iconTemplate(this.iconName) + this.title;
+        if (this.icon !== null) {
+            this.elementTitleText.innerHTML = '<img class="panel-titlebar-icon" src="' + this.icon + '">' + this.title;
             return;
         }
-        this.elementTitleText.innerHTML = '<i class="' + this.iconName + '"></i> ' + this.title;
+        this.elementTitleText.innerHTML = this.title;
     }
 
     getRawTitle() {

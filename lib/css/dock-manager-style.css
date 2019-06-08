@@ -13,12 +13,10 @@
 }
 
 .panel-titlebar-button-close {
-	font-weight: bold;
 	color:#aaa;
 }
 
 .panel-titlebar-button-close:hover {
-	font-weight: bold;
 	color:red;
 }
 
@@ -130,7 +128,7 @@
 }
 
 .dockspan-tab-handle-close-button:hover {
-	color:red;
+	color: red;
 }
 
 .dockspan-tab-handle-list-container {

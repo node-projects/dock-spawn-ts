@@ -36,7 +36,9 @@ export class DockManager {
     backgroundContext: HTMLElement;
     _undockEnabled: boolean;
     zIndexCounter: number;
-    closeTabIconTemplate: string;
+    _activePanel: PanelContainer;
+    onKeyPressBound: any;
+    
     constructor(element: HTMLElement) {
         if (element === undefined)
             throw new Error('Invalid Dock Manager element provided');
@@ -67,6 +69,16 @@ export class DockManager {
         if (this.backgroundContext != null) {
             (<FillDockContainer>this.context.model.rootNode.container).tabHost.hostElement
                 .insertBefore(this.backgroundContext, (<FillDockContainer>this.context.model.rootNode.container).tabHost.hostElement.firstChild);
+        }
+
+        this.onKeyPressBound = this.onKeyPress.bind(this);
+        this.element.addEventListener('keydown', this.onKeyPressBound);
+    }
+
+    onKeyPress(e: KeyboardEvent) {
+        if (e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
+            this.activePanel.close();
+            this.activePanel = null;
         }
     }
 
@@ -149,6 +161,7 @@ export class DockManager {
 
         // node.performLayout();
     }
+    
 
     setRootNode(node: DockNode) {
         // if (this.context.model.rootNode)
@@ -649,7 +662,13 @@ export class DockManager {
         }
     }
 
-    setCloseTabIconTemplate(template: string) {
-        this.closeTabIconTemplate = template;
+    get activePanel(): PanelContainer {
+        return this._activePanel;
+    }
+    set activePanel(value:PanelContainer) {
+        if (value !== this._activePanel) {
+            this._activePanel = value;
+            console.warn("Active Panel:", this._activePanel);
+        }
     }
 }
