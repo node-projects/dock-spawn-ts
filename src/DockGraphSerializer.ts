@@ -3,6 +3,7 @@ import { DockNode } from "./DockNode.js";
 import { Dialog } from "./Dialog.js";
 import { IPanelInfo } from "./interfaces/IPanelInfo.js";
 import { INodeInfo } from "./interfaces/INodeInfo.js";
+import { IState } from "./interfaces/IState.js";
 
 /**
  * The serializer saves / loads the state of the dock layout hierarchy
@@ -16,7 +17,7 @@ export class DockGraphSerializer {
     }
 
     _buildGraphInfo(node: DockNode): INodeInfo {
-        let nodeState = new Map<string, object>();
+        let nodeState: IState = {};
         node.container.saveState(nodeState);
 
         let childrenInfo: INodeInfo[] = [];

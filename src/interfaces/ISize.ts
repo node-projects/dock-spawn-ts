@@ -1,4 +1,4 @@
 export interface ISize {
     width?: number;
-    heigth?: number;
+    height?: number;
 }

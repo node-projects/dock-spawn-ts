@@ -1,6 +1,7 @@
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { EventHandler } from "./EventHandler.js";
 import { Utils } from "./Utils.js";
+import { IMouseOrTouchEvent } from "./interfaces/IMouseOrTouchEvent.js";
 
 export class SplitterBar {
     previousContainer: IDockContainer;
@@ -12,13 +13,13 @@ export class SplitterBar {
     minPanelSize: number;
     readyToProcessNextDrag: boolean;
     dockSpawnResizedEvent: CustomEvent<{}>;
-    previousMouseEvent: any;
+    previousMouseEvent: IMouseOrTouchEvent;
     mouseMovedHandler: EventHandler;
     mouseUpHandler: EventHandler;
     touchMovedHandler: EventHandler;
     touchUpHandler: EventHandler;
-    
-    constructor(previousContainer:IDockContainer, nextContainer:IDockContainer, stackedVertical:boolean) {
+
+    constructor(previousContainer: IDockContainer, nextContainer: IDockContainer, stackedVertical: boolean) {
         // The panel to the left/top side of the bar, depending on the bar orientation
         this.previousContainer = previousContainer;
         // The panel to the right/bottom side of the bar, depending on the bar orientation
@@ -33,17 +34,17 @@ export class SplitterBar {
         this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent");
     }
 
-    onMouseDown(e) {
+    onMouseDown(e: IMouseOrTouchEvent) {
         if (e.touches)
             e = e.touches[0];
         this._startDragging(e);
     }
 
-    onMouseUp(e) {
+    onMouseUp() {
         this._stopDragging();
     }
 
-    onMouseMoved(e) {
+    onMouseMoved(e: IMouseOrTouchEvent) {
         if (!this.readyToProcessNextDrag)
             return;
         this.readyToProcessNextDrag = false;
@@ -96,7 +97,7 @@ export class SplitterBar {
         document.dispatchEvent(this.dockSpawnResizedEvent);
     }
 
-    _startDragging(e : MouseEvent & TouchEvent) {
+    _startDragging(e: IMouseOrTouchEvent) {
         Utils.disableGlobalTextSelection();
         if (this.mouseMovedHandler) {
             this.mouseMovedHandler.cancel();

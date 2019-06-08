@@ -1,6 +1,8 @@
 import { TabPage } from "./TabPage.js";
 import { Utils } from "./Utils.js";
 import { TabHostDirection } from "./enums/TabHostDirection.js";
+import { TabHandle } from "./TabHandle.js";
+import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 
 /**
  * Tab Host control contains tabs known as TabPages.
@@ -16,7 +18,7 @@ export class TabHost {
     createTabPage: (tabHost: any, container: any) => any;
     timeoutPerform: NodeJS.Timeout;
     tabHandleListener: { onMoveTab: (e: any) => void; };
-    eventListeners: any[];
+    eventListeners: ILayoutEventListener[];
     pages: any[];
     activeTab: TabPage;
 
@@ -66,15 +68,13 @@ export class TabHost {
         this.contentElement.classList.add('dockspan-tab-content');
     }
 
-
     onMoveTab(e) {
         // this.tabListElement;
-        var index = Array.prototype.slice.call(this.tabListElement.childNodes).indexOf(e.self.elementBase);
-
-        this.change(/*host*/this, /*handle*/e.self, e.state, index);
+        let index = Array.prototype.slice.call(this.tabListElement.childNodes).indexOf(e.self.elementBase);
+        this.change(this, /*handle*/e.self, e.state, index);
     }
 
-    performTabsLayout(indexes) {
+    performTabsLayout(indexes: number[]) {
         this.pages = Utils.orderByIndexes(this.pages, indexes);
 
         let items = this.tabListElement.childNodes;
@@ -105,7 +105,7 @@ export class TabHost {
         this.eventListeners.splice(this.eventListeners.indexOf(listener), 1);
     }
 
-    change(host, handle, state, index) {
+    change(host: TabHost, handle: TabHandle, state, index) {
         this.eventListeners.forEach((listener) => {
             if (listener.onChange) {
                 listener.onChange({ host: host, handle: handle, state: state, index: index });

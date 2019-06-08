@@ -6,7 +6,7 @@ export class DockNode {
     container: IDockContainer;
     children: DockNode[];
 
-    constructor(container) {
+    constructor(container: IDockContainer) {
         /** The dock container represented by this node */
         this.container = container;
         this.children = [];
@@ -19,8 +19,8 @@ export class DockNode {
         }
     }
 
-    removeChild(childNode) {
-        var index = this.children.indexOf(childNode);
+    removeChild(childNode: DockNode) {
+        let index = this.children.indexOf(childNode);
         if (index >= 0)
             this.children.splice(index, 1);
     }
@@ -44,9 +44,9 @@ export class DockNode {
         childNode.detachFromParent();
         childNode.parent = this;
 
-        var referenceIndex = this.children.indexOf(referenceNode);
-        var preList = this.children.slice(0, referenceIndex);
-        var postList = this.children.slice(referenceIndex + 1, this.children.length);
+        let referenceIndex = this.children.indexOf(referenceNode);
+        let preList = this.children.slice(0, referenceIndex);
+        let postList = this.children.slice(referenceIndex + 1, this.children.length);
 
         this.children = preList.slice(0);
         if (before) {
@@ -60,12 +60,12 @@ export class DockNode {
         Array.prototype.push.apply(this.children, postList);
     }
 
-    performLayout(relayoutEvenIfEqual : boolean) {
-        var childContainers = this.children.map((childNode) => { return childNode.container; });
+    performLayout(relayoutEvenIfEqual: boolean) {
+        let childContainers = this.children.map((childNode) => { return childNode.container; });
         this.container.performLayout(childContainers, relayoutEvenIfEqual);
     }
 
-    debugDumpTree(indent) {
+    debugDumpTree(indent: number) {
         if (indent === undefined)
             indent = 0;
 

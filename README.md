@@ -9,6 +9,12 @@ it is still alpha, npm packages will follow in the next few weeks
 
 ![Logo](ide.png)
 
+# differneces to original docksapwn
+ - typescript
+ - save/resotre fixed and saveing/restoring of dialogs
+ - touch support (works on ipad/iphone and android devices)
+ - perfromance fixes (unnessecary removeig and adding to dom reduced, not needed elements are hidden, not removed from dom)
+
 # testing
  - download the project
  - install node packages ("npm i")

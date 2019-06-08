@@ -27,13 +27,13 @@ export class DockWheelItem {
         this.active = false;    // Becomes active when the mouse is hovered over it
     }
 
-    onMouseMoved(e) {
+    onMouseMoved() {
         this.active = true;
         this.element.classList.add(this.hoverIconClass);
         this.wheel.onMouseOver(this);
     }
 
-    onMouseOut(e) {
+    onMouseOut() {
         this.active = false;
         this.element.classList.remove(this.hoverIconClass);
         this.wheel.onMouseOut();

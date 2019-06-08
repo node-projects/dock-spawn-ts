@@ -1,14 +1,18 @@
 import { DockManager } from "./DockManager.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { Utils } from "./Utils.js";
 import { UndockInitiator } from "./UndockInitiator.js";
 import { ContainerType } from "./ContainerType.js";
 import { EventHandler } from "./EventHandler.js";
+import { ISize } from "./interfaces/ISize.js";
+import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
+import { IState } from "./interfaces/IState.js";
+import { Point } from "./Point.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
  */
-export class PanelContainer implements IDockContainer {
+export class PanelContainer implements IDockContainerWithSize {
 
     onTitleChanged: any;
     elementPanel: HTMLDivElement;
@@ -16,7 +20,7 @@ export class PanelContainer implements IDockContainer {
     elementTitleText: HTMLDivElement;
     elementContentHost: HTMLDivElement;
     name: string;
-    state: { width: any; height: any; };
+    state: ISize;
     elementContent: HTMLElement & { resizeHandler?: any, _dockSpawnPanelContainer: PanelContainer };
     dockManager: DockManager;
     title: string;
@@ -81,7 +85,7 @@ export class PanelContainer implements IDockContainer {
         this.undockInitiator.enabled = canUndock;
     }
 
-    static loadFromState(state, dockManager: DockManager) {
+    static loadFromState(state: IState, dockManager: DockManager) {
         let elementName = state.element;
         let elementContent = document.getElementById(elementName);
         if (elementContent === null) {
@@ -92,13 +96,13 @@ export class PanelContainer implements IDockContainer {
         return ret;
     }
 
-    saveState(state) {
+    saveState(state: IState) {
         state.element = this.elementContent.id;
         state.width = this.width;
         state.height = this.height;
     }
 
-    loadState(state) {
+    loadState(state: IState) {
         this.width = state.width;
         this.height = state.height;
         this.state = { width: state.width, height: state.height };
@@ -185,7 +189,7 @@ export class PanelContainer implements IDockContainer {
     /**
      * Undocks the panel and and converts it to a dialog box
      */
-    performUndockToDialog(e, dragOffset) {
+    performUndockToDialog(e, dragOffset: Point) {
         this.isDialog = true;
         this.undockInitiator.enabled = false;
         this.elementContent.style.display = "block";
@@ -239,7 +243,7 @@ export class PanelContainer implements IDockContainer {
     }
 
 
-    resize(width, height) {
+    resize(width: number, height: number) {
         // if (this._cachedWidth === width && this._cachedHeight === height)
         // {
         //     // Already in the desired size
@@ -256,7 +260,7 @@ export class PanelContainer implements IDockContainer {
         }
     }
 
-    _setPanelDimensions(width, height) {
+    _setPanelDimensions(width: number, height: number) {
         this.elementTitle.style.width = width + 'px';
         this.elementContentHost.style.width = width + 'px';
         this.elementContent.style.width = width + 'px';
@@ -269,29 +273,29 @@ export class PanelContainer implements IDockContainer {
         this.elementPanel.style.height = height + 'px';
     }
 
-    setTitle(title) {
+    setTitle(title: string) {
         this.title = title;
         this._updateTitle();
         if (this.onTitleChanged)
             this.onTitleChanged(this, title);
     }
 
-    setTitleIcon(iconName) {
+    setTitleIcon(iconName: string) {
         this.iconName = iconName;
         this._updateTitle();
         if (this.onTitleChanged)
             this.onTitleChanged(this, this.title);
     }
 
-    setTitleIconTemplate(iconTemplate) {
+    setTitleIconTemplate(iconTemplate: string) {
         this.iconTemplate = iconTemplate;
         this._updateTitle();
         if (this.onTitleChanged)
             this.onTitleChanged(this, this.title);
     }
 
-    setCloseIconTemplate(closeIconTemplate) {
-        this.elementButtonClose.innerHTML = closeIconTemplate();
+    setCloseIconTemplate(closeIconTemplate: string) {
+        this.elementButtonClose.innerHTML = closeIconTemplate;
     }
 
     _updateTitle() {
@@ -306,7 +310,7 @@ export class PanelContainer implements IDockContainer {
         return this.elementTitleText.innerHTML;
     }
 
-    performLayout(children) {
+    performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean) {
     }
 
     onCloseButtonClicked() {

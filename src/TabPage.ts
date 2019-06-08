@@ -12,7 +12,7 @@ export class TabPage {
     containerElement: HTMLElement;
     _initContent: boolean;
 
-    constructor(host, container) {
+    constructor(host: TabHost, container: IDockContainer) {
         if (arguments.length === 0) {
             return;
         }
@@ -52,7 +52,7 @@ export class TabPage {
 
     }
 
-    setSelected(flag) {
+    setSelected(flag: boolean) {
         this.selected = flag;
         this.handle.setSelected(flag);
 

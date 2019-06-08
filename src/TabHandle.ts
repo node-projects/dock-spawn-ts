@@ -194,8 +194,8 @@ export class TabHandle {
     }
 
     generateMoveTabEvent(event, pos) {
-        var contain = pos > event.rect.left && pos < event.rect.right;
-        var m = Math.abs(event.bound - pos);
+        let contain = pos > event.rect.left && pos < event.rect.right;
+        let m = Math.abs(event.bound - pos);
         if (m < this.moveThreshold && contain)
             this.moveTabEvent(this, event.state);
     }
@@ -225,7 +225,6 @@ export class TabHandle {
             if (this.direction !== 0) this.generateMoveTabEvent(event, this.current);
         }
     }
-
 
     hideCloseButton(state) {
         this.elementCloseButton.style.display = state ? 'none' : 'block';

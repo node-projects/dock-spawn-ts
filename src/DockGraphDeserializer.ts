@@ -96,7 +96,6 @@ export class DockGraphDeserializer {
             throw new Error('Cannot create dock container of unknown type: ' + containerType);
 
         // Restore the state of the container
-
         container.loadState(containerState);
 
         // container.performLayout(childContainers);

@@ -57,7 +57,7 @@ export class ResizableContainer implements IDockContainer {
         this._buildResizeHandle(false, false, false, true);
     }
 
-    _buildResizeHandle(east, west, north, south) {
+    _buildResizeHandle(east:boolean, west:boolean, north:boolean, south:boolean) {
         var handle = new ResizeHandle();
         handle.east = east;
         handle.west = west;

@@ -1,6 +1,7 @@
 import { EventHandler } from "./EventHandler.js";
 import { Point } from "./Point.js";
 import { Dialog } from "./Dialog.js";
+import { IMouseOrTouchEvent } from "./interfaces/IMouseOrTouchEvent.js";
 
 /**
  * Listens for events on the [element] and notifies the [listener]
@@ -145,7 +146,7 @@ export class UndockInitiator {
         }
     }
 
-    onMouseMove(e) {
+    onMouseMove(e: IMouseOrTouchEvent) {
         if (e.touches)
             e = e.touches[0];
         let position = new Point(e.clientX, e.clientY);
@@ -169,7 +170,6 @@ export class UndockInitiator {
             left += currentElement.offsetLeft || 0;
             currentElement = currentElement.offsetParent as HTMLElement;
         } while (currentElement);
-
 
         let dragOffsetX = this.dragStartPosition.x - left; //this.element.offsetLeft;
         let dragOffsetY = this.dragStartPosition.y - top; //this.element.offsetTop;

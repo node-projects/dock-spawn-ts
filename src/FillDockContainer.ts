@@ -3,9 +3,11 @@ import { Utils } from "./Utils.js";
 import { ContainerType } from "./ContainerType.js";
 import { TabHost } from "./TabHost.js";
 import { TabHostDirection } from "./enums/TabHostDirection.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { ISize } from "./interfaces/ISize.js";
+import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
+import { IState } from "./interfaces/IState.js";
 
-export class FillDockContainer implements IDockContainer {
+export class FillDockContainer implements IDockContainerWithSize {
 
     dockManager: DockManager;
     tabOrientation: TabHostDirection;
@@ -16,7 +18,7 @@ export class FillDockContainer implements IDockContainer {
     minimumAllowedChildNodes: number;
     tabHost: TabHost;
     tabHostListener: { onChange: (e: any) => void; };
-    state: { width: number; height: number; };
+    state: ISize;
 
     constructor(dockManager: DockManager, tabStripDirection?: TabHostDirection) {
         if (tabStripDirection === undefined) {
@@ -62,12 +64,12 @@ export class FillDockContainer implements IDockContainer {
             delete this.element;
     }
 
-    saveState(state) {
+    saveState(state: IState): void {
         state.width = this.width;
         state.height = this.height;
     }
 
-    loadState(state) {
+    loadState(state: IState): void {
         // this.resize(state.width, state.height);
         // this.width = state.width;
         // this.height = state.height;

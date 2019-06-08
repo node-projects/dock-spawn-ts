@@ -3,6 +3,7 @@ import { TabHost } from "./TabHost.js";
 import { DocumentTabPage } from "./DocumentTabPage.js";
 import { DockManager } from "./DockManager.js";
 import { TabHostDirection } from "./enums/TabHostDirection.js";
+import { IState } from "./interfaces/IState.js";
 
 /**
  * The document manager is then central area of the dock layout hierarchy.
@@ -27,8 +28,8 @@ export class DocumentManagerContainer extends FillDockContainer {
         return new DocumentTabPage(tabHost, container);
     }
 
-    saveState(state) {
-        FillDockContainer.prototype.saveState.call(this, state);
+    saveState(state: IState) {
+        super.saveState(state);
         state.documentManager = true;
     }
 

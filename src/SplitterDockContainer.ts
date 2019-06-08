@@ -2,8 +2,11 @@ import { DockManager } from "./DockManager.js";
 import { SplitterPanel } from "./SplitterPanel.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
+import { ISize } from "./interfaces/ISize.js";
+import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
+import { IState } from "./interfaces/IState.js";
 
-export abstract class SplitterDockContainer {
+export abstract class SplitterDockContainer implements IDockContainerWithSize {
     name: string;
     dockManager: DockManager;
     minimumAllowedChildNodes: number;
@@ -12,7 +15,7 @@ export abstract class SplitterDockContainer {
     containerElement: HTMLDivElement;
     _cachedWidth: number;
     _cachedHeight: number;
-    state: { width: any; height: any; };
+    state: ISize;
     containerType: ContainerType;
     
     constructor(name: string, dockManager: DockManager, childContainers: IDockContainer[], stackedVertical : boolean) {
@@ -54,17 +57,17 @@ export abstract class SplitterDockContainer {
      * Sets the percentage of space the specified [container] takes in the split panel
      * The percentage is specified in [ratio] and is between 0..1
      */
-    setContainerRatio(container, ratio) {
+    setContainerRatio(container: IDockContainer, ratio: number) {
         this.splitterPanel.setContainerRatio(container, ratio);
         this.resize(this.width, this.height);
     }
 
-    saveState(state) {
+    saveState(state: IState) {
         state.width = this.width;
         state.height = this.height;
     }
 
-    loadState(state) {
+    loadState(state: IState) {
         this.state = { width: state.width, height: state.height };
         // this.resize(state.width, state.height);
     }
