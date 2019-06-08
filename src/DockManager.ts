@@ -36,7 +36,7 @@ export class DockManager {
     backgroundContext: HTMLElement;
     _undockEnabled: boolean;
     zIndexCounter: number;
-    closeTabIconTemplate: any;
+    closeTabIconTemplate: string;
     constructor(element: HTMLElement) {
         if (element === undefined)
             throw new Error('Invalid Dock Manager element provided');
@@ -163,7 +163,7 @@ export class DockManager {
         this.element.appendChild(node.container.containerElement);
     }
 
-    _onDialogDragStarted(sender, e) {
+    _onDialogDragStarted(sender: Dialog, e) {
         this.dockWheel.activeNode = this._findNodeOnPoint(e.clientX, e.clientY);
         this.dockWheel.activeDialog = sender;
         if (sender.noDocking == null || sender.noDocking !== true)
@@ -180,7 +180,7 @@ export class DockManager {
         this.touchMoveHandler = new EventHandler(window, 'touchmove', this._onMouseMoved.bind(this));
     }
 
-    _onDialogDragEnded(sender, e) {
+    _onDialogDragEnded(sender: Dialog, e) {
         if (this.mouseMoveHandler) {
             this.mouseMoveHandler.cancel();
             delete this.mouseMoveHandler;
@@ -201,21 +201,22 @@ export class DockManager {
             e = e.changedTouches[0];
         }
         this.dockWheel.activeNode = this._findNodeOnPoint(e.clientX, e.clientY);
+        console.log(this.dockWheel.activeNode);
     }
 
     /**
-     * Perform a DFS on the dock model's tree to find the
+     * Perform a DFS (DeepFirstSearch) on the dock model's tree to find the
      * deepest level panel (i.e. the top-most non-overlapping panel)
      * that is under the mouse cursor
      * Retuns null if no node is found under this point
      */
-    private _findNodeOnPoint(x, y) {
-        var stack = [];
+    private _findNodeOnPoint(x: number, y: number) {
+        let stack = [];
         stack.push(this.context.model.rootNode);
-        var bestMatch;
+        let bestMatch;
 
         while (stack.length > 0) {
-            var topNode = stack.pop();
+            let topNode = stack.pop();
 
             if (Utils.isPointInsideNode(x, y, topNode)) {
                 // This node contains the point.
@@ -386,7 +387,7 @@ export class DockManager {
     * closes a Panel
     */
     requestClose(container: PanelContainer) {
-        var node = this._findNodeFromContainer(container);
+        let node = this._findNodeFromContainer(container);
         this.layoutEngine.close(node);
     }
 
@@ -394,13 +395,13 @@ export class DockManager {
      * Opens a Elemnt in a Dialog
      * It is assumed that only leaf nodes (panels) can be undocked
      */
-    openInDialog(container: PanelContainer, event, dragOffset) {
+    openInDialog(container: PanelContainer, event, dragOffset: Point) {
         // Create a new dialog window for the undocked panel
-        var dialog = new Dialog(container, this);
+        let dialog = new Dialog(container, this);
 
         if (event !== undefined) {
             // Adjust the relative position
-            var dialogWidth = dialog.elementDialog.clientWidth;
+            let dialogWidth = dialog.elementDialog.clientWidth;
             if (dragOffset.x > dialogWidth)
                 dragOffset.x = 0.75 * dialogWidth;
             dialog.setPosition(
@@ -415,7 +416,7 @@ export class DockManager {
      * It is assumed that only leaf nodes (panels) can be undocked
      */
     requestUndock(container: PanelContainer) {
-        var node = this._findNodeFromContainer(container);
+        let node = this._findNodeFromContainer(container);
         this.layoutEngine.undock(node);
     }
 
@@ -424,8 +425,8 @@ export class DockManager {
      * Returns the node that was removed from the dock tree
      */
     requestRemove(container: PanelContainer) {
-        var node = this._findNodeFromContainer(container);
-        var parent = node.parent;
+        let node = this._findNodeFromContainer(container);
+        let parent = node.parent;
         node.detachFromParent();
         if (parent)
             this.rebuildLayout(parent);
@@ -438,7 +439,7 @@ export class DockManager {
         stack.push(this.context.model.rootNode);
 
         while (stack.length > 0) {
-            var topNode = stack.pop();
+            let topNode = stack.pop();
 
             if (topNode.container === container)
                 return topNode;
@@ -448,12 +449,12 @@ export class DockManager {
         throw new Error('Cannot find dock node belonging to the element');
     }
 
-    findNodeFromContainerElement(containerElement) {
+    findNodeFromContainerElement(containerElement: HTMLElement) {
         let stack = [];
         stack.push(this.context.model.rootNode);
 
         while (stack.length > 0) {
-            var topNode = stack.pop();
+            let topNode = stack.pop();
 
             if (topNode.container.containerElement === containerElement)
                 return topNode;
@@ -477,7 +478,7 @@ export class DockManager {
         });
     }
 
-    resumeLayout(panel) {
+    resumeLayout(panel: IDockContainer) {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onResumeLayout) listener.onResumeLayout(this, panel);
         });
@@ -500,7 +501,6 @@ export class DockManager {
         });
     }
 
-
     notifyOnUnDock(dockNode: DockNode) {
         this._checkShowBackgroundContext();
         this.layoutEventListeners.forEach((listener) => {
@@ -510,7 +510,7 @@ export class DockManager {
         });
     }
 
-    notifyOnClosePanel(panel) {
+    notifyOnClosePanel(panel: PanelContainer) {
         this._checkShowBackgroundContext();
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onClosePanel) {
@@ -518,7 +518,6 @@ export class DockManager {
             }
         });
     }
-
 
     notifyOnCreateDialog(dialog: Dialog) {
         this.layoutEventListeners.forEach((listener) => {
@@ -544,7 +543,6 @@ export class DockManager {
             }
         });
     }
-
 
     notifyOnChangeDialogPosition(dialog: Dialog, x: number, y: number) {
         this.layoutEventListeners.forEach((listener) => {
@@ -574,7 +572,7 @@ export class DockManager {
     }
 
     getPanels() {
-        let panels = [];
+        let panels: PanelContainer[] = [];
         //all visible nodes
         this._allPanels(this.context.model.rootNode, panels);
 
@@ -587,25 +585,25 @@ export class DockManager {
         return panels;
     }
 
-    undockEnabled(state) {
+    undockEnabled(state: boolean) {
         this._undockEnabled = state;
         this.getPanels().forEach((panel) => {
             panel.canUndock(state);
         });
     }
 
-    lockDockState(state) {
+    lockDockState(state: boolean) {
         this.undockEnabled(!state); // false - not enabled
         this.hideCloseButton(state); //true - hide
     }
 
-    hideCloseButton(state) {
+    hideCloseButton(state: boolean) {
         this.getPanels().forEach((panel) => {
             panel.hideCloseButton(state);
         });
     }
 
-    updatePanels(ids) {
+    updatePanels(ids: string[]) {
         let panels: PanelContainer[] = [];
         //all visible nodes
         this._allPanels(this.context.model.rootNode, panels);
@@ -651,7 +649,7 @@ export class DockManager {
         }
     }
 
-    setCloseTabIconTemplate(template) {
+    setCloseTabIconTemplate(template: string) {
         this.closeTabIconTemplate = template;
     }
 }

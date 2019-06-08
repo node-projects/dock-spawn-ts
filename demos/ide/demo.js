@@ -13,6 +13,8 @@ window.refresh = refresh;
 
 window.onload = () => {
     // Convert a div to the dock manager. Panels can then be docked on to it
+    
+    let divDockContainer = document.getElementById('dock_div');
     let divDockManager = document.getElementById('my_dock_manager');
     dockManager = new DockManager(divDockManager);
     //@ts-ignore
@@ -27,8 +29,8 @@ window.onload = () => {
     // Let the dock manager element fill in the entire screen
     window.onresize = () => {
         dockManager.resize(
-            window.innerWidth - (divDockManager.clientLeft + divDockManager.offsetLeft),
-            window.innerHeight - (divDockManager.clientTop + divDockManager.offsetTop)
+            divDockContainer.clientWidth,
+            divDockContainer.clientHeight
         );
     };
     window.onresize(null);

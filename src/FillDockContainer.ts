@@ -49,7 +49,7 @@ export class FillDockContainer implements IDockContainerWithSize {
         this.tabHost.setActiveTab(child);
     }
 
-    resize(width, height) {
+    resize(width: number, height: number) {
         this.element.style.width = width + 'px';
         this.element.style.height = height + 'px';
         this.tabHost.resize(width, height);

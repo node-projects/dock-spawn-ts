@@ -138,9 +138,11 @@
 /**************************** Splitter *********************************/
 .splitter-container-horizontal {
 	float:left;
+	position: relative;
 }
 
 .splitter-container-vertical {
+	position: relative;
 }
 
 .splitbar-horizontal {

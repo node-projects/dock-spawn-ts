@@ -85,11 +85,6 @@ export class UndockInitiator {
         }
     }
 
-
-    //UndockInitiator.prototype.setThresholdPixels = function (thresholdPixels, horizontalChange){
-    //     this.horizontalChange = horizontalChange;
-    //     this.thresholdPixels = thresholdPixels;
-    //};
     onMouseDown(e:any) {
         // Make sure we dont do this on floating dialogs
         if (this.enabled) {

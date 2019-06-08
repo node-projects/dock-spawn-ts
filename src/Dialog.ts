@@ -17,6 +17,7 @@ export class Dialog {
     mouseDownHandler: any;
     touchDownHandler: any;
     onKeyPressBound: any;
+    noDocking: boolean;
     isHidden: boolean;
 
     constructor(panel: PanelContainer, dockManager: DockManager) {

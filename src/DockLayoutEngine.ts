@@ -174,7 +174,7 @@ export class DockLayoutEngine {
     }
 
     _performDock(referenceNode: DockNode, newNode: DockNode, direction: string, insertBeforeReference: boolean) {
-        (<PanelContainer>newNode.container).elementPanel.style.position = "relative";
+        //(<PanelContainer>newNode.container).elementPanel.style.position = "relative";
 
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')
             referenceNode = referenceNode.parent;
@@ -271,13 +271,13 @@ export class DockLayoutEngine {
         this.dockManager.notifyOnDock(newNode);
     }
 
-    _forceResizeCompositeContainer = (container) => {
+    _forceResizeCompositeContainer = (container: IDockContainer) => {
         let width = container.containerElement.clientWidth;
         let height = container.containerElement.clientHeight;
         container.resize(width, height);
     }
 
-    _createDockContainer(containerType, newNode, referenceNode) {
+    _createDockContainer(containerType: string, newNode: DockNode, referenceNode: DockNode) {
         if (containerType === 'horizontal')
             return new HorizontalDockContainer(this.dockManager, [newNode.container, referenceNode.container]);
         if (containerType === 'vertical')
@@ -293,7 +293,7 @@ export class DockLayoutEngine {
      * The state is not modified in this function.  It is used for showing a preview of where
      * the panel would be docked when hovered over a dock wheel button
      */
-    getDockBounds(referenceNode: DockNode, containerToDock: IDockContainer, direction, insertBeforeReference: boolean): IRectangle {
+    getDockBounds(referenceNode: DockNode, containerToDock: IDockContainer, direction: string, insertBeforeReference: boolean): IRectangle {
         let compositeNode; // The node that contains the splitter / fill node
         let childCount;
         let childPosition;
@@ -303,8 +303,9 @@ export class DockLayoutEngine {
             // Since this is a fill operation, the highlight bounds is the same as the reference node
             // TODO: Create a tab handle highlight to show that it's going to be docked in a tab
             let targetElement = referenceNode.container.containerElement;
+            let outerRect = this.dockManager.element.getBoundingClientRect();
             let targetElementRect = targetElement.getBoundingClientRect();
-            return { x: targetElementRect.left, y: targetElementRect.top, width: targetElement.clientWidth, height: targetElement.clientHeight };
+            return { x: targetElementRect.left - outerRect.left, y: targetElementRect.top - outerRect.top, width: targetElement.clientWidth, height: targetElement.clientHeight };
         }
 
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')
@@ -351,14 +352,16 @@ export class DockLayoutEngine {
         }
 
         bounds = {};
+        let outerRect = this.dockManager.element.getBoundingClientRect();
+        let rect = compositeNode.container.containerElement.getBoundingClientRect();
         if (direction === 'vertical') {
-            bounds.x = compositeNode.container.containerElement.offsetLeft;
-            bounds.y = compositeNode.container.containerElement.offsetTop + targetPanelStart;
+            bounds.x = rect.left - outerRect.left;
+            bounds.y = rect.top - outerRect.top + targetPanelStart;
             bounds.width = compositeNode.container.width;
             bounds.height = targetPanelSize;
         } else if (direction === 'horizontal') {
-            bounds.x = compositeNode.container.containerElement.offsetLeft + targetPanelStart;
-            bounds.y = compositeNode.container.containerElement.offsetTop;
+            bounds.x = rect.left - outerRect.left + targetPanelStart;
+            bounds.y = rect.top - outerRect.top;
             bounds.width = targetPanelSize;
             bounds.height = compositeNode.container.height;
         }
@@ -366,7 +369,7 @@ export class DockLayoutEngine {
         return bounds;
     }
 
-    _getVaringDimension(container, direction) {
+    _getVaringDimension(container: IDockContainer, direction: string): number {
         if (direction === 'vertical')
             return container.height;
         if (direction === 'horizontal')

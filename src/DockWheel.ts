@@ -23,7 +23,7 @@ export class DockWheel {
         this.elementMainWheel = document.createElement('div');    // Contains the main wheel's 5 dock buttons
         this.elementSideWheel = document.createElement('div');    // Contains the 4 buttons on the side
         this.wheelItems = {};
-        for (let wheelType of Object.values(WheelTypes)) {
+        for (let wheelType in WheelTypes) {
             this.wheelItems[wheelType] = new DockWheelItem(this, wheelType);
             if (wheelType.substr(-2, 2) === '-s')
                 // Side button
@@ -33,7 +33,7 @@ export class DockWheel {
                 this.elementMainWheel.appendChild(this.wheelItems[wheelType].element);
         };
 
-        var zIndex = 9000000;
+        let zIndex = 9000000;
         this.elementMainWheel.classList.add('dock-wheel-base');
         this.elementSideWheel.classList.add('dock-wheel-base');
         this.elementMainWheel.style.zIndex = String(zIndex + 1);
@@ -45,7 +45,6 @@ export class DockWheel {
         this._activeNode = undefined;
         this._visible = false;
     }
-
 
     /** The node over which the dock wheel is being displayed on */
     get activeNode(): DockNode {
@@ -90,13 +89,13 @@ export class DockWheel {
         element.appendChild(this.elementMainWheel);
         this.dockManager.element.appendChild(this.elementSideWheel);
 
-        this._setWheelButtonPosition('left-s', sideMargin, -dockManagerHeight / 2);
-        this._setWheelButtonPosition('right-s', dockManagerWidth - sideMargin * 2, -dockManagerHeight / 2);
-        this._setWheelButtonPosition('top-s', dockManagerWidth / 2, -dockManagerHeight + sideMargin);
-        this._setWheelButtonPosition('down-s', dockManagerWidth / 2, -sideMargin);
+        this._setWheelButtonPosition(WheelTypes["left-s"], sideMargin, -dockManagerHeight / 2);
+        this._setWheelButtonPosition(WheelTypes["right-s"], dockManagerWidth - sideMargin * 2, -dockManagerHeight / 2);
+        this._setWheelButtonPosition(WheelTypes["top-s"], dockManagerWidth / 2, -dockManagerHeight + sideMargin);
+        this._setWheelButtonPosition(WheelTypes["down-s"], dockManagerWidth / 2, -sideMargin);
     }
 
-    _setWheelButtonPosition(wheelId, left, top) {
+    _setWheelButtonPosition(wheelId: WheelTypes, left: number, top: number) {
         let item = this.wheelItems[wheelId];
         let itemHalfWidth = item.element.clientWidth / 2;
         let itemHalfHeight = item.element.clientHeight / 2;
@@ -117,34 +116,34 @@ export class DockWheel {
         Utils.removeNode(this.elementPanelPreview);
 
         // deactivate all wheels
-        for (var wheelType in this.wheelItems)
+        for (let wheelType in this.wheelItems)
             this.wheelItems[wheelType].active = false;
     }
 
-    onMouseOver(wheelItem) {
+    onMouseOver(wheelItem: DockWheelItem) {
         if (!this.activeDialog)
             return;
 
         // Display the preview panel to show where the panel would be docked
         let rootNode = this.dockManager.context.model.rootNode;
         let bounds;
-        if (wheelItem.id === 'top') {
+        if (wheelItem.id === WheelTypes.top) {
             bounds = this.dockManager.layoutEngine.getDockBounds(this.activeNode, this.activeDialog.panel, 'vertical', true);
-        } else if (wheelItem.id === 'down') {
+        } else if (wheelItem.id === WheelTypes.down) {
             bounds = this.dockManager.layoutEngine.getDockBounds(this.activeNode, this.activeDialog.panel, 'vertical', false);
-        } else if (wheelItem.id === 'left') {
+        } else if (wheelItem.id === WheelTypes.left) {
             bounds = this.dockManager.layoutEngine.getDockBounds(this.activeNode, this.activeDialog.panel, 'horizontal', true);
-        } else if (wheelItem.id === 'right') {
+        } else if (wheelItem.id === WheelTypes.right) {
             bounds = this.dockManager.layoutEngine.getDockBounds(this.activeNode, this.activeDialog.panel, 'horizontal', false);
-        } else if (wheelItem.id === 'fill') {
+        } else if (wheelItem.id === WheelTypes.fill) {
             bounds = this.dockManager.layoutEngine.getDockBounds(this.activeNode, this.activeDialog.panel, 'fill', false);
-        } else if (wheelItem.id === 'top-s') {
+        } else if (wheelItem.id === WheelTypes["top-s"]) {
             bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'vertical', true);
-        } else if (wheelItem.id === 'down-s') {
+        } else if (wheelItem.id === WheelTypes["down-s"]) {
             bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'vertical', false);
-        } else if (wheelItem.id === 'left-s') {
+        } else if (wheelItem.id === WheelTypes["left-s"]) {
             bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'horizontal', true);
-        } else if (wheelItem.id === 'right-s') {
+        } else if (wheelItem.id === WheelTypes["right-s"]) {
             bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'horizontal', false);
         }
 
@@ -166,7 +165,7 @@ export class DockWheel {
      * The dialog might not necessarily be dropped in one of the dock wheel buttons,
      * in which case the request will be ignored
      */
-    onDialogDropped(dialog) {
+    onDialogDropped(dialog: Dialog) {
         // Check if the dialog was dropped in one of the wheel items
         let wheelItem = this._getActiveWheelItem();
         if (wheelItem)
@@ -191,23 +190,23 @@ export class DockWheel {
 
         if (!this.activeNode)
             return;
-        if (wheelItem.id === 'left') {
+        if (wheelItem.id === WheelTypes.left) {
             this.dockManager.dockDialogLeft(this.activeNode, dialog);
-        } else if (wheelItem.id === 'right') {
+        } else if (wheelItem.id === WheelTypes.right) {
             this.dockManager.dockDialogRight(this.activeNode, dialog);
-        } else if (wheelItem.id === 'top') {
+        } else if (wheelItem.id === WheelTypes.top) {
             this.dockManager.dockDialogUp(this.activeNode, dialog);
-        } else if (wheelItem.id === 'down') {
+        } else if (wheelItem.id === WheelTypes.down) {
             this.dockManager.dockDialogDown(this.activeNode, dialog);
-        } else if (wheelItem.id === 'fill') {
+        } else if (wheelItem.id === WheelTypes.fill) {
             this.dockManager.dockDialogFill(this.activeNode, dialog);
-        } else if (wheelItem.id === 'left-s') {
+        } else if (wheelItem.id === WheelTypes["left-s"]) {
             this.dockManager.dockDialogLeft(this.dockManager.context.model.rootNode, dialog);
-        } else if (wheelItem.id === 'right-s') {
+        } else if (wheelItem.id === WheelTypes["right-s"]) {
             this.dockManager.dockDialogRight(this.dockManager.context.model.rootNode, dialog);
-        } else if (wheelItem.id === 'top-s') {
+        } else if (wheelItem.id === WheelTypes["top-s"]) {
             this.dockManager.dockDialogUp(this.dockManager.context.model.rootNode, dialog);
-        } else if (wheelItem.id === 'down-s') {
+        } else if (wheelItem.id === WheelTypes["down-s"]) {
             this.dockManager.dockDialogDown(this.dockManager.context.model.rootNode, dialog);
         }
     }

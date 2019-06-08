@@ -3,6 +3,7 @@ import { Utils } from "./Utils.js";
 import { TabHostDirection } from "./enums/TabHostDirection.js";
 import { TabHandle } from "./TabHandle.js";
 import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 
 /**
  * Tab Host control contains tabs known as TabPages.
@@ -19,7 +20,7 @@ export class TabHost {
     timeoutPerform: NodeJS.Timeout;
     tabHandleListener: { onMoveTab: (e: any) => void; };
     eventListeners: ILayoutEventListener[];
-    pages: any[];
+    pages: TabPage[];
     activeTab: TabPage;
 
     constructor(tabStripDirection: TabHostDirection, displayCloseButton?: boolean) {
@@ -113,12 +114,12 @@ export class TabHost {
         });
     }
 
-    _createDefaultTabPage(tabHost, container) {
+    _createDefaultTabPage(tabHost: TabHost, container: IDockContainer) {
         return new TabPage(tabHost, container);
     }
 
-    setActiveTab(container) {
-        var currentPage;
+    setActiveTab(container: IDockContainer) {
+        let currentPage;
         this.pages.forEach((itm) => {
             if (itm.container === container) {
                 currentPage = itm;
@@ -133,14 +134,14 @@ export class TabHost {
         this.hostElement.style.width = width + 'px';
         this.hostElement.style.height = height + 'px';
 
-        var tabHeight = this.tabListElement.clientHeight;
+        let tabHeight = this.tabListElement.clientHeight;
         if (this.timeoutPerform) //lazy check
             clearTimeout(this.timeoutPerform);
         this.timeoutPerform = setTimeout(() => {
             this.resizeTabListElement(width, height);
         }, 100);
-        var separatorHeight = this.separatorElement.clientHeight;
-        var contentHeight = height - tabHeight - separatorHeight;
+        let separatorHeight = this.separatorElement.clientHeight;
+        let contentHeight = height - tabHeight - separatorHeight;
         this.contentElement.style.height = contentHeight + 'px';
 
         if (this.activeTab)
@@ -149,14 +150,14 @@ export class TabHost {
 
     resizeTabListElement(width: number, height?: number) {
         if (this.pages.length === 0) return;
-        var tabListWidth = 0;
+        let tabListWidth = 0;
         this.pages.forEach((page) => {
-            var handle = page.handle;
+            let handle = page.handle;
             handle.elementBase.style.width = ''; //clear
             handle.elementText.style.width = '';
             tabListWidth += handle.elementBase.clientWidth;
         });
-        var scaleMultiplier = width / tabListWidth;
+        let scaleMultiplier = width / tabListWidth;
         if (scaleMultiplier > 1.2) return; //with a reserve
         this.pages.forEach((page, index) => {
             var handle = page.handle;
@@ -170,7 +171,7 @@ export class TabHost {
         });
     }
 
-    performLayout(children) {
+    performLayout(children: IDockContainer[]) {
         // Destroy all existing tab pages not in children
         this.pages.forEach((tab) => {
             if (!children.some((x) => x == tab.container)) {
@@ -183,17 +184,17 @@ export class TabHost {
             }
         });
 
-        var oldActiveTab = this.activeTab;
+        let oldActiveTab = this.activeTab;
         delete this.activeTab;
 
-        var childPanels = children.filter((child) => {
+        let childPanels = children.filter((child) => {
             return child.containerType === 'panel';
         });
 
         if (childPanels.length > 0) {
             // Rebuild new tab pages
             childPanels.forEach((child) => {
-                var page = null;
+                let page = null;
                 if (!this.pages.some((x) => {
                     if (x.container == child) {
                         page = x;
@@ -220,12 +221,12 @@ export class TabHost {
             this.onTabPageSelected(this.activeTab);
     }
 
-    _setTabHandlesVisible(visible) {
+    _setTabHandlesVisible(visible: boolean) {
         this.tabListElement.style.display = visible ? 'flex' : 'none';
         this.separatorElement.style.display = visible ? 'block' : 'none';
     }
 
-    onTabPageSelected(page) {
+    onTabPageSelected(page: TabPage) {
         this.activeTab = page;
         this.pages.forEach((tabPage) => {
             var selected = (tabPage === page);
@@ -233,8 +234,8 @@ export class TabHost {
         });
 
         // adjust the zIndex of the tabs to have proper shadow/depth effect
-        var zIndexDelta = 1;
-        var zIndex = 1000;
+        let zIndexDelta = 1;
+        let zIndex = 1000;
         this.pages.forEach((tabPage) => {
             tabPage.handle.setZIndex(zIndex);
             var selected = (tabPage === page);

@@ -22,12 +22,13 @@ export class Utils {
 
     static isPointInsideNode(px: number, py: number, node: DockNode): boolean {
         let element = node.container.containerElement;
+        let rect = element.getBoundingClientRect();
 
         return (
-            px >= element.offsetLeft &&
-            px <= element.offsetLeft + element.clientWidth &&
-            py >= element.offsetTop &&
-            py <= element.offsetTop + element.clientHeight
+            px >= rect.left &&
+            px <= rect.left + rect.width &&
+            py >= rect.top &&
+            py <= rect.top + rect.height
         );
     }
 

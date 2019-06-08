@@ -3,6 +3,7 @@ import { DockNode } from "../DockNode.js";
 import { Dialog } from "../Dialog.js";
 import { TabPage } from "../TabPage.js";
 import { IDockContainer } from "./IDockContainer.js";
+import { PanelContainer } from "../PanelContainer.js";
 
 /**
 * The Dock Manager notifies the listeners of layout changes so client containers that have
@@ -12,7 +13,7 @@ export interface ILayoutEventListener {
     onDock?(dockManager: DockManager, dockNode: DockNode): void;
     onTabsReorder?(dockManager: DockManager, dockNode: DockNode): void;
     onUndock?(dockManager: DockManager, dockNode: DockNode): void;
-    onClosePanel?(dockManager: DockManager, dockNode: DockNode): void;
+    onClosePanel?(dockManager: DockManager, panel: PanelContainer): void;
     onCreateDialog?(dockManager: DockManager, dialog: Dialog): void;
     onHideDialog?(dockManager: DockManager, dialog: Dialog): void;
     onShowDialog?(dockManager: DockManager, dialog: Dialog): void;

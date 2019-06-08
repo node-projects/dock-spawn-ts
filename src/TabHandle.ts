@@ -66,7 +66,7 @@ export class TabHandle {
 
         // Set the close button text (font awesome)
         if (this.parent.container instanceof PanelContainer && this.parent.container.dockManager.closeTabIconTemplate) {
-            this.elementCloseButton.innerHTML = this.parent.container.dockManager.closeTabIconTemplate();
+            this.elementCloseButton.innerHTML = this.parent.container.dockManager.closeTabIconTemplate;
         }
         else {
             this.elementCloseButton.innerHTML = '<i class="fa fa-times"></i>';
