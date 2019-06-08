@@ -4,6 +4,7 @@ import { TabHostDirection } from "./enums/TabHostDirection.js";
 import { TabHandle } from "./TabHandle.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { DockManager } from "./DockManager.js";
+import { PanelContainer } from "./PanelContainer.js";
 
 /**
  * Tab Host control contains tabs known as TabPages.
@@ -49,6 +50,7 @@ export class TabHost {
         this.tabListElement = document.createElement('div');    // Hosts the tab handles
         this.separatorElement = document.createElement('div');  // A seperator line between the tabs and content
         this.contentElement = document.createElement('div');    // Hosts the active tab content
+        this.contentElement.tabIndex = 0;
         this.createTabPage = this._createDefaultTabPage;        // Factory for creating tab pages
 
         if (this.tabStripDirection === TabHostDirection.BOTTOM) {
@@ -129,7 +131,8 @@ export class TabHost {
         });
         if (this.pages.length > 0 && currentPage) {
             this.onTabPageSelected(currentPage);
-        }
+            this.dockManager.activePanel = container as PanelContainer;
+        }    
     }
 
     resize(width: number, height: number) {

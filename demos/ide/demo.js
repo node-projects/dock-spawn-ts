@@ -75,7 +75,7 @@ window.onload = () => {
         },
         onActivePanelChange: (dockManger, panel) => {
             console.log('onActivePanelChange: ', dockManager, panel);
-            if (panel.panelType == PanelType.document && panel.elementContent.editor) {
+            if (panel && panel.panelType == PanelType.document && panel.elementContent.editor) {
                 // CodeMirror needs refresh wehn loaded into invisible div
                 panel.elementContent.editor.refresh()
             }

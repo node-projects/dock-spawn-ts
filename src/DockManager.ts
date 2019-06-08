@@ -38,7 +38,7 @@ export class DockManager {
     zIndexCounter: number;
     _activePanel: PanelContainer;
     onKeyPressBound: any;
-    
+
     constructor(element: HTMLElement) {
         if (element === undefined)
             throw new Error('Invalid Dock Manager element provided');
@@ -77,8 +77,9 @@ export class DockManager {
 
     onKeyPress(e: KeyboardEvent) {
         if (e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
-            this.activePanel.close();
+            let panel = this.activePanel;
             this.activePanel = null;
+            panel.close();
         }
     }
 
@@ -161,7 +162,7 @@ export class DockManager {
 
         // node.performLayout();
     }
-    
+
 
     setRootNode(node: DockNode) {
         // if (this.context.model.rootNode)
@@ -673,7 +674,7 @@ export class DockManager {
     get activePanel(): PanelContainer {
         return this._activePanel;
     }
-    set activePanel(value:PanelContainer) {
+    set activePanel(value: PanelContainer) {
         if (value !== this._activePanel) {
             this._activePanel = value;
             this.notifyOnActivePanelChange(value);

@@ -258,6 +258,10 @@
 
 .dockspan-tab-content {}
 
+.dockspan-tab-content:focus {
+	outline: 0;
+}
+
 .dockspan-tab-content * {}
 
 .dockspan-tab-handle {
