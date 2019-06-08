@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <link rel="stylesheet" href="../../node_modules/@fortawesome/fontawesome-free/css/all.css">
+    <link rel="stylesheet" href="../../lib/css/dock-manager.css">
+    <link rel="stylesheet" href="../../lib/css/dock-wheel.css">
+    <link rel="stylesheet" href="../../lib/css/dock-manager-style.css">
+</head>
+
+<body style="width: 100%; height: 100%">
+    <div class="demo-header" id="header" style="width:100%">
+        <div class="demo-header-title">Dock Spawn Demo</div>
+    </div>
+    <div id="dock_div1" style="opacity:0;height:500px;width:500px;top:150px;left:100px;position:absolute;">
+        <div id="my_dock_manager1" class="my-dock-manager" style="position: relative;"></div>
+        <div id="edt1_1" data-panel-caption="Steering.h" style="background: lightcoral"></div>
+        <div id="edt2_1" data-panel-caption="Steering.cpp" style="background: lightgoldenrodyellow"></div>
+    </div>
+
+    <div id="dock_div2" style="opacity:0;height:500px;width:500px;top:150px;left:700px;position:absolute;">
+        <div id="my_dock_manager2" class="my-dock-manager" style="position: relative;"></div>
+        <div id="edt1_2" data-panel-caption="Steering.h" style="background: lightblue"></div>
+        <div id="edt2_2" data-panel-caption="Steering.cpp" style="background: lightgreen"></div>
+    </div>
+
+    <script type="module">
+        import { DockManager } from "../../lib/js/DockManager.js";
+        import { PanelContainer } from "../../lib/js/PanelContainer.js";
+
+        window.onload = () => {
+            // Convert a div to the dock manager. Panels can then be docked on to it
+
+            let divDockContainer1 = document.getElementById('dock_div1');
+            let divDockManager1 = document.getElementById('my_dock_manager1');
+            let dockManager1 = new DockManager(divDockManager1);
+
+            let divDockContainer2 = document.getElementById('dock_div2');
+            let divDockManager2 = document.getElementById('my_dock_manager2');
+            let dockManager2 = new DockManager(divDockManager2);
+
+            dockManager1.initialize();
+            dockManager2.initialize();
+
+            dockManager1.resize(divDockContainer1.clientWidth, divDockContainer1.clientHeight);
+            dockManager2.resize(divDockContainer2.clientWidth, divDockContainer2.clientHeight);
+
+            let editor1_1 = new PanelContainer(document.getElementById("edt1_1"), dockManager1);
+            let editor2_1 = new PanelContainer(document.getElementById("edt2_1"), dockManager1);
+            let documentNode1 = dockManager1.context.model.documentManagerNode;
+            dockManager1.dockFill(documentNode1, editor1_1);
+            dockManager1.dockFill(documentNode1, editor2_1);
+
+            let editor1_2 = new PanelContainer(document.getElementById("edt1_2"), dockManager2);
+            let editor2_2 = new PanelContainer(document.getElementById("edt2_2"), dockManager2);
+            let documentNode2 = dockManager2.context.model.documentManagerNode;
+            dockManager2.dockFill(documentNode2, editor1_2);
+            dockManager2.dockFill(documentNode2, editor2_2);
+
+            document.getElementById('dock_div1').style.opacity = '';
+            document.getElementById('dock_div2').style.opacity = '';
+        };
+    </script>
+</body>
+
+</html>
