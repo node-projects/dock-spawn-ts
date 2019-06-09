@@ -1,6 +1,6 @@
-import { DockManager } from "../../lib/js/DockManager.js";
-import { PanelContainer } from "../../lib/js/PanelContainer.js";
-import { PanelType } from "../../lib/js/enums/PanelContainerType.js";
+import { DockManager } from "../../../lib/js/DockManager.js";
+import { PanelContainer } from "../../../lib/js/PanelContainer.js";
+import { PanelType } from "../../../lib/js/enums/PanelContainerType.js";
 
 let dockManager,
     storeKey = 'lastState';

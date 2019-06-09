@@ -1,0 +1,262 @@
+<html lang="en">
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>dock-spawn-ts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" href="./page/assets/bootstrap.min.css">
+	<link rel="stylesheet" href="./page/assets/dock-spawn.css">
+	
+    <style>
+      body {
+        padding-top: 60px;
+      }
+    </style>
+    <link rel="stylesheet" href="./page/assets/bootstrap-responsive.css">
+
+	<!-- Syntax Highlight -->
+	<link type="text/css" rel="stylesheet" href="./page/assets/sh_neon.min.css">
+	<script type="text/javascript" src="./page/assets/sh_main.min.js"></script>
+	<script type="text/javascript" src="./page/assets/sh_javascript.min.js"></script>
+
+  <body onload="sh_highlightDocument();">
+    <div id="navbar" class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="https://node-projects.github.io/dock-spawn-ts/#">Dock Spawn TS</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="https://node-projects.github.io/dock-spawn-ts/#">Home</a></li>
+              <li><a href="https://github.com/coderespawn/dock-spawn/zipball/master">Download</a></li>
+              <li>
+				<a href="https://node-projects.github.io/dock-spawn-ts/#demo">Demo</a>
+			   </li>
+              <li><a href="https://node-projects.github.io/dock-spawn-ts/#integration">Integration</a></li>
+              <li><a href="https://github.com/node-projects/dock-spawn-ts/issues">Support</a></li>
+              <li><a href="https://node-projects.github.io/dock-spawn-ts/#license">License</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+      <div class="hero-unit">
+		<div class="row">
+			<div class="span5">
+				<h1>Dock Spawn TS</h1>
+				<p>
+					Dock Spawn TS is a Typescript fork of Dock Spawn (<a href="http://www.dockspawn.com/">http://www.dockspawn.com/</a>)
+					<br><br>
+					Dock Spawn is a web based dock layout engine that aids in creating flexible user interfaces by enabling
+					panels to be docked on the screen similar to Visual Studio IDE
+				</p>
+				
+				<p>
+					<a id="view-demo" class="btn btn-info btn-large" href="http://www.dockspawn.com/#">View Demo</a>
+					<a class="btn btn-info btn-large" href="https://github.com/coderespawn/dock-spawn">View on GitHub</a>
+
+			</p></div>
+			<div class="span5">
+				<!-- Image gallery -->
+				<div id="sliderFrame">
+					<div id="ribbon"></div>
+					<div id="slider">
+						<img src="./page/assets/ide.png">
+					</div>
+				</div>
+			</div>
+		</div>
+      </div>
+
+      <div class="row">
+        <div class="span4">
+          <h2>Docking</h2>
+           <p>Create complex layout through code or during runtime by docking panels on the screen.</p>
+        </div>
+        <div class="span4">
+          <h2>Floating Dialogs</h2>
+           <p>Create floating dialog boxes by undocking a panel.  Floating dialog boxes could be dragged/resized</p>
+       </div>
+        <div class="span4">
+          <h2>Tabbed Panels</h2>
+          <p>Dock panels within other existing panels to place them in a tab control.   Tabs can be undocked back into floating dialogs</p>
+        </div>
+      </div>
+
+	<!-- Demos sub-section -->
+    <hr>
+	<br>
+	<h1>Demos</h1>
+	
+	<div class="row">
+		<br>
+		<div class="span1">&nbsp;</div>
+		<div class="span6">
+			<h2>Integrated Development Environment</h2>
+			<p>The sample demonstrates an IDE user interface.</p>
+			
+			<a href="./page/demo/ide/demo.html" class="btn btn-primary btn-large">Launch</a>
+			<br><br>
+			<h2>Two Dock Spawn Containers</h2>
+			<p>The sample demonstrates the usage of two independet DockSpawn instances.</p>
+			
+			<a href="./page/demo/demo_2.html" class="btn btn-primary btn-large">Launch</a>
+		</div>
+	</div>
+	<div id="integration"></div>
+
+	<!-- Integration sub-section -->
+    <hr>
+	<br>
+	<h1>Integration</h1>
+	<div class="row">
+		<br>
+		<div class="span6">
+			<p>Dock Spawn TS is written in <a href="https://www.typescriptlang.org/">Typescript.</a>
+			Start by importing the dock-spawn library into your project
+			</p><p></p>
+<pre class="sh_javascript sh_sourceCode">
+import { DockManager } from "./js/DockManager.js";
+import { PanelContainer } from "./js/PanelContainer.js";
+import { PanelType } from "./js/enums/PanelContainerType.js";
+</pre>
+			<p>
+			Create a dock manager DIV element in the html page.   This div would be converted to a dock manager,
+			which would enable panels to be docked on to it.  There is no restriction on the size of this div.
+			It could take up the entire screen or have a fixed size
+			</p><p></p>
+<pre class="sh_javascript sh_sourceCode">
+let dockManager = new DockManager(document.getElementById('my_dock_manager'));
+dockManager.initialize();
+</pre>
+			<p>
+			Existing elements in the DOM can be converted to <em>Dock Panels</em> which would enable them
+			to be docked on to the dock manager created above.   A dock panel wraps the provided content element
+			around a frame with a title bar and a close button.
+			</p>
+			<p>
+			There are 2 different types for PanelContainer. "document" and "panel". 
+			</p>
+			<p></p>
+<pre class="sh_javascript sh_sourceCode">
+let editor1 = new PanelContainer(document.getElementById("editor_div"), dockManager, null, PanelType.document);
+let toolbox = new PanelContainer(document.getElementById("toolbox_div"), dockManager, null, PanelType.panel);
+// ...
+</pre>
+			<p>Now that the panels are created, dock them on the <em>dock manager</em>.   Initially, the dock manager
+			contains a docked view, called the <em>Document Manager</em> which is the central area of the dock manager.
+			Get a reference to the document manager node
+			</p><p></p>
+<pre class="sh_javascript sh_sourceCode">
+let documentNode = dockManager.context.model.documentManagerNode;
+</pre>
+			<p>Using this as a point of reference, lets dock the Solution Explorer to the left, taking up 20% of the space
+			</p><p></p>
+<pre class="sh_javascript sh_sourceCode">
+let solutionNode = dockManager.dockLeft(documentNode, solution, 0.20);
+</pre>
+			<p>Dock the outline node inside the Solution Explorer (fill mode) to create a tabbed interface with these two panels
+			</p><p></p>
+<pre class="sh_javascript sh_sourceCode">
+let outlineNode = dockManager.dockFill(solutionNode, outline);
+</pre>
+			<p>Notice the first argument in dockFill method is solutionNode, indicating that this is relative to the Solution Explorer.
+			This way, a dock hierarchy of arbitrary complexity can be created.   
+			</p><p></p>
+<pre class="sh_javascript sh_sourceCode">
+let editor1Node = dockManager.dockFill(documentNode, editor1);
+</pre>
+			Its a good idea to dock dominant panels (e.g. the Editor panel in an IDE) in the <em>Document Node</em> with fill mode
+			so that the documents are displayed as tabs in the document manager
+
+			<p>During runtime, dock panels can be undocked from their positions into floating dialog boxes, which can be dragged/resized
+			and docked in another location</p>
+			<p></p>
+			<p>You can also create dialogs directly from PanelContainers. This will create a Dialog at x:50 and y:70</p>
+<pre class="sh_javascript sh_sourceCode">
+dockManager.floatDialog(infovis, 50, 70);
+</pre>
+			</div>
+		<div class="span6">
+<pre class="sh_javascript sh_sourceCode">
+// Convert a div to the dock manager. Panels can then be docked on to it
+let divDockContainer = document.getElementById('dock_div');
+let divDockManager = document.getElementById('my_dock_manager');
+dockManager = new DockManager(divDockManager
+dockManager.initialize();
+
+// Let the dock manager element fill in the entire screen
+window.onresize = () => {
+	dockManager.resize(
+		divDockContainer.clientWidth,
+		divDockContainer.clientHeight
+	);
+};
+window.onresize(null);
+
+// Convert existing elements on the page into "Panels".
+// They can then be docked on to the dock manager
+// Panels get a titlebar and a close button, and can also be
+// converted to a floating dialog box which can be dragged / resized
+let solution = new PanelContainer(document.getElementById("solution_window"), dockManager);
+let properties = new PanelContainer(document.getElementById("properties_window"), dockManager);
+let toolbox = new PanelContainer(document.getElementById("toolbox_window"), dockManager);
+let outline = new PanelContainer(document.getElementById("outline_window"), dockManager);
+let problems = new PanelContainer(document.getElementById("problems_window"), dockManager);
+let output = new PanelContainer(document.getElementById("output_window"), dockManager);
+let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager, null, PanelType.document);
+let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager, null, PanelType.document);
+editor2.hideCloseButton(true);
+let infovis = new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
+infovis.width = 600;
+infovis.height = 400;
+
+// Dock the panels on the dock manager
+let documentNode = dockManager.context.model.documentManagerNode;
+let outlineNode = dockManager.dockLeft(documentNode, outline, 0.15);
+dockManager.dockFill(outlineNode, solution);
+dockManager.dockDown(outlineNode, properties, 0.6);
+let outputNode = dockManager.dockDown(documentNode, output, 0.2);
+dockManager.dockRight(outputNode, problems, 0.40);
+dockManager.dockRight(documentNode, toolbox, 0.20);
+dockManager.dockFill(documentNode, editor1);
+dockManager.dockFill(documentNode, editor2);
+dockManager.floatDialog(infovis, 50, 50);
+</pre>
+		</div>
+	</div>
+	
+	<!-- License sub-section -->
+	<div id="license"></div>
+    <hr>
+	<br>
+	<h1>License</h1>
+	<div class="row">
+		<br>
+		<div class="span8">
+			Dock Spawn TS is an open source software released under the MIT License.   Refer 
+			<a href="https://github.com/coderespawn/dock-spawn/blob/master/MIT-LICENSE.txt">
+				MIT-License.txt
+			</a> for more details
+		</div>
+	</div>
+	
+	<hr>
+    <footer>
+        <p>© <a href="https://github.com/node-projects">node projects</a> 2019</p>
+    </footer>
+
+    </div>
+
+	
+ </body></html>

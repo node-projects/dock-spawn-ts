@@ -1,0 +1,10 @@
+.sample-ide-thumb {
+	display: block;
+	width: 440px;
+	height: 242px;
+	background: url('../../gallery/images/ide_0_gs.png') bottom;
+	text-indent: -99999px;
+}
+.sample-ide-thumb:hover {
+	background-position: 0 0;
+}
