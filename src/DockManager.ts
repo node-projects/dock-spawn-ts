@@ -16,6 +16,7 @@ import { FillDockContainer } from "./FillDockContainer.js";
 import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { DockModel } from "./DockModel.js";
 import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
+import { DockConfig } from "./DockConfig.js";
 
 
 
@@ -38,10 +39,13 @@ export class DockManager {
     zIndexCounter: number;
     _activePanel: PanelContainer;
     onKeyPressBound: any;
+    private _config: DockConfig;
 
-    constructor(element: HTMLElement) {
+    constructor(element: HTMLElement, config?: DockConfig) {
         if (element === undefined)
             throw new Error('Invalid Dock Manager element provided');
+
+        this._config = Object.assign(new DockConfig(), config);
 
         this.element = element;
         this.context = this.dockWheel = this.layoutEngine = this.mouseMoveHandler = this.touchMoveHandler = undefined;
@@ -50,6 +54,9 @@ export class DockManager {
         this.defaultDialogPosition = new Point(0, 0);
     }
 
+    get config(): DockConfig {
+        return this._config;
+    }
 
     initialize() {
         this.backgroundContext = this.element.children[0] as HTMLElement;
@@ -76,7 +83,7 @@ export class DockManager {
     }
 
     onKeyPress(e: KeyboardEvent) {
-        if (e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
+        if (this._config.escClosesWindow && e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
             let panel = this.activePanel;
             this.activePanel = null;
             panel.close();

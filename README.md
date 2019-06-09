@@ -14,6 +14,7 @@ A TypeScript Version of dock-spawn (see https://github.com/coderespawn/dock-spaw
  - performance fixes (unnessecary removeig and adding to dom reduced, not needed elements are hidden, not removed from dom)
  - multiple dockspawn in one page
  - removed font-awesome dependency
+ - settings (dockManger.config)
 
 # testing
  - download the project
