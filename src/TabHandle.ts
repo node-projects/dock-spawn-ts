@@ -287,9 +287,9 @@ export class TabHandle {
         }
     }
 
-    setSelected(selected) {
+    setSelected(isSelected: boolean) {
         let selectedClassName = 'dockspan-tab-handle-selected';
-        if (selected)
+        if (isSelected)
             this.elementBase.classList.add(selectedClassName);
         else
             this.elementBase.classList.remove(selectedClassName);
@@ -299,8 +299,8 @@ export class TabHandle {
         this.elementBase.style.zIndex = <string><any>zIndex;
     }
 
-    _bringToFront(element) {
-        element.style.zIndex = this.zIndexCounter;
+    _bringToFront(element: HTMLElement) {
+        element.style.zIndex = <string><any>this.zIndexCounter;
         this.zIndexCounter++;
     }
 }

@@ -4,6 +4,7 @@ import { DocumentTabPage } from "./DocumentTabPage.js";
 import { DockManager } from "./DockManager.js";
 import { TabHostDirection } from "./enums/TabHostDirection.js";
 import { IState } from "./interfaces/IState.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 
 /**
  * The document manager is then central area of the dock layout hierarchy.
@@ -24,7 +25,7 @@ export class DocumentManagerContainer extends FillDockContainer {
         this.tabHost.displayCloseButton = true;
     }
 
-    private _createDocumentTabPage(tabHost: TabHost, container) {
+    private _createDocumentTabPage(tabHost: TabHost, container: IDockContainer) {
         return new DocumentTabPage(tabHost, container);
     }
 

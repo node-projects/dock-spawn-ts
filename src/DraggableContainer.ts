@@ -5,6 +5,7 @@ import { Point } from "./Point.js";
 import { Utils } from "./Utils.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
+import { IState } from "./interfaces/IState.js";
 
 export class DraggableContainer implements IDockContainer {
 
@@ -23,7 +24,7 @@ export class DraggableContainer implements IDockContainer {
     mouseUpHandler: EventHandler;
     touchUpHandler: EventHandler;
 
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, dragHandle) {
+    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, dragHandle: HTMLElement) {
         this.dialog = dialog;
         this.delegate = delegate;
         this.containerElement = delegate.containerElement;
@@ -42,11 +43,11 @@ export class DraggableContainer implements IDockContainer {
         this.delegate.destroy();
     }
 
-    saveState(state) {
+    saveState(state: IState) {
         this.delegate.saveState(state);
     }
 
-    loadState(state) {
+    loadState(state: IState) {
         this.delegate.loadState(state);
     }
 
@@ -69,11 +70,11 @@ export class DraggableContainer implements IDockContainer {
             this.delegate.name = value;
     }
 
-    resize(width, height) {
+    resize(width:number, height:number) {
         this.delegate.resize(width, height);
     }
 
-    performLayout(children) {
+    performLayout(children: IDockContainer[]) {
         this.delegate.performLayout(children, false);
     }
 

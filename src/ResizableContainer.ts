@@ -7,6 +7,7 @@ import { ContainerType } from "./ContainerType.js";
 import { Point } from "./Point.js";
 import { Utils } from "./Utils.js";
 import { IThickness } from "./interfaces/IThickness.js";
+import { IState } from "./interfaces/IState.js";
 
 /**
  * Decorates a dock container with resizer handles around its base element
@@ -87,11 +88,11 @@ export class ResizableContainer implements IDockContainer {
         handle.touchDownHandler = new EventHandler(handle.element, 'touchstart', (e) => { this.onMouseDown(handle, e); });
     }
 
-    saveState(state) {
+    saveState(state: IState) {
         this.delegate.saveState(state);
     }
 
-    loadState(state) {
+    loadState(state: IState) {
         this.delegate.loadState(state);
     }
 
@@ -212,19 +213,19 @@ export class ResizableContainer implements IDockContainer {
         if (handle.south) this._resizeSouth(dy, bounds);
     }
 
-    _resizeWest(dx: number, bounds) {
+    _resizeWest(dx: number, bounds: IThickness) {
         this._resizeContainer(dx, 0, -dx, 0, bounds);
     }
 
-    _resizeEast(dx: number, bounds) {
+    _resizeEast(dx: number, bounds: IThickness) {
         this._resizeContainer(0, 0, dx, 0, bounds);
     }
 
-    _resizeNorth(dy: number, bounds) {
+    _resizeNorth(dy: number, bounds: IThickness) {
         this._resizeContainer(0, dy, 0, -dy, bounds);
     }
 
-    _resizeSouth(dy: number, bounds) {
+    _resizeSouth(dy: number, bounds: IThickness) {
         this._resizeContainer(0, 0, 0, dy, bounds);
     }
 

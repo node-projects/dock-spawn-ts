@@ -6,6 +6,7 @@ import { TabHostDirection } from "./enums/TabHostDirection.js";
 import { ISize } from "./interfaces/ISize.js";
 import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
 import { IState } from "./interfaces/IState.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 
 export class FillDockContainer implements IDockContainerWithSize {
 
@@ -45,7 +46,7 @@ export class FillDockContainer implements IDockContainerWithSize {
     }
 
 
-    setActiveChild(child) {
+    setActiveChild(child: IDockContainer) {
         this.tabHost.setActiveTab(child);
     }
 
@@ -55,7 +56,7 @@ export class FillDockContainer implements IDockContainerWithSize {
         this.tabHost.resize(width, height);
     }
 
-    performLayout(children) {
+    performLayout(children: IDockContainer[]) {
         this.tabHost.performLayout(children);
     }
 
