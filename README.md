@@ -7,6 +7,8 @@ Hompage at https://node-projects.github.io/dock-spawn-ts/
 [![Downloads](https://img.shields.io/npm/dm/dock-spawn-ts.svg)](https://www.npmjs.com/package/dock-spawn-ts)
 
 # info
+Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like IDE in HTML
+
 ![Logo](ide.png)
 
 # differences to original docksapwn
