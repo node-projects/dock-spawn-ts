@@ -11,7 +11,7 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
 
 ![Logo](ide.png)
 
-# differences to original docksapwn
+# differences to original dockspawn
  - typescript
  - bugfixes / preformance optimations
  - save/restore fixed and saveing/restoring of dialogs
