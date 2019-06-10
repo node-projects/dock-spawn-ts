@@ -24,6 +24,7 @@ export declare class TabHost {
     eventListeners: any[];
     pages: TabPage[];
     activeTab: TabPage;
+    _resizeRequested: boolean;
     constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean);
     onMoveTab(e: any): void;
     performTabsLayout(indexes: number[]): void;

@@ -287,8 +287,8 @@
 	overflow: hidden;
 	float: left;
 	text-overflow: ellipsis;
-	width: 100%;
-	display: flex;
+	width: calc(100% - 3px);
+	display: block;
 }
 
 .dockspan-tab-handle-close-button {

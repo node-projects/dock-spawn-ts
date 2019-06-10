@@ -24,6 +24,7 @@ export class TabHost {
     eventListeners: any[];
     pages: TabPage[];
     activeTab: TabPage;
+    _resizeRequested : boolean;
 
     constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean) {
         /**
@@ -132,7 +133,7 @@ export class TabHost {
         if (this.pages.length > 0 && currentPage) {
             this.onTabPageSelected(currentPage);
             this.dockManager.activePanel = container as PanelContainer;
-        }    
+        }
     }
 
     resize(width: number, height: number) {
@@ -140,11 +141,9 @@ export class TabHost {
         this.hostElement.style.height = height + 'px';
 
         let tabHeight = this.tabListElement.clientHeight;
-        if (this.timeoutPerform) //lazy check
-            clearTimeout(this.timeoutPerform);
-        this.timeoutPerform = setTimeout(() => {
-            this.resizeTabListElement(width, height);
-        }, 100);
+        if (!this._resizeRequested)
+            requestAnimationFrame(() => this.resizeTabListElement(width, height));
+        this._resizeRequested = true;
         let separatorHeight = this.separatorElement.clientHeight;
         let contentHeight = height - tabHeight - separatorHeight;
         this.contentElement.style.height = contentHeight + 'px';
@@ -154,12 +153,12 @@ export class TabHost {
     }
 
     resizeTabListElement(width: number, height?: number) {
+        this._resizeRequested = false;
         if (this.pages.length === 0) return;
         let tabListWidth = 0;
         this.pages.forEach((page) => {
             let handle = page.handle;
             handle.elementBase.style.width = ''; //clear
-            handle.elementText.style.width = '';
             tabListWidth += handle.elementBase.clientWidth;
         });
         let scaleMultiplier = width / tabListWidth;
@@ -170,9 +169,6 @@ export class TabHost {
             if (index === this.pages.length - 1)
                 newSize = newSize - 5;
             handle.elementBase.style.width = newSize + 'px';
-            if (this.tabStripDirection === TabHostDirection.TOP) {
-                handle.elementText.style.width = newSize - handle.elementCloseButton.clientWidth - 16 + 'px';
-            }
         });
     }
 
