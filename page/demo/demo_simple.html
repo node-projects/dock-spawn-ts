@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <link rel="stylesheet" href="../../lib/css/dock-manager.css">
+    <link rel="stylesheet" href="../../lib/css/dock-manager-style.css">
+</head>
+
+<body style="width: 100%; height: 100%; margin: 0;">
+    <div class="demo-header" id="header" style="width:100%">
+        <div class="demo-header-title">Dock Spawn Demo</div>
+    </div>
+
+    <div id="dock_div" style="height:calc(100% - 40px); width: 100%; position: absolute; left: 0; top: 40px;">
+        <div id="my_dock_manager" class="my-dock-manager" style="position: relative;"></div>
+        <div id="edt1" data-panel-caption="Steering.h" style="background: lightcoral"></div>
+        <div id="edt2" data-panel-caption="Steering.cpp" style="background: lightgoldenrodyellow"></div>
+    </div>
+
+    <script type="module">
+        import { DockManager } from "../../lib/js/DockManager.js";
+        import { PanelContainer } from "../../lib/js/PanelContainer.js";
+
+        window.onload = () => {
+            let divDockContainer = document.getElementById('dock_div');
+            let divDockManager = document.getElementById('my_dock_manager');
+            let dockManager = new DockManager(divDockManager);
+            dockManager.initialize();
+            window.onresize = () => dockManager.resize(divDockContainer.clientWidth, divDockContainer.clientHeight);
+            window.onresize(null);
+            let editor1 = new PanelContainer(document.getElementById("edt1"), dockManager);
+            let editor2 = new PanelContainer(document.getElementById("edt2"), dockManager);
+            let documentNode = dockManager.context.model.documentManagerNode;
+            dockManager.dockFill(documentNode, editor1);
+            dockManager.dockFill(documentNode, editor2);
+        };
+    </script>
+</body>
+
+</html>
