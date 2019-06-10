@@ -1,5 +1,4 @@
 /************* Panel with title bar ************/
-
 .panel-base {}
 
 .panel-base:focus {
@@ -351,26 +350,6 @@
 /*************************** Text Selection **************************/
 
 .disable-selection {
-	-moz-user-select: none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
 	user-select: none;
 	cursor: default;
-}
-
-/************************ Misc Utils *************************/
-
-.full-screen {
-	display: block;
-	/*set the div in the top-left corner of the screen*/
-	top: 0;
-	left: 0;
-	/*set the width and height to 100% of the screen*/
-	width: 100%;
-	height: 100%;
-}
-
-.rounded-corner-top {
-	border-top-right-radius: 10px;
-	border-top-left-radius: 10px;
 }

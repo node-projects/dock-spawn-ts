@@ -51,8 +51,6 @@ export class Dialog {
 
         document.body.appendChild(this.elementDialog);
         this.elementDialog.classList.add('dialog-floating');
-        //this.elementDialog.classList.add('rounded-corner-top');
-        //this.panel.elementTitle.classList.add('rounded-corner-top');
 
         this.mouseDownHandler = new EventHandler(this.elementDialog, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementDialog, 'touchstart', this.onMouseDown.bind(this));
@@ -91,8 +89,6 @@ export class Dialog {
             delete this.keyPressHandler;
         }
         window.removeEventListener('keydown', this.onKeyPressBound);
-        //this.elementDialog.classList.remove('rounded-corner-top');
-        //this.panel.elementTitle.classList.remove('rounded-corner-top');
         Utils.removeNode(this.elementDialog);
         this.draggable.removeDecorator();
         Utils.removeNode(this.panel.elementPanel);

@@ -1,4 +1,3 @@
-
 /************* Panel with title bar ************/
 .panel-base {
 }
@@ -142,18 +141,4 @@
 
 .dockspan-tab-handle-content-seperator {
 	background-color: #008749;
-}
-
-/*************************** Text Selection **************************/
-.disable-selection {
-}
-
-
-/************************ Misc Utils *************************/
-.full-screen {
-}
-
-.rounded-corner-top {
-	border-top-right-radius: 10px;
-	border-top-left-radius: 10px;
 }
