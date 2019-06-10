@@ -121,6 +121,11 @@
 	color:#fff;
 }
 
+.dockspan-tab-handle-selected:hover {
+    background-color: #008749;
+	color:#fff;
+}
+
 .dockspan-tab-handle-text {
 }
 
