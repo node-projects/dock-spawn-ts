@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { TabPage } from "./TabPage.js";
 import { TabHostDirection } from "./enums/TabHostDirection.js";
 import { TabHandle } from "./TabHandle.js";
@@ -17,7 +16,6 @@ export declare class TabHost {
     separatorElement: HTMLDivElement;
     contentElement: HTMLDivElement;
     createTabPage: (tabHost: any, container: any) => any;
-    timeoutPerform: NodeJS.Timeout;
     tabHandleListener: {
         onMoveTab: (e: any) => void;
     };

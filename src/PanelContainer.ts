@@ -319,7 +319,7 @@ export class PanelContainer implements IDockContainerWithSize {
 
     _updateTitle() {
         if (this.icon !== null) {
-            this.elementTitleText.innerHTML = '<img class="panel-titlebar-icon" src="' + this.icon + '">' + this.title;
+            this.elementTitleText.innerHTML = '<img class="panel-titlebar-icon" src="' + this.icon + '"><span>' + this.title + '</span>';
             return;
         }
         this.elementTitleText.innerHTML = this.title;

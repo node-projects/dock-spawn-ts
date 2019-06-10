@@ -19,7 +19,6 @@ export class TabHost {
     separatorElement: HTMLDivElement;
     contentElement: HTMLDivElement;
     createTabPage: (tabHost: any, container: any) => any;
-    timeoutPerform: NodeJS.Timeout;
     tabHandleListener: { onMoveTab: (e: any) => void; };
     eventListeners: any[];
     pages: TabPage[];

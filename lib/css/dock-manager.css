@@ -25,7 +25,10 @@
 	overflow: hidden;
 	width: calc(100% - 30px);
 	white-space: nowrap;
-	display: flex;
+}
+
+.panel-titlebar-text > span {
+	vertical-align: top;
 }
 
 .panel-titlebar-button-close {
@@ -289,6 +292,10 @@
 	text-overflow: ellipsis;
 	width: calc(100% - 3px);
 	display: block;
+}
+
+.dockspan-tab-handle-text > span {
+	vertical-align: top;
 }
 
 .dockspan-tab-handle-close-button {
