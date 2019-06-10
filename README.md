@@ -11,17 +11,18 @@ Hompage at https://node-projects.github.io/dock-spawn-ts/
 
 # differences to original docksapwn
  - typescript
- - save/resotre fixed and saveing/restoring of dialogs
+ - bugfixes / preformance optimations
+ - save/restore fixed and saveing/restoring of dialogs
  - touch support (works on ipad/iphone and android devices)
- - performance fixes (unnessecary removeig and adding to dom reduced, not needed elements are hidden, not removed from dom)
- - multiple dockspawn in one page
+ - performance fixes (unnessecary removeing and adding to dom reduced, not needed elements are hidden, not removed from dom)
+ - multiple dockspawn's in one page
  - removed font-awesome dependency
  - settings (dockManger.config)
 
 # testing
  - download the project
  - install node packages ("npm i")
- - compile typescript ("npm run tsc")
+ - compile typescript ("npm run tsc") (compiled version is included in repo for live demo)
  - run ("npm start")
  - browse to: http://127.0.0.1:8080/demos/ide/demo.html
 
@@ -29,6 +30,19 @@ Hompage at https://node-projects.github.io/dock-spawn-ts/
 
 ```html
    dockspawn div container needs position absolute or relative 
+
+<div id="dock_div" style="height: calc(100% - 45px);">
+    <div id="my_dock_manager" class="my-dock-manager" style="position: relative;"></div>
+    <div id="solution_window" data-panel-caption="Solution Explorer" data-panel-icon="test.png" class="solution-window" hidden></div>
+    <div id="properties_window" data-panel-caption="Properties" class="properties-window" hidden></div>
+    <div id="problems_window" data-panel-caption="Problems" class="problems-window" hidden></div>
+    <div id="editor1_window" data-panel-caption="Steering.h" class="editor1-window editor-host" hidden></div>
+    <div id="editor2_window" data-panel-caption="Steering.cpp" class="editor2-window editor-host" hidden></div>
+    <div id="infovis" data-panel-caption="Dock Tree Visualizer" class="editor2-window editor-host" hidden></div>
+    <div id="output_window" data-panel-caption="Output" class="output-window editor-host" hidden></div>
+    <div id="outline_window" data-panel-caption="Outline" class="outline-window" hidden></div>
+    <div id="toolbox_window" data-panel-caption="Toolbox" class="toolbox-window" hidden></div>
+</div>
 
 ```
 
