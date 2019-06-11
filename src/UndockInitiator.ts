@@ -88,8 +88,11 @@ export class UndockInitiator {
     onMouseDown(e:any) {
         // Make sure we dont do this on floating dialogs
         if (this.enabled) {
-            if (e.touches)
+            if (e.touches) {
+                if (e.touches.length > 1)
+                    return;
                 e = e.touches[0];
+            }
 
             if (this.mouseUpHandler) {
                 this.mouseUpHandler.cancel();

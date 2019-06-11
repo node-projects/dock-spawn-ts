@@ -35,8 +35,11 @@ export class SplitterBar {
     }
 
     onMouseDown(e: IMouseOrTouchEvent) {
-        if (e.touches)
+        if (e.touches) {
+            if (e.touches.length > 1)
+                return;
             e = e.touches[0];
+        }
         this._startDragging(e);
     }
 

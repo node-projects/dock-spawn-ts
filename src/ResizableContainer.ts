@@ -138,6 +138,8 @@ export class ResizableContainer implements IDockContainer {
 
     onMouseMoved(handle, e) {
         if (e.changedTouches != null) { // TouchMove Event
+            if (e.changedTouches.length > 1)
+                return;
             e = e.changedTouches[0];
         }
 
@@ -158,8 +160,11 @@ export class ResizableContainer implements IDockContainer {
     }
 
     onMouseDown(handle, event) {
-        if (event.touches)
+        if (event.touches) {
+            if (event.touches.length > 1)
+                return;
             event = event.touches[0];
+        }
         this.previousMousePosition = new Point(event.clientX, event.clientY);
         if (handle.mouseMoveHandler) {
             handle.mouseMoveHandler.cancel();
