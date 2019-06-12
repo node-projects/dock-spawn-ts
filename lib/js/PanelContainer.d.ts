@@ -8,6 +8,7 @@ import { IState } from "./interfaces/IState.js";
 import { Point } from "./Point.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { PanelType } from "./enums/PanelType.js";
+import { Dialog } from "./Dialog.js";
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
  */
@@ -28,13 +29,13 @@ export declare class PanelContainer implements IDockContainerWithSize {
     containerType: ContainerType;
     icon: string;
     minimumAllowedChildNodes: number;
-    _floatingDialog: any;
+    _floatingDialog?: Dialog;
     isDialog: boolean;
     _canUndock: boolean;
     eventListeners: any[];
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
-    closeButtonClickedHandler: any;
+    closeButtonClickedHandler: EventHandler;
     _cachedWidth: number;
     _cachedHeight: number;
     _hideCloseButton: boolean;
@@ -45,7 +46,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     canUndock(state: boolean): void;
     addListener(listener: any): void;
     removeListener(listener: any): void;
-    floatingDialog: any;
+    floatingDialog: Dialog;
     static loadFromState(state: IState, dockManager: DockManager): PanelContainer;
     saveState(state: IState): void;
     loadState(state: IState): void;
@@ -58,7 +59,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     /**
      * Undocks the panel and and converts it to a dialog box
      */
-    performUndockToDialog(e: any, dragOffset: Point): import("./Dialog.js").Dialog;
+    performUndockToDialog(e: any, dragOffset: Point): Dialog;
     /**
     * Closes the panel
     */

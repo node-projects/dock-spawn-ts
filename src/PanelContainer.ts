@@ -9,6 +9,7 @@ import { IState } from "./interfaces/IState.js";
 import { Point } from "./Point.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { PanelType } from "./enums/PanelType.js";
+import { Dialog } from "./Dialog.js";
 
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
@@ -28,13 +29,13 @@ export class PanelContainer implements IDockContainerWithSize {
     containerType: ContainerType;
     icon: string;
     minimumAllowedChildNodes: number;
-    _floatingDialog: any;
+    _floatingDialog?: Dialog;
     isDialog: boolean;
     _canUndock: boolean;
     eventListeners: any[];
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
-    closeButtonClickedHandler: any;
+    closeButtonClickedHandler: EventHandler;
     _cachedWidth: number;
     _cachedHeight: number;
     _hideCloseButton: boolean;
@@ -80,10 +81,10 @@ export class PanelContainer implements IDockContainerWithSize {
         this.eventListeners.splice(this.eventListeners.indexOf(listener), 1);
     }
 
-    get floatingDialog() {
+    get floatingDialog(): Dialog {
         return this._floatingDialog;
     }
-    set floatingDialog(value) {
+    set floatingDialog(value: Dialog) {
         this._floatingDialog = value;
         let canUndock = (this._floatingDialog === undefined);
         this.undockInitiator.enabled = canUndock;
@@ -153,9 +154,6 @@ export class PanelContainer implements IDockContainerWithSize {
         let panelHeight = this.elementContent.clientHeight;
         let titleHeight = this.elementTitle.clientHeight;
         this._setPanelDimensions(panelWidth, panelHeight + titleHeight);
-
-        // Add the panel to the body
-        //document.body.appendChild(this.elementPanel);
 
         if (!this._hideCloseButton) {
             this.closeButtonClickedHandler =
@@ -267,7 +265,6 @@ export class PanelContainer implements IDockContainerWithSize {
             this.elementPanel.style.height = value + 'px';
         }
     }
-
 
     resize(width: number, height: number) {
         // if (this._cachedWidth === width && this._cachedHeight === height)
