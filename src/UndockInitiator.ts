@@ -20,18 +20,18 @@ export class UndockInitiator {
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     element: HTMLElement;
-    listener: (e: MouseEvent, dragOffset: Point) => Dialog;
+    _undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog;
+    touchDownUndockedHandler: EventHandler;
 
-    constructor(element: Element, listener: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number) {
+    constructor(element: Element, undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number) {
         if (!thresholdPixels) {
             thresholdPixels = 10;
         }
 
         this.element = element as HTMLElement;
-        this.listener = listener;
+        this._undockededCallback = undockededCallback;
         this.thresholdPixels = thresholdPixels;
         this._enabled = false;
-        //this.horizontalChange = true;
     }
 
     get enabled(): boolean {
@@ -85,7 +85,7 @@ export class UndockInitiator {
         }
     }
 
-    onMouseDown(e:any) {
+    onMouseDown(e: any) {
         // Make sure we dont do this on floating dialogs
         if (this.enabled) {
             if (e.touches) {
@@ -145,10 +145,13 @@ export class UndockInitiator {
     }
 
     onMouseMove(e: IMouseOrTouchEvent) {
-        if (e.touches)
+        if (e.touches) {
+            if (e.touches.length > 1)
+                return;
             e = e.touches[0];
+        }
+
         let position = new Point(e.clientX, e.clientY);
-        //let dx = this.horizontalChange ? position.x - this.dragStartPosition.x : 10;
         let dx = position.x - this.dragStartPosition.x;
         let dy = position.y - this.dragStartPosition.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
@@ -169,9 +172,9 @@ export class UndockInitiator {
             currentElement = currentElement.offsetParent as HTMLElement;
         } while (currentElement);
 
-        let dragOffsetX = this.dragStartPosition.x - left; //this.element.offsetLeft;
-        let dragOffsetY = this.dragStartPosition.y - top; //this.element.offsetTop;
+        let dragOffsetX = this.dragStartPosition.x - left;
+        let dragOffsetY = this.dragStartPosition.y - top;
         let dragOffset = new Point(dragOffsetX, dragOffsetY);
-        this.listener(e, dragOffset);
+        this._undockededCallback(e, dragOffset);
     }
 }

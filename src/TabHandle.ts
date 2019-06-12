@@ -148,8 +148,6 @@ export class TabHandle {
     }
 
     onMouseDown(e) {
-        //if(this.undockInitiator.enabled)
-        //    this.undockInitiator.setThresholdPixels(10, false);
         if (this.mouseMoveHandler) {
             this.mouseMoveHandler.cancel();
             delete this.mouseMoveHandler;
@@ -174,8 +172,6 @@ export class TabHandle {
     }
 
     onMouseUp() {
-        //if(this.undockInitiator.enabled)
-        //    this.undockInitiator.setThresholdPixels(10, true);
         if (this.elementBase) {
             this.elementBase.classList.remove('dockspan-tab-handle-dragged');
         }

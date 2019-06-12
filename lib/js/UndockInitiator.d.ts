@@ -19,8 +19,9 @@ export declare class UndockInitiator {
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     element: HTMLElement;
-    listener: (e: MouseEvent, dragOffset: Point) => Dialog;
-    constructor(element: Element, listener: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number);
+    _undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog;
+    touchDownUndockedHandler: EventHandler;
+    constructor(element: Element, undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number);
     enabled: boolean;
     onMouseDown(e: any): void;
     onMouseUp(): void;

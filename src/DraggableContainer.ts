@@ -120,9 +120,9 @@ export class DraggableContainer implements IDockContainer {
         }
 
         this.mouseMoveHandler = new EventHandler(window, 'mousemove', this.onMouseMove.bind(this));
-        this.touchMoveHandler = new EventHandler(window, 'touchmove', this.onMouseMove.bind(this));
+        this.touchMoveHandler = new EventHandler(<Element>event.target, 'touchmove', this.onMouseMove.bind(this));
         this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
-        this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
+        this.touchUpHandler = new EventHandler(<Element>event.target, 'touchend', this.onMouseUp.bind(this));
     }
 
     onMouseUp(event) {

@@ -81,7 +81,7 @@ export class DockManager {
         this.onKeyPressBound = this.onKeyPress.bind(this);
         this.element.addEventListener('keydown', this.onKeyPressBound);
     }
-
+    
     onKeyPress(e: KeyboardEvent) {
         if (this._config.escClosesWindow && e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
             let panel = this.activePanel;
@@ -166,7 +166,6 @@ export class DockManager {
         node.children.reverse();
         let container = node.container as IDockContainerWithSize;
         node.container.resize(container.state.width, container.state.height);
-
         // node.performLayout();
     }
 
