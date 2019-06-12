@@ -145,6 +145,8 @@ export class DraggableContainer implements IDockContainer {
     onMouseMove(event: TouchEvent | MouseEvent) {
         let br = document.body.getBoundingClientRect();
         if ((<TouchEvent>event).touches != null) {
+            if ((<TouchEvent>event).touches.length > 1)
+                return;
             for (let w in this.dockManager.dockWheel.wheelItems) {
                 let item = this.dockManager.dockWheel.wheelItems[w];
                 let offset = item.element.getBoundingClientRect();
