@@ -58,7 +58,7 @@ export class ResizableContainer implements IDockContainer {
         this._buildResizeHandle(false, false, false, true);
     }
 
-    _buildResizeHandle(east:boolean, west:boolean, north:boolean, south:boolean) {
+    _buildResizeHandle(east: boolean, west: boolean, north: boolean, south: boolean) {
         let handle = new ResizeHandle();
         handle.east = east;
         handle.west = west;
@@ -84,8 +84,8 @@ export class ResizableContainer implements IDockContainer {
         handle.element.classList.add(cssClass);
         this.resizeHandles.push(handle);
 
-        handle.mouseDownHandler = new EventHandler(handle.element, 'mousedown', (e) => { this.onMouseDown(handle, e); });
-        handle.touchDownHandler = new EventHandler(handle.element, 'touchstart', (e) => { this.onMouseDown(handle, e); });
+        handle.mouseDownHandler = new EventHandler(handle.element, 'mousedown', (e) => { this.onMouseDown(handle, <MouseEvent>e); });
+        handle.touchDownHandler = new EventHandler(handle.element, 'touchstart', (e) => { this.onMouseDown(handle, <TouchEvent>e); });
     }
 
     saveState(state: IState) {
@@ -136,20 +136,22 @@ export class ResizableContainer implements IDockContainer {
     removeDecorator() {
     }
 
-    onMouseMoved(handle, e) {
-        if (e.changedTouches != null) { // TouchMove Event
-            if (e.changedTouches.length > 1)
+    onMouseMoved(handle, event: TouchEvent | MouseEvent) {
+        let touchOrMouseData: { clientX: number, clientY: number } = null;
+        if ((<TouchEvent>event).changedTouches) {
+            if ((<TouchEvent>event).changedTouches.length > 1)
                 return;
-            e = e.changedTouches[0];
+            touchOrMouseData = (<TouchEvent>event).changedTouches[0];
+        } else {
+            touchOrMouseData = <MouseEvent>event;
         }
 
         if (!this.readyToProcessNextResize)
             return;
         this.readyToProcessNextResize = false;
 
-        //    window.requestLayoutFrame(() {
         this.dockManager.suspendLayout();
-        let currentMousePosition = new Point(e.clientX, e.clientY);
+        let currentMousePosition = new Point(touchOrMouseData.clientX, touchOrMouseData.clientY);
         let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
         let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
         this._performDrag(handle, dx, dy);
@@ -159,13 +161,17 @@ export class ResizableContainer implements IDockContainer {
             this.dockManager.resumeLayout(this.dialog.panel);
     }
 
-    onMouseDown(handle, event) {
-        if (event.touches) {
-            if (event.touches.length > 1)
+    onMouseDown(handle, event: TouchEvent | MouseEvent) {
+        let touchOrMouseData: { clientX: number, clientY: number } = null;
+        if ((<TouchEvent>event).touches) {
+            if ((<TouchEvent>event).touches.length > 1)
                 return;
-            event = event.touches[0];
+            touchOrMouseData = (<TouchEvent>event).touches[0];
+        } else {
+            touchOrMouseData = <MouseEvent>event;
         }
-        this.previousMousePosition = new Point(event.clientX, event.clientY);
+
+        this.previousMousePosition = new Point(touchOrMouseData.clientX, touchOrMouseData.clientY);
         if (handle.mouseMoveHandler) {
             handle.mouseMoveHandler.cancel();
             delete handle.mouseMoveHandler;
@@ -184,8 +190,8 @@ export class ResizableContainer implements IDockContainer {
         }
 
         // Create the mouse event handlers
-        handle.mouseMoveHandler = new EventHandler(window, 'mousemove', (e) => { this.onMouseMoved(handle, e); });
-        handle.touchMoveHandler = new EventHandler(window, 'touchmove', (e) => { this.onMouseMoved(handle, e); });
+        handle.mouseMoveHandler = new EventHandler(window, 'mousemove', (e) => { this.onMouseMoved(handle, <MouseEvent>e); });
+        handle.touchMoveHandler = new EventHandler(window, 'touchmove', (e) => { this.onMouseMoved(handle, <TouchEvent>e); });
         handle.mouseUpHandler = new EventHandler(window, 'mouseup', (e) => { this.onMouseUp(handle); });
         handle.touchUpHandler = new EventHandler(window, 'touchend', (e) => { this.onMouseUp(handle); });
 

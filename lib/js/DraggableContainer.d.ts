@@ -33,7 +33,7 @@ export declare class DraggableContainer implements IDockContainer {
     resize(width: number, height: number): void;
     performLayout(children: IDockContainer[]): void;
     removeDecorator(): void;
-    onMouseDown(event: any): void;
+    onMouseDown(event: TouchEvent | MouseEvent): void;
     onMouseUp(event: any): void;
     _startDragging(event: any): void;
     _stopDragging(event: any): void;

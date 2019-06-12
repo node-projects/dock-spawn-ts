@@ -89,15 +89,18 @@ export class DraggableContainer implements IDockContainer {
         }
     }
 
-    onMouseDown(event) {
-        if (event.touches) {
-            if (event.touches.length > 1)
+    onMouseDown(event: TouchEvent | MouseEvent) {
+        let touchOrMouseData: { clientX: number, clientY: number } = null;
+        if ((<TouchEvent>event).touches) {
+            if ((<TouchEvent>event).touches.length > 1)
                 return;
-            event = event.touches[0];
+            touchOrMouseData = (<TouchEvent>event).touches[0];
+        } else {
+            touchOrMouseData = <MouseEvent>event;
         }
 
-        this._startDragging(event);
-        this.previousMousePosition = { x: event.clientX, y: event.clientY };
+        this._startDragging(touchOrMouseData);
+        this.previousMousePosition = { x: touchOrMouseData.clientX, y: touchOrMouseData.clientY };
         if (this.mouseMoveHandler) {
             this.mouseMoveHandler.cancel();
             delete this.mouseMoveHandler;
@@ -147,6 +150,7 @@ export class DraggableContainer implements IDockContainer {
 
     onMouseMove(event: TouchEvent | MouseEvent) {
         let br = document.body.getBoundingClientRect();
+
         if ((<TouchEvent>event).touches != null) {
             if ((<TouchEvent>event).touches.length > 1)
                 return;
@@ -164,11 +168,16 @@ export class DraggableContainer implements IDockContainer {
             }
         }
 
-        if ((<TouchEvent>event).changedTouches != null) { // TouchMove Event
-            event = <any>(<TouchEvent>event).changedTouches[0];
+        let touchOrMouseData: { clientX: number, clientY: number } = null;
+        if ((<TouchEvent>event).changedTouches) {
+            if ((<TouchEvent>event).changedTouches.length > 1)
+                return;
+            touchOrMouseData = (<TouchEvent>event).changedTouches[0];
+        } else {
+            touchOrMouseData = <MouseEvent>event;
         }
 
-        let currentMousePosition = new Point((<MouseEvent>event).clientX, (<MouseEvent>event).clientY);
+        let currentMousePosition = new Point(touchOrMouseData.clientX, touchOrMouseData.clientY);
 
         let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
         let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
