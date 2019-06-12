@@ -6,6 +6,7 @@ import { Utils } from "./Utils.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
 import { IState } from "./interfaces/IState.js";
+import { DockWheelItem } from "./DockWheelItem.js";
 
 export class DraggableContainer implements IDockContainer {
 
@@ -155,15 +156,16 @@ export class DraggableContainer implements IDockContainer {
             if ((<TouchEvent>event).touches.length > 1)
                 return;
             for (let w in this.dockManager.dockWheel.wheelItems) {
-                let item = this.dockManager.dockWheel.wheelItems[w];
+                let item: DockWheelItem = this.dockManager.dockWheel.wheelItems[w];
                 let offset = item.element.getBoundingClientRect();
                 if ((<TouchEvent>event).touches[0].clientX > (offset.left - br.left) &&
                     (<TouchEvent>event).touches[0].clientX < (offset.left + item.element.clientWidth - br.left) &&
                     (<TouchEvent>event).touches[0].clientY > (offset.top - br.top) &&
                     (<TouchEvent>event).touches[0].clientY < (offset.top + item.element.clientHeight - br.top)) {
-                    item.onMouseMoved(event);
+                    item.onMouseMoved();
                 } else {
-                    item.onMouseOut(event);
+                    if (item.active)
+                        item.onMouseOut();
                 }
             }
         }
