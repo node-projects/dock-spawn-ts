@@ -70,7 +70,7 @@ export class DraggableContainer implements IDockContainer {
             this.delegate.name = value;
     }
 
-    resize(width:number, height:number) {
+    resize(width: number, height: number) {
         this.delegate.resize(width, height);
     }
 
@@ -90,8 +90,11 @@ export class DraggableContainer implements IDockContainer {
     }
 
     onMouseDown(event) {
-        if (event.touches)
+        if (event.touches) {
+            if (event.touches.length > 1)
+                return;
             event = event.touches[0];
+        }
 
         this._startDragging(event);
         this.previousMousePosition = { x: event.clientX, y: event.clientY };
