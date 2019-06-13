@@ -26,7 +26,7 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
  - install node packages ("npm i")
  - compile typescript ("npm run tsc") (compiled version is included in repo for live demo)
  - run ("npm start")
- - browse to: http://127.0.0.1:8080/demos/ide/demo.html
+ - browse to: http://127.0.0.1:8080/page/demo/ide/demo.html
 
 # how to use:
 
