@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -15,6 +15,6 @@
     "typescript": "^3.3.4000",
     "yarn": "^1.16.0"
   },
-  "files": ["lib/**/*"],
+  "files": ["lib/**/*", "src/**/*"],
   "homepage": "https://github.com/node-projects/dock-spawn-ts"
 }

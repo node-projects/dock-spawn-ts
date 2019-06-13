@@ -1,6 +1,7 @@
 import { TabPage } from "./TabPage.js";
 import { UndockInitiator } from "./UndockInitiator.js";
 import { EventHandler } from "./EventHandler.js";
+import { DockNode } from "./DockNode.js";
 /**
  * A tab handle represents the tab button on the tab strip
  */
@@ -37,8 +38,9 @@ export declare class TabHandle {
     addListener(listener: any): void;
     removeListener(listener: any): void;
     undockEnabled(state: boolean): void;
+    static createContextMenuContentCallback: (tabHandle: TabHandle, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => void;
     oncontextMenuClicked(e: MouseEvent): void;
-    _removeCtxMenu(): void;
+    closeContextMenu(): void;
     onMouseDown(e: any): void;
     onMouseUp(): void;
     generateMoveTabEvent(event: any, pos: any): void;

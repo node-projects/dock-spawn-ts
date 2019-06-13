@@ -90,7 +90,7 @@ export declare class DockManager {
     */
     requestClose(container: PanelContainer): void;
     /**
-     * Opens a Elemnt in a Dialog
+     * Opens a Element in a Dialog
      * It is assumed that only leaf nodes (panels) can be undocked
      */
     openInDialog(container: PanelContainer, event: any, dragOffset: Point): Dialog;

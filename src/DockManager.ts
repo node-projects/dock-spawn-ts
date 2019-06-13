@@ -221,7 +221,6 @@ export class DockManager {
             e = e.changedTouches[0];
         }
         this.dockWheel.activeNode = this._findNodeOnPoint(e.clientX, e.clientY);
-        console.log(this.dockWheel.activeNode);
     }
 
     /**
@@ -412,7 +411,7 @@ export class DockManager {
     }
 
     /**
-     * Opens a Elemnt in a Dialog
+     * Opens a Element in a Dialog
      * It is assumed that only leaf nodes (panels) can be undocked
      */
     openInDialog(container: PanelContainer, event, dragOffset: Point) {

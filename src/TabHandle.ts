@@ -4,6 +4,7 @@ import { UndockInitiator } from "./UndockInitiator.js";
 import { EventHandler } from "./EventHandler.js";
 import { Utils } from "./Utils.js";
 import { PanelType } from "./enums/PanelType.js";
+import { DockNode } from "./DockNode.js";
 
 /**
  * A tab handle represents the tab button on the tab strip
@@ -36,7 +37,7 @@ export class TabHandle {
     direction: number;
     _ctxMenu: HTMLDivElement;
     _removeCtxMenuBound: any;
-
+    
     constructor(parent: TabPage) {
         this.parent = parent;
         let undockHandler = TabHandle.prototype._performUndock.bind(this);
@@ -92,57 +93,63 @@ export class TabHandle {
         this.undockInitiator.enabled = state;
     }
 
+    static createContextMenuContentCallback = (tabHandle: TabHandle, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => {
+        let btnCloseAll = document.createElement('div');
+        btnCloseAll.innerText = 'Close all documents';
+        contextMenuContainer.append(btnCloseAll);
+
+        let btnCloseAllButThis = document.createElement('div');
+        btnCloseAllButThis.innerText = 'Close all documents but this';
+        contextMenuContainer.append(btnCloseAllButThis);
+
+        btnCloseAll.onclick = () => {
+            let length = documentMangerNodes.length;
+            for (let i = length - 1; i >= 0; i--) {
+                let panel = (<PanelContainer>documentMangerNodes[i].container);
+                if (panel.panelType == PanelType.document)
+                    panel.close();
+            }
+            tabHandle.closeContextMenu();
+        };
+
+        btnCloseAllButThis.onclick = () => {
+            let length = documentMangerNodes.length;
+            for (let i = length - 1; i >= 0; i--) {
+                let panel = (<PanelContainer>documentMangerNodes[i].container);
+                if (tabHandle.parent.container != panel && panel.panelType == PanelType.document)
+                    panel.close();
+            }
+            tabHandle.closeContextMenu();
+        };
+    }
+
     oncontextMenuClicked(e: MouseEvent) {
         e.preventDefault();
 
-        if (!this._ctxMenu) {
+        if (!this._ctxMenu && TabHandle.createContextMenuContentCallback) {
             this._ctxMenu = document.createElement('div');
             this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
 
-            let btnCloseAll = document.createElement('div');
-            btnCloseAll.innerText = 'Close all documents';
-            this._ctxMenu.append(btnCloseAll);
-
-            let btnCloseAllButThis = document.createElement('div');
-            btnCloseAllButThis.innerText = 'Close all documents but this';
-            this._ctxMenu.append(btnCloseAllButThis);
-
-            btnCloseAll.onclick = () => {
-                let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
-                for (let i = length - 1; i >= 0; i--) {
-                    let panel = (<PanelContainer>this.parent.container.dockManager.context.model.documentManagerNode.children[i].container);
-                    if (panel.panelType == PanelType.document)
-                        panel.close();
-                }
-                this._removeCtxMenu();
-            };
-
-            btnCloseAllButThis.onclick = () => {
-                let length = this.parent.container.dockManager.context.model.documentManagerNode.children.length;
-                for (let i = length - 1; i >= 0; i--) {
-                    let panel = (<PanelContainer>this.parent.container.dockManager.context.model.documentManagerNode.children[i].container);
-                    if (this.parent.container != panel && panel.panelType == PanelType.document)
-                        panel.close();
-                }
-                this._removeCtxMenu();
-            };
+            TabHandle.createContextMenuContentCallback(this, this._ctxMenu, this.parent.container.dockManager.context.model.documentManagerNode.children);            
 
             this._ctxMenu.style.left = e.pageX + "px";
             this._ctxMenu.style.top = e.pageY + "px";
             document.body.appendChild(this._ctxMenu);
-            this._removeCtxMenuBound = this._removeCtxMenu.bind(this)
+            this._removeCtxMenuBound = this.closeContextMenu.bind(this)
             window.addEventListener('mousedown', this._removeCtxMenuBound);
         } else {
-            this._removeCtxMenu();
+            this.closeContextMenu();
         }
     }
 
-    _removeCtxMenu() {
+    closeContextMenu() {
         if (this._ctxMenu) {
             setTimeout(() => {
-                document.body.removeChild(this._ctxMenu);
-                delete this._ctxMenu;
-                window.removeEventListener('mousedown', this._removeCtxMenuBound);
+                if (this._ctxMenu) {
+                    document.body.removeChild(this._ctxMenu);
+                    delete this._ctxMenu;
+                    window.removeEventListener('mousedown', this._removeCtxMenuBound);
+                }
             }, 100);
         }
     }
