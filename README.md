@@ -20,6 +20,7 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
  - multiple dockspawn's in one page
  - removed font-awesome dependency
  - settings (dockManger.config)
+ - ContextMenu to close all docks (Document Docks only)
 
 # testing
  - download the project
