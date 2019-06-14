@@ -54,6 +54,7 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
     import { PanelContainer } from "../PanelContainer.js";
 
     // Convert a div to a dock manager.  Panels can then be docked on to it
+    let divDockManager = document.getElementById('dock_div');
     let dockManager = new DockManager(document.getElementById('my_dock_manager'));
     dockManager.initialize();
 
