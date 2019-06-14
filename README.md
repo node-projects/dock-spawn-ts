@@ -103,6 +103,7 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
 
 # other html docking frameworks 
 
- - https://github.com/golden-layout/golden-layout
- - https://github.com/WebCabin/wcDocker
- - https://jspanel.de
+ - https://github.com/golden-layout/golden-layout (MIT)
+ - https://github.com/WebCabin/wcDocker (MIT)
+ - https://jspanel.de (MIT)
+ - http://www.htmldockfloat.com (Commerical, but also a free Version exists)
