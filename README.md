@@ -20,13 +20,14 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
  - multiple dockspawn's in one page
  - removed font-awesome dependency
  - settings (dockManger.config)
+ - ContextMenu to close all docks (Document Docks only)
 
 # testing
  - download the project
  - install node packages ("npm i")
  - compile typescript ("npm run tsc") (compiled version is included in repo for live demo)
  - run ("npm start")
- - browse to: http://127.0.0.1:8080/demos/ide/demo.html
+ - browse to: http://127.0.0.1:8080/page/demo/ide/demo.html
 
 # how to use:
 
@@ -53,6 +54,7 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
     import { PanelContainer } from "../PanelContainer.js";
 
     // Convert a div to a dock manager.  Panels can then be docked on to it
+    let divDockManager = document.getElementById('dock_div');
     let dockManager = new DockManager(document.getElementById('my_dock_manager'));
     dockManager.initialize();
 
@@ -99,3 +101,12 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
         }
     });
 ```
+
+# other html docking frameworks 
+
+| Url                                            | Licence         | Touch support |
+|------------------------------------------------|-----------------|---------------|
+| https://github.com/golden-layout/golden-layout | MIT             | No            |
+| https://github.com/WebCabin/wcDocker           | MIT             | Yes           |
+| https://jspanel.de                             | MIT             | Yes           |
+| http://www.htmldockfloat.com                   | Commerical/free | No            |
