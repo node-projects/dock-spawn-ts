@@ -81,7 +81,7 @@ export class DockManager {
         this.onKeyPressBound = this.onKeyPress.bind(this);
         this.element.addEventListener('keydown', this.onKeyPressBound);
     }
-    
+
     onKeyPress(e: KeyboardEvent) {
         if (this._config.escClosesWindow && e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
             let panel = this.activePanel;
@@ -469,7 +469,7 @@ export class DockManager {
     }
 
     findNodeFromContainerElement(containerElement: HTMLElement) {
-        let stack = [];
+        let stack: DockNode[] = [];
         stack.push(this.context.model.rootNode);
 
         while (stack.length > 0) {

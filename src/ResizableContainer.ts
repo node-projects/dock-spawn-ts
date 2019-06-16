@@ -195,7 +195,7 @@ export class ResizableContainer implements IDockContainer {
         handle.mouseUpHandler = new EventHandler(window, 'mouseup', (e) => { this.onMouseUp(handle); });
         handle.touchUpHandler = new EventHandler(window, 'touchend', (e) => { this.onMouseUp(handle); });
 
-        document.body.classList.add('disable-selection');
+        Utils.disableGlobalTextSelection(this.dockManager.config.dialogRootElement);
     }
 
     onMouseUp(handle) {
@@ -208,7 +208,7 @@ export class ResizableContainer implements IDockContainer {
         delete handle.mouseUpHandler;
         delete handle.touchUpHandler;
 
-        document.body.classList.remove('disable-selection');
+        Utils.enableGlobalTextSelection(this.dockManager.config.dialogRootElement);
     }
 
     _performDrag(handle, dx: number, dy: number) {

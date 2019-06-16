@@ -105,7 +105,7 @@ export declare class DockManager {
     requestRemove(container: PanelContainer): DockNode;
     /** Finds the node that owns the specified [container] */
     private _findNodeFromContainer;
-    findNodeFromContainerElement(containerElement: HTMLElement): any;
+    findNodeFromContainerElement(containerElement: HTMLElement): DockNode;
     addLayoutListener(listener: ILayoutEventListener): void;
     removeLayoutListener(listener: ILayoutEventListener): void;
     suspendLayout(): void;

@@ -101,7 +101,7 @@ export class SplitterBar {
     }
 
     _startDragging(e: IMouseOrTouchEvent) {
-        Utils.disableGlobalTextSelection();
+        Utils.disableGlobalTextSelection(this.previousContainer.dockManager.config.dialogRootElement);
         if (this.mouseMovedHandler) {
             this.mouseMovedHandler.cancel();
             delete this.mouseMovedHandler;
@@ -126,8 +126,7 @@ export class SplitterBar {
     }
 
     _stopDragging() {
-        Utils.enableGlobalTextSelection();
-        document.body.classList.remove('disable-selection');
+        Utils.enableGlobalTextSelection(this.previousContainer.dockManager.config.dialogRootElement);
         if (this.mouseMovedHandler) {
             this.mouseMovedHandler.cancel();
             delete this.mouseMovedHandler;

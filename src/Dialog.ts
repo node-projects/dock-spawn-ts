@@ -49,7 +49,7 @@ export class Dialog {
         this.draggable = new DraggableContainer(this, this.panel, this.elementDialog, this.panel.elementTitle);
         this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement);
 
-        document.body.appendChild(this.elementDialog);
+        this.dockManager.config.dialogRootElement.appendChild(this.elementDialog);
         this.elementDialog.classList.add('dialog-floating');
 
         this.mouseDownHandler = new EventHandler(this.elementDialog, 'mousedown', this.onMouseDown.bind(this));

@@ -12,12 +12,12 @@ export class Utils {
         return parseInt(pixels.replace('px', ''));
     }
 
-    static disableGlobalTextSelection() {
-        document.body.classList.add('disable-selection');
+    static disableGlobalTextSelection(element: HTMLElement) {
+        element.classList.add('disable-selection');
     }
 
-    static enableGlobalTextSelection() {
-        document.body.classList.remove('disable-selection');
+    static enableGlobalTextSelection(element: HTMLElement) {
+        element.classList.remove('disable-selection');
     }
 
     static isPointInsideNode(px: number, py: number, node: DockNode): boolean {

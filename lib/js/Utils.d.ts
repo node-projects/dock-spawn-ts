@@ -2,8 +2,8 @@ import { DockNode } from "./DockNode";
 export declare class Utils {
     private static _counter;
     static getPixels(pixels: string): number;
-    static disableGlobalTextSelection(): void;
-    static enableGlobalTextSelection(): void;
+    static disableGlobalTextSelection(element: HTMLElement): void;
+    static enableGlobalTextSelection(element: HTMLElement): void;
     static isPointInsideNode(px: number, py: number, node: DockNode): boolean;
     static getNextId(prefix: string): string;
     static removeNode(node: Node): boolean;
