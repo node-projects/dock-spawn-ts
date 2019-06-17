@@ -1,4 +1,4 @@
-import { DockManager } from "../../../lib/js/";
+import { DockManager } from "../../../lib/js/DockManager.js";
 import { PanelContainer } from "../../../lib/js/PanContainer.js";
 import { PanelType } from "../../../lib/js/enums/PanelContainerType.js";
 
