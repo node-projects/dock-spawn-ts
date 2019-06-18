@@ -9,7 +9,7 @@ Hompage at https://node-projects.github.io/dock-spawn-ts/
 # info
 Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like IDE in HTML
 
-![Logo](ide.png)
+![Logo](https://raw.githubusercontent.com/node-projects/dock-spawn-ts/master/ide.png)
 
 # differences to original dockspawn
  - typescript
@@ -21,6 +21,7 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
  - removed font-awesome dependency
  - settings (dockManger.config)
  - ContextMenu to close all docks (Document Docks only)
+ - wip webcomponent support
 
 # testing
  - download the project
