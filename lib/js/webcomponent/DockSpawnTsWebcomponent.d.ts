@@ -2,11 +2,15 @@ import { PanelContainer } from "../PanelContainer.js";
 import { PanelType } from "../enums/PanelType.js";
 import { DockNode } from "../DockNode.js";
 export declare class DockSpawnTsWebcomponent extends HTMLElement {
+    static cssRootDirectory: string;
     private dockManager;
     private slotId;
     private windowResizedBound;
     private slotElementMap;
+    private observer;
     constructor();
+    private handleAddedChildNode;
+    private handleRemovedChildNode;
     connectedCallback(): void;
     disconnectedCallback(): void;
     private windowResized;
