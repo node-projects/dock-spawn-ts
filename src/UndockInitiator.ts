@@ -166,14 +166,16 @@ export class UndockInitiator {
         let top = 0;
         let left = 0;
         let currentElement = this.element;
+        let rect = this.element.getBoundingClientRect();
+        
         do {
             top += currentElement.offsetTop || 0;
             left += currentElement.offsetLeft || 0;
             currentElement = currentElement.offsetParent as HTMLElement;
         } while (currentElement);
 
-        let dragOffsetX = this.dragStartPosition.x - left;
-        let dragOffsetY = this.dragStartPosition.y - top;
+        let dragOffsetX = this.dragStartPosition.x - rect.left;
+        let dragOffsetY = this.dragStartPosition.y - rect.top;
         let dragOffset = new Point(dragOffsetX, dragOffsetY);
         this._undockededCallback(e, dragOffset);
     }

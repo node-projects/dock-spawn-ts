@@ -32,12 +32,12 @@ export class Dialog {
         panel.isDialog = true;
     }
 
-    saveState(x:number, y:number) {
+    saveState(x: number, y: number) {
         this.position = new Point(x, y);
         this.dockManager.notifyOnChangeDialogPosition(this, x, y);
     }
 
-    static fromElement(id:string, dockManager: DockManager) {
+    static fromElement(id: string, dockManager: DockManager) {
         return new Dialog(new PanelContainer(<HTMLElement>document.getElementById(id), dockManager), dockManager);
     }
 
@@ -60,10 +60,11 @@ export class Dialog {
         this.bringToFront();
     }
 
-    setPosition(x:number, y:number) {
-        this.position = new Point(x, y);
-        this.elementDialog.style.left = x + 'px';
-        this.elementDialog.style.top = y + 'px';
+    setPosition(x: number, y: number) {
+        let rect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
+        this.position = new Point(x - rect.left, y - rect.top);
+        this.elementDialog.style.left = (x - rect.left) + 'px';
+        this.elementDialog.style.top = (y - rect.top) + 'px';
         this.dockManager.notifyOnChangeDialogPosition(this, x, y);
     }
 
@@ -96,7 +97,7 @@ export class Dialog {
         delete this.panel.floatingDialog;
     }
 
-    resize(width:number, height:number) {
+    resize(width: number, height: number) {
         this.resizable.resize(width, height);
     }
 
