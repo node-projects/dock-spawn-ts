@@ -5,7 +5,7 @@ import { DockNode } from "../DockNode.js";
 
 export class DockSpawnTsWebcomponent extends HTMLElement {
 
-    static cssRootDirectory = "../../";
+    public static cssRootDirectory = "../../";
 
     private dockManager: DockManager;
     private slotId: number = 0;
@@ -19,8 +19,8 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
 
         const template = document.createElement('template')
         template.innerHTML = `
-<link rel="stylesheet" href="../../lib/css/dock-manager.css">
-<link rel="stylesheet" href="../../lib/css/dock-manager-style.css">
+<link rel="stylesheet" href="${DockSpawnTsWebcomponent.cssRootDirectory}/lib/css/dock-manager.css">
+<link rel="stylesheet" href="${DockSpawnTsWebcomponent.cssRootDirectory}/lib/css/dock-manager-style.css">
 <div id="dockSpawnDiv" style="width:100%;height:100%;position:relative"></div>
 `
 
