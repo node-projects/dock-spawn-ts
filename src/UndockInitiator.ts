@@ -25,7 +25,7 @@ export class UndockInitiator {
 
     constructor(element: Element, undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number) {
         if (!thresholdPixels) {
-            thresholdPixels = 10;
+            thresholdPixels = 30;
         }
 
         this.element = element as HTMLElement;
@@ -152,7 +152,7 @@ export class UndockInitiator {
         }
 
         let position = new Point(e.clientX, e.clientY);
-        let dx = position.x - this.dragStartPosition.x;
+        let dx = 0; //position.x - this.dragStartPosition.x;
         let dy = position.y - this.dragStartPosition.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
 
