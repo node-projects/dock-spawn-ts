@@ -5,42 +5,35 @@ import { DockNode } from "../DockNode.js";
 
 export class DockSpawnTsWebcomponent extends HTMLElement {
 
+    static cssRootDirectory = "../../";
+
     private dockManager: DockManager;
     private slotId: number = 0;
     private windowResizedBound;
     private slotElementMap: Map<HTMLSlotElement, HTMLElement>;
+    private observer: MutationObserver;
+
 
     constructor() {
         super();
+
+        const template = document.createElement('template')
+        template.innerHTML = `
+<link rel="stylesheet" href="../../lib/css/dock-manager.css">
+<link rel="stylesheet" href="../../lib/css/dock-manager-style.css">
+<div id="dockSpawnDiv" style="width:100%;height:100%;position:relative"></div>
+`
 
         this.windowResizedBound = this.windowResized.bind(this);
         this.slotElementMap = new Map();
 
         let shadowRoot = this.attachShadow({ mode: 'open' });
-        let dockSpawnDiv = document.createElement("div");
-        dockSpawnDiv.style.width = "100%";
-        dockSpawnDiv.style.height = "100%";
-        dockSpawnDiv.style.position = "relative";
-        shadowRoot.innerHTML = '<link rel="stylesheet" href="../../lib/css/dock-manager.css"><link rel="stylesheet" href="../../lib/css/dock-manager-style.css">';
-        shadowRoot.appendChild(dockSpawnDiv);
+        shadowRoot.appendChild(template.content.cloneNode(true));
+        let dockSpawnDiv = shadowRoot.querySelector("#dockSpawnDiv") as HTMLDivElement;
 
         this.dockManager = new DockManager(dockSpawnDiv);
         this.dockManager.config.dialogRootElement = dockSpawnDiv;
         this.dockManager.initialize();
-        this.dockManager.resize(this.clientWidth, this.clientHeight);
-        let documentNode = this.dockManager.context.model.documentManagerNode;
-
-        for (let element of this.children) {
-            let slot = document.createElement('slot');
-            let slotName = 'slot_' + this.slotId++;
-            slot.name = slotName;
-            element.slot = slotName;
-            let container = new PanelContainer(slot, this.dockManager);
-            this.dockManager.dockFill(documentNode, container);
-            if ((<HTMLElement>element).style.display == 'none')
-            (<HTMLElement>element).style.display = 'block';
-            this.slotElementMap.set(slot, (<HTMLElement>element));
-        }
 
         this.dockManager.addLayoutListener({
             onClosePanel: (dockManager, dockNode) => {
@@ -50,6 +43,43 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
                 this.slotElementMap.delete(slot);
             }
         });
+
+        for (let element of this.children) {
+            this.handleAddedChildNode(element)
+        }
+
+        this.observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    this.handleAddedChildNode(node);
+                });
+                mutation.removedNodes.forEach((node) => {
+                    this.handleRemovedChildNode(node);
+                });
+            });
+        });
+        this.observer.observe(this, { childList: true });
+
+        this.dockManager.resize(this.clientWidth, this.clientHeight);
+        requestAnimationFrame(() => {
+            this.dockManager.resize(this.clientWidth, this.clientHeight);
+        });
+    }
+
+    private handleAddedChildNode(element) {
+        let slot = document.createElement('slot');
+        let slotName = 'slot_' + this.slotId++;
+        slot.name = slotName;
+        element.slot = slotName;
+        let container = new PanelContainer(slot, this.dockManager);
+        this.dockManager.dockFill(this.dockManager.context.model.documentManagerNode, container);
+        if ((<HTMLElement>element).style.display == 'none')
+            (<HTMLElement>element).style.display = 'block';
+        this.slotElementMap.set(slot, (<HTMLElement>element));
+    }
+
+    private handleRemovedChildNode(element) {
+        (<PanelContainer>this.getDockNodeForElement(element).container).close();
     }
 
     connectedCallback() {
