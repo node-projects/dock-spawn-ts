@@ -76,7 +76,23 @@
 	background-color: #000000;
 }
 
+.splitbar-horizontal:hover {
+	background-color: #5b636c;
+}
+
+.splitbar-horizontal:active {
+	background-color: #5b636c;
+}
+
 .splitbar-vertical {
+	background-color: #000000;
+}
+
+.splitbar-vertical:hover {
+	background-color: #5b636c;
+}
+
+.splitbar-vertical:active {
 	background-color: #5b636c;
 }
 
