@@ -112,3 +112,5 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
 | https://github.com/WebCabin/wcDocker           | MIT             | Yes           | Yes     | No                            |
 | https://jspanel.de                             | MIT             | Yes           | Yes     | No                            |
 | http://www.htmldockfloat.com                   | Commerical/free | No            | Yes     | No                            |
+| http://phosphorjs.github.io/                   | BSD 3           | ?             | ?       | No                            |
+   
