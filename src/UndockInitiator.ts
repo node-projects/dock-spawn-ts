@@ -25,7 +25,7 @@ export class UndockInitiator {
 
     constructor(element: Element, undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number) {
         if (!thresholdPixels) {
-            thresholdPixels = 10;
+            thresholdPixels = 5;
         }
 
         this.element = element as HTMLElement;
@@ -152,11 +152,9 @@ export class UndockInitiator {
         }
 
         let position = new Point(e.clientX, e.clientY);
-        let dx = position.x - this.dragStartPosition.x;
         let dy = position.y - this.dragStartPosition.y;
-        let distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance > this.thresholdPixels) {
+        
+        if (dy > this.thresholdPixels) {
             this.enabled = false;
             this._requestUndock(e);
         }

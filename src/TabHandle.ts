@@ -40,7 +40,7 @@ export class TabHandle {
     
     constructor(parent: TabPage) {
         this.parent = parent;
-        let undockHandler = TabHandle.prototype._performUndock.bind(this);
+        let undockHandler = this._performUndock.bind(this);
         this.elementBase = document.createElement('div');
         this.elementText = document.createElement('div');
         this.elementCloseButton = document.createElement('div');
@@ -206,7 +206,6 @@ export class TabHandle {
                 listener.onMoveTab({ self: that, state: state });
             }
         });
-
     }
 
     onMouseMove(e) {
