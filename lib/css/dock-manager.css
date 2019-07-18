@@ -270,7 +270,7 @@
 
 .dockspan-tab-handle {
 	position: relative;
-	height: 25px;
+	height: 22px;
 	float: left;
 	overflow: hidden;
 	cursor: pointer;
@@ -278,6 +278,7 @@
 }
 
 .dockspan-tab-handle:hover {
+	cursor: pointer;
 }
 
 .dockspan-tab-handle-selected {}
