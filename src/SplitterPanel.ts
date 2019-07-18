@@ -41,7 +41,17 @@ export class SplitterPanel {
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean) {
         let containersEqual = Utils.arrayEqual(this.childContainers, children);
         if (!containersEqual || relayoutEvenIfEqual) {
-            this.removeFromDOM();
+            this.childContainers.forEach((container) => {
+                if (!children.some((item) => item == container)) {
+                    if (container.containerElement) {
+                        container.containerElement.classList.remove('splitter-container-vertical');
+                        container.containerElement.classList.remove('splitter-container-horizontal');
+                        Utils.removeNode(container.containerElement);
+                    }
+                }
+            });
+
+            this.removeSplittersFromDOM();
 
             // rebuild
             this.childContainers = children;
@@ -57,6 +67,10 @@ export class SplitterPanel {
                 Utils.removeNode(container.containerElement);
             }
         });
+        this.removeSplittersFromDOM();
+    }
+
+    removeSplittersFromDOM() {
         this.spiltterBars.forEach((bar) => { Utils.removeNode(bar.barElement); });
     }
 

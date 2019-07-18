@@ -13,6 +13,7 @@ export declare class SplitterPanel {
     _buildSplitterDOM(): void;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean): void;
     removeFromDOM(): void;
+    removeSplittersFromDOM(): void;
     destroy(): void;
     _insertContainerIntoPanel(container: IDockContainer): void;
     /**
