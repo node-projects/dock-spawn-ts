@@ -17,10 +17,10 @@ export class SplitterPanel {
         this.stackedVertical = stackedVertical;
         this.panelElement = document.createElement('div');
         this.spiltterBars = [];
-        this._buildSplitterDOM();
+        this._buildSplitterDOMAndAddElements();
     }
 
-    _buildSplitterDOM() {
+    _buildSplitterDOMAndAddElements() {
         if (this.childContainers.length <= 1)
             throw new Error('Splitter panel should contain atleast 2 panels');
 
@@ -60,7 +60,7 @@ export class SplitterPanel {
 
             // rebuild
             this.childContainers = children;
-            this._buildSplitterDOM();
+            this._buildSplitterDOMAndAddElements();
         }
     }
 

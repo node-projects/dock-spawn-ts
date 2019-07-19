@@ -10,7 +10,7 @@ export declare class SplitterPanel {
     stackedVertical: boolean;
     childContainers: IDockContainer[];
     constructor(childContainers: IDockContainer[], stackedVertical: boolean);
-    _buildSplitterDOM(): void;
+    _buildSplitterDOMAndAddElements(): void;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean): void;
     removeFromDOM(): void;
     destroy(): void;

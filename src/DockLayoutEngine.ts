@@ -194,14 +194,18 @@ export class DockLayoutEngine {
             referenceParent: DockNode;
 
         if (referenceNode === model.rootNode) {
-            compositeContainer = this._createDockContainer(direction, newNode, referenceNode);
-            compositeNode = new DockNode(compositeContainer);
+            //compositeContainer = this._createDockContainer(direction, newNode, referenceNode);
+            //compositeNode = new DockNode(compositeContainer);
 
             if (insertBeforeReference) {
+                compositeContainer = this._createDockContainer(direction, newNode, referenceNode);
+                compositeNode = new DockNode(compositeContainer);
                 compositeNode.addChild(newNode);
                 compositeNode.addChild(referenceNode);
             }
             else {
+                compositeContainer = this._createDockContainer(direction, referenceNode, newNode);
+                compositeNode = new DockNode(compositeContainer);
                 compositeNode.addChild(referenceNode);
                 compositeNode.addChild(newNode);
             }
