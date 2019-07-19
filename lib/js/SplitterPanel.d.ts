@@ -13,9 +13,8 @@ export declare class SplitterPanel {
     _buildSplitterDOM(): void;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean): void;
     removeFromDOM(): void;
-    removeSplittersFromDOM(): void;
     destroy(): void;
-    _insertContainerIntoPanel(container: IDockContainer): void;
+    _insertContainerIntoPanel(container: IDockContainer, afterElement: HTMLElement): void;
     /**
      * Sets the percentage of space the specified [container] takes in the split panel
      * The percentage is specified in [ratio] and is between 0..1

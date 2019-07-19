@@ -25,6 +25,7 @@ export class SplitterPanel {
             throw new Error('Splitter panel should contain atleast 2 panels');
 
         this.spiltterBars = [];
+        let afterElement: HTMLElement = null;
         for (let i = 0; i < this.childContainers.length - 1; i++) {
             let previousContainer = this.childContainers[i];
             let nextContainer = this.childContainers[i + 1];
@@ -32,10 +33,14 @@ export class SplitterPanel {
             this.spiltterBars.push(splitterBar);
 
             // Add the container and split bar to the panel's base div element
-            this._insertContainerIntoPanel(previousContainer);
-            this.panelElement.appendChild(splitterBar.barElement);
+            if (!Array.from(this.panelElement.children).includes(previousContainer.containerElement))
+                this._insertContainerIntoPanel(previousContainer, afterElement);
+            this.panelElement.insertBefore(splitterBar.barElement, previousContainer.containerElement.nextSibling);
+            afterElement = splitterBar.barElement;
         }
-        this._insertContainerIntoPanel(this.childContainers.slice(-1)[0]);
+        let last = this.childContainers.slice(-1)[0];
+        if (!Array.from(this.panelElement.children).includes(last.containerElement))
+            this._insertContainerIntoPanel(last, afterElement);
     }
 
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean) {
@@ -47,11 +52,11 @@ export class SplitterPanel {
                         container.containerElement.classList.remove('splitter-container-vertical');
                         container.containerElement.classList.remove('splitter-container-horizontal');
                         Utils.removeNode(container.containerElement);
+
                     }
                 }
             });
-
-            this.removeSplittersFromDOM();
+            this.spiltterBars.forEach((bar) => { Utils.removeNode(bar.barElement); });
 
             // rebuild
             this.childContainers = children;
@@ -67,10 +72,6 @@ export class SplitterPanel {
                 Utils.removeNode(container.containerElement);
             }
         });
-        this.removeSplittersFromDOM();
-    }
-
-    removeSplittersFromDOM() {
         this.spiltterBars.forEach((bar) => { Utils.removeNode(bar.barElement); });
     }
 
@@ -79,14 +80,23 @@ export class SplitterPanel {
         this.panelElement.parentNode.removeChild(this.panelElement);
     }
 
-    _insertContainerIntoPanel(container: IDockContainer) {
+    _insertContainerIntoPanel(container: IDockContainer, afterElement: HTMLElement) {
         if (!container) {
             console.error('container is undefined');
             return;
         }
 
-        Utils.removeNode(container.containerElement);
-        this.panelElement.appendChild(container.containerElement);
+        if (container.containerElement.parentNode != this.panelElement) {
+            Utils.removeNode(container.containerElement);
+            if (afterElement)
+                this.panelElement.insertBefore(container.containerElement, afterElement.nextSibling);
+            else {
+                if (this.panelElement.children.length > 0)
+                    this.panelElement.insertBefore(container.containerElement, this.panelElement.children[0]);
+                else
+                    this.panelElement.appendChild(container.containerElement);
+            }
+        }
         container.containerElement.classList.add(
             this.stackedVertical ? 'splitter-container-vertical' : 'splitter-container-horizontal'
         );
