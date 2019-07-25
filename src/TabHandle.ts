@@ -36,8 +36,8 @@ export class TabHandle {
     current: number;
     direction: number;
     _ctxMenu: HTMLDivElement;
-    _removeCtxMenuBound: any;
-    
+    _windowsContextMenuCloseBound: any;
+
     constructor(parent: TabPage) {
         this.parent = parent;
         let undockHandler = this._performUndock.bind(this);
@@ -130,13 +130,13 @@ export class TabHandle {
             this._ctxMenu = document.createElement('div');
             this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
 
-            TabHandle.createContextMenuContentCallback(this, this._ctxMenu, this.parent.container.dockManager.context.model.documentManagerNode.children);            
+            TabHandle.createContextMenuContentCallback(this, this._ctxMenu, this.parent.container.dockManager.context.model.documentManagerNode.children);
 
             this._ctxMenu.style.left = e.pageX + "px";
             this._ctxMenu.style.top = e.pageY + "px";
             document.body.appendChild(this._ctxMenu);
-            this._removeCtxMenuBound = this.closeContextMenu.bind(this)
-            window.addEventListener('mousedown', this._removeCtxMenuBound);
+            this._windowsContextMenuCloseBound = this.windowsContextMenuClose.bind(this)
+            window.addEventListener('mouseup', this._windowsContextMenuCloseBound);
         } else {
             this.closeContextMenu();
         }
@@ -144,14 +144,22 @@ export class TabHandle {
 
     closeContextMenu() {
         if (this._ctxMenu) {
-            setTimeout(() => {
-                if (this._ctxMenu) {
-                    document.body.removeChild(this._ctxMenu);
-                    delete this._ctxMenu;
-                    window.removeEventListener('mousedown', this._removeCtxMenuBound);
-                }
-            }, 100);
+            if (this._ctxMenu) {
+                document.body.removeChild(this._ctxMenu);
+                delete this._ctxMenu;
+                window.removeEventListener('mouseup', this._windowsContextMenuCloseBound);
+            }
         }
+    }
+
+    windowsContextMenuClose(e: Event) {
+        let cp = e.composedPath();
+        for (let i in cp) {
+            let el = cp[i];
+            if (el == this._ctxMenu)
+                return;
+        }
+        this.closeContextMenu();
     }
 
     onMouseDown(e) {
@@ -178,15 +186,19 @@ export class TabHandle {
         this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
     }
 
-    onMouseUp() {
+    onMouseUp(e) {
         if (this.elementBase) {
             this.elementBase.classList.remove('dockspan-tab-handle-dragged');
         }
         this.dragged = false;
-        this.mouseMoveHandler.cancel();
-        this.touchMoveHandler.cancel();
-        this.mouseUpHandler.cancel();
-        this.touchUpHandler.cancel();
+        if (this.mouseMoveHandler)
+            this.mouseMoveHandler.cancel();
+        if (this.touchMoveHandler)
+            this.touchMoveHandler.cancel();
+        if (this.mouseUpHandler)
+            this.mouseUpHandler.cancel();
+        if (this.touchUpHandler)
+            this.touchUpHandler.cancel();
         delete this.mouseMoveHandler;
         delete this.touchMoveHandler;
         delete this.mouseUpHandler;

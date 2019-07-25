@@ -258,6 +258,7 @@
 
 .dockspan-tab-host {
 	display: inline-block;
+	position: absolute;
 }
 
 .dockspan-tab-content {}

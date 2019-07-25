@@ -33,7 +33,7 @@ export declare class TabHandle {
     current: number;
     direction: number;
     _ctxMenu: HTMLDivElement;
-    _removeCtxMenuBound: any;
+    _windowsContextMenuCloseBound: any;
     constructor(parent: TabPage);
     addListener(listener: any): void;
     removeListener(listener: any): void;
@@ -41,8 +41,9 @@ export declare class TabHandle {
     static createContextMenuContentCallback: (tabHandle: TabHandle, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => void;
     oncontextMenuClicked(e: MouseEvent): void;
     closeContextMenu(): void;
+    windowsContextMenuClose(e: Event): void;
     onMouseDown(e: any): void;
-    onMouseUp(): void;
+    onMouseUp(e: any): void;
     generateMoveTabEvent(event: any, pos: any): void;
     moveTabEvent(that: any, state: any): void;
     onMouseMove(e: any): void;
