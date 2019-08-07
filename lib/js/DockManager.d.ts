@@ -108,7 +108,7 @@ export declare class DockManager {
     findNodeFromContainerElement(containerElement: HTMLElement): DockNode;
     addLayoutListener(listener: ILayoutEventListener): void;
     removeLayoutListener(listener: ILayoutEventListener): void;
-    suspendLayout(): void;
+    suspendLayout(panel: IDockContainer): void;
     resumeLayout(panel: IDockContainer): void;
     notifyOnDock(dockNode: DockNode): void;
     notifyOnTabsReorder(dockNode: DockNode): void;

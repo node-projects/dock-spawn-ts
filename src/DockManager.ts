@@ -491,9 +491,9 @@ export class DockManager {
         this.layoutEventListeners.splice(this.layoutEventListeners.indexOf(listener), 1);
     }
 
-    suspendLayout() {
+    suspendLayout(panel: IDockContainer) {
         this.layoutEventListeners.forEach((listener) => {
-            if (listener.onSuspendLayout) listener.onSuspendLayout(this);
+            if (listener.onSuspendLayout) listener.onSuspendLayout(this, panel);
         });
     }
 
