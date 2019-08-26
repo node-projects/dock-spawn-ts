@@ -54,7 +54,6 @@ export class Dialog {
 
         this.mouseDownHandler = new EventHandler(this.elementDialog, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementDialog, 'touchstart', this.onMouseDown.bind(this));
-        //this.keyPressHandler = new EventHandler(this.elementDialog, 'keypress', this.dockManager.onKeyPress, true);
         this.keyPressHandler = new EventHandler(this.elementDialog, 'keypress', this.dockManager.onKeyPressBound, true);
         this.resize(this.panel.elementPanel.clientWidth, this.panel.elementPanel.clientHeight);
         this.isHidden = false;
@@ -90,7 +89,6 @@ export class Dialog {
             this.keyPressHandler.cancel();
             delete this.keyPressHandler;
         }
-        window.removeEventListener('keydown', this.onKeyPressBound);
         Utils.removeNode(this.elementDialog);
         this.draggable.removeDecorator();
         Utils.removeNode(this.panel.elementPanel);

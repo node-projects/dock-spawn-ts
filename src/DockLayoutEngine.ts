@@ -127,9 +127,8 @@ export class DockLayoutEngine {
                     parentNode.detachFromParent();
                     let width = parentNode.container.containerElement.clientWidth;
                     let height = parentNode.container.containerElement.clientHeight;
-                    parentNode.container.destroy();
-
                     otherChild.container.resize(width, height);
+                    parentNode.container.destroy();
                     grandParent.performLayout(false);
                 } else {
                     // Parent is a root node.

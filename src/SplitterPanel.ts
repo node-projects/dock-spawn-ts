@@ -142,9 +142,9 @@ export class SplitterPanel {
         for (i = 0; i < this.childContainers.length; i++) {
             let childContainer = this.childContainers[i];
             if (this.stackedVertical)
-                childContainer.resize(width, childContainer.height);
+                childContainer.resize(width, !childContainer.height ? height : childContainer.height);
             else
-                childContainer.resize(childContainer.width, height);
+                childContainer.resize(!childContainer.width ? width : childContainer.width, height);
 
             if (i < this.spiltterBars.length) {
                 let splitBar = this.spiltterBars[i];
