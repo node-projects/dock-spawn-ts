@@ -15,6 +15,9 @@
     "typescript": "^3.3.4000",
     "yarn": "^1.16.0"
   },
-  "files": ["lib/**/*", "src/**/*"],
+  "files": [
+    "lib/**/*",
+    "src/**/*"
+  ],
   "homepage": "https://github.com/node-projects/dock-spawn-ts"
 }
