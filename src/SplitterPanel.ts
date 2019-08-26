@@ -119,7 +119,7 @@ export class SplitterPanel {
             let child = this.childContainers[i];
             let size;
             if (child !== container) {
-                size = this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth;
+                size = this.stackedVertical ? child.containerElement.parentElement.clientHeight : child.containerElement.parentElement.clientWidth;
                 size *= otherPanelScaleMultipler;
             }
             else
