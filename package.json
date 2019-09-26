@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "2.16.0",
+  "version": "2.17.0",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -10,9 +10,9 @@
     "start": "http-server"
   },
   "devDependencies": {
-    "@types/node": "^12.7.2",
+    "@types/node": "^12.7.8",
     "http-server": "^0.11.1",
-    "typescript": "^3.5.3",
+    "typescript": "^3.6.3",
     "yarn": "^1.17.3"
   },
   "main": "/dist/Exports.js",
