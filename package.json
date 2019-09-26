@@ -15,6 +15,7 @@
     "typescript": "^3.5.3",
     "yarn": "^1.17.3"
   },
+  "main": "/dist/Exports.js",
   "files": [
     "lib/**/*",
     "src/**/*"
