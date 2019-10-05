@@ -11,6 +11,11 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
 
 ![Logo](https://raw.githubusercontent.com/node-projects/dock-spawn-ts/master/ide.png)
 
+# es5 version
+
+There is an ES5 Version in the lib/es5 directory
+Usage Example is in page/demo/demo_simple_es5.html
+
 # differences to original dockspawn
  - typescript
  - bugfixes / preformance optimations
