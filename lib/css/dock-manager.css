@@ -34,7 +34,11 @@
 	display: flex;
     justify-content: flex-end;
     align-items: center;
-    height: 100%;
+	width: 25px;
+    height: 25px;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 
 .panel-titlebar-button-close::after {
