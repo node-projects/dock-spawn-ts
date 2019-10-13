@@ -465,7 +465,7 @@ export class DockManager {
             [].push.apply(stack, topNode.children);
         }
 
-        throw new Error('Cannot find dock node belonging to the element');
+        return null;
     }
 
     findNodeFromContainerElement(containerElement: HTMLElement) {
@@ -480,7 +480,7 @@ export class DockManager {
             [].push.apply(stack, topNode.children);
         }
 
-        throw new Error('Cannot find dock node belonging to the element');
+        return null;
     }
 
     addLayoutListener(listener: ILayoutEventListener) {

@@ -4,28 +4,29 @@ import { PanelType } from "../enums/PanelType.js";
 import { DockNode } from "../DockNode.js";
 
 export class DockSpawnTsWebcomponent extends HTMLElement {
-
-    public static cssRootDirectory = "../../";
+    public static cssRootDirectory = "../../lib/css/";
 
     private dockManager: DockManager;
     private slotId: number = 0;
     private windowResizedBound;
     private slotElementMap: Map<HTMLSlotElement, HTMLElement>;
     private observer: MutationObserver;
-
+    private initialized = false;
 
     constructor() {
         super();
 
-        const template = document.createElement('template')
-        template.innerHTML = `
-<link rel="stylesheet" href="${DockSpawnTsWebcomponent.cssRootDirectory}/lib/css/dock-manager.css">
-<link rel="stylesheet" href="${DockSpawnTsWebcomponent.cssRootDirectory}/lib/css/dock-manager-style.css">
-<div id="dockSpawnDiv" style="width:100%;height:100%;position:relative"></div>
-`
-
         this.windowResizedBound = this.windowResized.bind(this);
         this.slotElementMap = new Map();
+    }
+
+    private initDockspawn() {
+        const template = document.createElement('template')
+        template.innerHTML = `
+<link rel="stylesheet" href="${DockSpawnTsWebcomponent.cssRootDirectory}dock-manager.css">
+<link rel="stylesheet" href="${DockSpawnTsWebcomponent.cssRootDirectory}dock-manager-style.css">
+<div id="dockSpawnDiv" style="width:100%;height:100%;position:relative"></div>
+`
 
         let shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.appendChild(template.content.cloneNode(true));
@@ -79,10 +80,16 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     }
 
     private handleRemovedChildNode(element) {
-        (<PanelContainer>this.getDockNodeForElement(element).container).close();
+        let node = this.getDockNodeForElement(element);
+        if (node)
+            (<PanelContainer>node.container).close();
     }
 
     connectedCallback() {
+        if (!this.initialized) {
+            this.initDockspawn();
+            this.initialized = true;
+        }
         window.addEventListener('resize', this.windowResizedBound);
         window.addEventListener('orientationchange', this.windowResizedBound);
     }
