@@ -9,6 +9,7 @@ export declare class DockSpawnTsWebcomponent extends HTMLElement {
     private slotElementMap;
     private observer;
     private initialized;
+    private elementContainerMap;
     constructor();
     private initDockspawn;
     private handleAddedChildNode;

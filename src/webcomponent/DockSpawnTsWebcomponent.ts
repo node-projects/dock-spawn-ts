@@ -12,6 +12,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     private slotElementMap: Map<HTMLSlotElement, HTMLElement>;
     private observer: MutationObserver;
     private initialized = false;
+    private elementContainerMap : Map<HTMLElement, PanelContainer> = new Map();
 
     constructor() {
         super();
@@ -31,7 +32,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.appendChild(template.content.cloneNode(true));
         let dockSpawnDiv = shadowRoot.querySelector("#dockSpawnDiv") as HTMLDivElement;
-
+        
         this.dockManager = new DockManager(dockSpawnDiv);
         this.dockManager.config.dialogRootElement = dockSpawnDiv;
         this.dockManager.initialize();
@@ -46,16 +47,16 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         });
 
         for (let element of this.children) {
-            this.handleAddedChildNode(element)
+            this.handleAddedChildNode(element as HTMLElement)
         }
 
         this.observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
-                    this.handleAddedChildNode(node);
+                    this.handleAddedChildNode(node as HTMLElement);
                 });
                 mutation.removedNodes.forEach((node) => {
-                    this.handleRemovedChildNode(node);
+                    this.handleRemovedChildNode(node as HTMLElement);
                 });
             });
         });
@@ -67,22 +68,49 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         });
     }
 
-    private handleAddedChildNode(element) {
+    private handleAddedChildNode(element: HTMLElement) {
         let slot = document.createElement('slot');
         let slotName = 'slot_' + this.slotId++;
         slot.name = slotName;
         element.slot = slotName;
         let container = new PanelContainer(slot, this.dockManager);
-        this.dockManager.dockFill(this.dockManager.context.model.documentManagerNode, container);
+
+        this.elementContainerMap.set(element, container);
+
+        let dockRatio: number = 0.5;
+        let dockRatioAttribute = element.getAttribute('dock-spawn-dock-ratio');
+        if (dockRatioAttribute)
+            dockRatio = <number><any>dockRatioAttribute;
+        let dockType = element.getAttribute('dock-spawn-dock-type');
+
+        let dockRelativeTo = this.dockManager.context.model.documentManagerNode;
+        let dockToAttribute = element.getAttribute('dock-spawn-dock-to');
+        if (dockToAttribute) {
+            let dockToElement = this.ownerDocument.getElementById(dockToAttribute) as HTMLElement;
+            dockRelativeTo = this.dockManager.findNodeFromContainerElement(this.elementContainerMap.get(dockToElement).containerElement);
+        }
+
+        if (dockType == 'left')
+            this.dockManager.dockLeft(dockRelativeTo, container, dockRatio);
+        else if (dockType == 'right')
+            this.dockManager.dockRight(dockRelativeTo, container, dockRatio);
+        else if (dockType == 'up')
+            this.dockManager.dockUp(dockRelativeTo, container, dockRatio);
+        else if (dockType == 'down')
+            this.dockManager.dockDown(dockRelativeTo, container, dockRatio);
+        else
+            this.dockManager.dockFill(dockRelativeTo, container);
+
         if ((<HTMLElement>element).style.display == 'none')
             (<HTMLElement>element).style.display = 'block';
         this.slotElementMap.set(slot, (<HTMLElement>element));
     }
 
-    private handleRemovedChildNode(element) {
+    private handleRemovedChildNode(element: HTMLElement) {
         let node = this.getDockNodeForElement(element);
         if (node)
             (<PanelContainer>node.container).close();
+        this.elementContainerMap.delete(element);
     }
 
     connectedCallback() {
