@@ -2,6 +2,7 @@ import { DockManager } from "../DockManager.js";
 import { PanelContainer } from "../PanelContainer.js";
 import { PanelType } from "../enums/PanelType.js";
 import { DockNode } from "../DockNode.js";
+import { link } from "fs";
 
 export class DockSpawnTsWebcomponent extends HTMLElement {
     public static cssRootDirectory = "../../lib/css/";
@@ -12,7 +13,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     private slotElementMap: Map<HTMLSlotElement, HTMLElement>;
     private observer: MutationObserver;
     private initialized = false;
-    private elementContainerMap : Map<HTMLElement, PanelContainer> = new Map();
+    private elementContainerMap: Map<HTMLElement, PanelContainer> = new Map();
 
     constructor() {
         super();
@@ -22,17 +23,25 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     }
 
     private initDockspawn() {
-        const template = document.createElement('template')
-        template.innerHTML = `
-<link rel="stylesheet" href="${DockSpawnTsWebcomponent.cssRootDirectory}dock-manager.css">
-<link rel="stylesheet" href="${DockSpawnTsWebcomponent.cssRootDirectory}dock-manager-style.css">
-<div id="dockSpawnDiv" style="width:100%;height:100%;position:relative"></div>
-`
+        const shadowRoot = this.attachShadow({ mode: 'open' });
 
-        let shadowRoot = this.attachShadow({ mode: 'open' });
-        shadowRoot.appendChild(template.content.cloneNode(true));
-        let dockSpawnDiv = shadowRoot.querySelector("#dockSpawnDiv") as HTMLDivElement;
-        
+        const linkElement1 = document.createElement("link");
+        linkElement1.rel = "stylesheet";
+        linkElement1.href = DockSpawnTsWebcomponent.cssRootDirectory + "dock-manager.css";
+        linkElement1.onload = this.cssLoaded.bind(this);
+        const linkElement2 = document.createElement("link");
+        linkElement2.rel = "stylesheet";
+        linkElement2.href = DockSpawnTsWebcomponent.cssRootDirectory + "dock-manager-style.css";
+        shadowRoot.appendChild(linkElement1);
+        shadowRoot.appendChild(linkElement2);
+
+        const dockSpawnDiv = document.createElement('div')
+        dockSpawnDiv.id = "dockSpawnDiv";
+        dockSpawnDiv.style.width = "100%";
+        dockSpawnDiv.style.height = "100%";
+        dockSpawnDiv.style.position = "relative";
+        shadowRoot.appendChild(dockSpawnDiv);
+
         this.dockManager = new DockManager(dockSpawnDiv);
         this.dockManager.config.dialogRootElement = dockSpawnDiv;
         this.dockManager.initialize();
@@ -45,6 +54,12 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
                 this.slotElementMap.delete(slot);
             }
         });
+
+        this.dockManager.resize(this.clientWidth, this.clientHeight);
+    }
+
+    private cssLoaded() {
+        this.dockManager.resize(this.clientWidth, this.clientHeight);
 
         for (let element of this.children) {
             this.handleAddedChildNode(element as HTMLElement)
@@ -61,11 +76,6 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
             });
         });
         this.observer.observe(this, { childList: true });
-
-        this.dockManager.resize(this.clientWidth, this.clientHeight);
-        requestAnimationFrame(() => {
-            this.dockManager.resize(this.clientWidth, this.clientHeight);
-        });
     }
 
     private handleAddedChildNode(element: HTMLElement) {
@@ -73,7 +83,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let slotName = 'slot_' + this.slotId++;
         slot.name = slotName;
         element.slot = slotName;
-        let container = new PanelContainer(slot, this.dockManager);
+        let container = new PanelContainer(slot, this.dockManager, element.title);
 
         this.elementContainerMap.set(element, container);
 
