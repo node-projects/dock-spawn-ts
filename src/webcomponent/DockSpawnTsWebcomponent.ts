@@ -2,7 +2,6 @@ import { DockManager } from "../DockManager.js";
 import { PanelContainer } from "../PanelContainer.js";
 import { PanelType } from "../enums/PanelType.js";
 import { DockNode } from "../DockNode.js";
-import { link } from "fs";
 
 export class DockSpawnTsWebcomponent extends HTMLElement {
     public static cssRootDirectory = "../../lib/css/";
