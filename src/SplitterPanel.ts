@@ -109,9 +109,7 @@ export class SplitterPanel {
     setContainerRatio(container: IDockContainer, ratio: number) {
         let splitPanelSize = this.stackedVertical ? this.panelElement.clientHeight : this.panelElement.clientWidth;
         let newContainerSize = splitPanelSize * ratio;
-        let barSize = this.stackedVertical ?
-            this.spiltterBars[0].barElement.clientHeight : this.spiltterBars[0].barElement.clientWidth;
-
+        let barSize = this.stackedVertical ? this.spiltterBars[0].barElement.clientHeight : this.spiltterBars[0].barElement.clientWidth;
         let otherPanelSizeQuota = splitPanelSize - newContainerSize - barSize * this.spiltterBars.length;
         let otherPanelScaleMultipler = otherPanelSizeQuota / splitPanelSize;
 
@@ -125,6 +123,31 @@ export class SplitterPanel {
             else
                 size = newContainerSize;
 
+            if (this.stackedVertical)
+                child.resize(child.width, Math.floor(size));
+            else
+                child.resize(Math.floor(size), child.height);
+        }
+    }
+
+    getRatios(): number[] {
+        let barSize = this.stackedVertical ? this.spiltterBars[0].barElement.clientHeight : this.spiltterBars[0].barElement.clientWidth;
+        let splitPanelSize = (this.stackedVertical ? this.panelElement.clientHeight : this.panelElement.clientWidth) - barSize * this.spiltterBars.length;
+        let result: number[] = [];
+        for (let i = 0; i < this.childContainers.length; i++) {
+            let child = this.childContainers[i];
+            let sizeOld = this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth;
+            result.push(sizeOld / splitPanelSize);
+        }
+        return result;
+    }
+
+    setRatios(ratios: number[]) {
+        let barSize = this.stackedVertical ? this.spiltterBars[0].barElement.clientHeight : this.spiltterBars[0].barElement.clientWidth;
+        let splitPanelSize = (this.stackedVertical ? this.panelElement.clientHeight : this.panelElement.clientWidth) - barSize * this.spiltterBars.length;
+        for (let i = 0; i < this.childContainers.length; i++) {
+            let child = this.childContainers[i];
+            let size = splitPanelSize * ratios[i];
             if (this.stackedVertical)
                 child.resize(child.width, Math.floor(size));
             else

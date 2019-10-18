@@ -20,5 +20,7 @@ export declare class SplitterPanel {
      * The percentage is specified in [ratio] and is between 0..1
      */
     setContainerRatio(container: IDockContainer, ratio: number): void;
+    getRatios(): number[];
+    setRatios(ratios: number[]): void;
     resize(width: number, height: number): void;
 }

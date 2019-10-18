@@ -62,6 +62,15 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
         this.resize(this.width, this.height);
     }
 
+    getRatios() : number[] {
+        return this.splitterPanel.getRatios();
+    }
+
+    setRatios(ratios: number[]) {
+        this.splitterPanel.setRatios(ratios);
+        this.resize(this.width, this.height);
+    }
+
     saveState(state: IState) {
         state.width = this.width;
         state.height = this.height;

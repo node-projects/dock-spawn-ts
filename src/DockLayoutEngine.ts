@@ -172,8 +172,6 @@ export class DockLayoutEngine {
     }
 
     _performDock(referenceNode: DockNode, newNode: DockNode, direction: string, insertBeforeReference: boolean) {
-        //(<PanelContainer>newNode.container).elementPanel.style.position = "relative";
-
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')
             referenceNode = referenceNode.parent;
 
@@ -193,9 +191,6 @@ export class DockLayoutEngine {
             referenceParent: DockNode;
 
         if (referenceNode === model.rootNode) {
-            //compositeContainer = this._createDockContainer(direction, newNode, referenceNode);
-            //compositeNode = new DockNode(compositeContainer);
-
             if (insertBeforeReference) {
                 compositeContainer = this._createDockContainer(direction, newNode, referenceNode);
                 compositeNode = new DockNode(compositeContainer);

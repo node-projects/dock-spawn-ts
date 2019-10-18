@@ -24,7 +24,7 @@ export declare class DockLayoutEngine {
     reorderTabs(node: DockNode, handle: TabHandle, state: string, index: number): void;
     _performDock(referenceNode: DockNode, newNode: DockNode, direction: string, insertBeforeReference: boolean): void;
     _forceResizeCompositeContainer: (container: IDockContainer) => void;
-    _createDockContainer(containerType: string, newNode: DockNode, referenceNode: DockNode): FillDockContainer | HorizontalDockContainer | VerticalDockContainer;
+    _createDockContainer(containerType: string, newNode: DockNode, referenceNode: DockNode): FillDockContainer | VerticalDockContainer | HorizontalDockContainer;
     /**
      * Gets the bounds of the new node if it were to dock with the specified configuration
      * The state is not modified in this function.  It is used for showing a preview of where

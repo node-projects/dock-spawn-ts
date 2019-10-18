@@ -26,6 +26,8 @@ export declare abstract class SplitterDockContainer implements IDockContainerWit
      * The percentage is specified in [ratio] and is between 0..1
      */
     setContainerRatio(container: IDockContainer, ratio: number): void;
+    getRatios(): number[];
+    setRatios(ratios: number[]): void;
     saveState(state: IState): void;
     loadState(state: IState): void;
     readonly width: number;

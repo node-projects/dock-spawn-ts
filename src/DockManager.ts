@@ -275,27 +275,27 @@ export class DockManager {
 
     /** Dock the [container] to the left of the [referenceNode] node */
     dockLeft(referenceNode: DockNode, container: PanelContainer, ratio: number) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockLeft.bind(this.layoutEngine), ratio);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockLeft.bind(this.layoutEngine), false, ratio);
     }
 
     /** Dock the [container] to the right of the [referenceNode] node */
     dockRight(referenceNode: DockNode, container: PanelContainer, ratio: number) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockRight.bind(this.layoutEngine), ratio);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockRight.bind(this.layoutEngine), true, ratio);
     }
 
     /** Dock the [container] above the [referenceNode] node */
     dockUp(referenceNode: DockNode, container: PanelContainer, ratio: number) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockUp.bind(this.layoutEngine), ratio);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockUp.bind(this.layoutEngine), false, ratio);
     }
 
     /** Dock the [container] below the [referenceNode] node */
     dockDown(referenceNode: DockNode, container: PanelContainer, ratio: number) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockDown.bind(this.layoutEngine), ratio);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockDown.bind(this.layoutEngine), true, ratio);
     }
 
     /** Dock the [container] as a tab inside the [referenceNode] node */
     dockFill(referenceNode: DockNode, container: PanelContainer) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine));
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine), false);
     }
 
     floatDialog(container: PanelContainer, x: number, y: number) {
@@ -346,7 +346,7 @@ export class DockManager {
         }
     }
 
-    private _requestDockContainer(referenceNode: DockNode, container: IDockContainer, layoutDockFunction: (referenceNode: DockNode, newNode: DockNode) => void, ratio?: number) {
+    private _requestDockContainer(referenceNode: DockNode, container: IDockContainer, layoutDockFunction: (referenceNode: DockNode, newNode: DockNode) => void, dockedToPrevious: boolean, ratio?: number) {
         // Get the active dialog that was dragged on to the dock wheel
         let newNode = new DockNode(container);
         if (container.containerType === 'panel') {
@@ -354,12 +354,31 @@ export class DockManager {
             panel.prepareForDocking();
             Utils.removeNode(panel.elementPanel);
         }
+
+        let ratios: number[] = null;
+        let oldSplitter: SplitterDockContainer;
+        if (referenceNode.parent && referenceNode.parent.container) {
+            oldSplitter = referenceNode.parent.container as SplitterDockContainer;
+            if (oldSplitter.getRatios)
+                ratios = oldSplitter.getRatios();
+        }
+
         layoutDockFunction(referenceNode, newNode);
 
-        if (ratio && newNode.parent &&
-            (newNode.parent.container.containerType === 'vertical' || newNode.parent.container.containerType === 'horizontal')) {
+        if (ratio && newNode.parent && (newNode.parent.container.containerType === 'vertical' || newNode.parent.container.containerType === 'horizontal')) {
             let splitter = newNode.parent.container as SplitterDockContainer;
-            splitter.setContainerRatio(container, ratio);
+            if (ratios && oldSplitter == splitter) {
+                if (dockedToPrevious) {
+                    ratios[ratios.length - 1] = ratios[ratios.length - 1] - ratio;
+                    ratios.push(ratio);
+                } else {
+                    ratios[0] = ratios[0] - ratio;
+                    ratios.unshift(ratio);
+                }
+                splitter.setRatios(ratios);
+            }
+            else
+                splitter.setContainerRatio(container, ratio);
         }
 
         this.rebuildLayout(this.context.model.rootNode);
