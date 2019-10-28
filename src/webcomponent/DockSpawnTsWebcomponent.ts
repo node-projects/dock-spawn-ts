@@ -95,7 +95,8 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let dockRelativeTo = this.dockManager.context.model.documentManagerNode;
         let dockToAttribute = element.getAttribute('dock-spawn-dock-to');
         if (dockToAttribute) {
-            let dockToElement = this.ownerDocument.getElementById(dockToAttribute) as HTMLElement;
+            //@ts-ignore
+            let dockToElement = this.getRootNode().getElementById(dockToAttribute) as HTMLElement;
             dockRelativeTo = this.dockManager.findNodeFromContainerElement(this.elementContainerMap.get(dockToElement).containerElement);
         }
 
