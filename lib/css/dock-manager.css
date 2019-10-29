@@ -265,7 +265,9 @@
 	position: absolute;
 }
 
-.dockspan-tab-content {}
+.dockspan-tab-content {
+	position: relative;
+}
 
 .dockspan-tab-content:focus {
 	outline: 0;
