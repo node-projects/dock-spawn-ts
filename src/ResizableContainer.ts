@@ -39,7 +39,7 @@ export class ResizableContainer implements IDockContainer {
         this.minimumAllowedChildNodes = delegate.minimumAllowedChildNodes;
         this._buildResizeHandles();
         this.readyToProcessNextResize = true;
-        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed : true });
+        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed : true, bubbles : true });
     }
 
     setActiveChild(/*child*/) {
