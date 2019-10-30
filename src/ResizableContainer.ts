@@ -39,7 +39,7 @@ export class ResizableContainer implements IDockContainer {
         this.minimumAllowedChildNodes = delegate.minimumAllowedChildNodes;
         this._buildResizeHandles();
         this.readyToProcessNextResize = true;
-        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent");
+        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed : true });
     }
 
     setActiveChild(/*child*/) {
@@ -160,6 +160,8 @@ export class ResizableContainer implements IDockContainer {
         this.readyToProcessNextResize = true;
         if (this.dialog.panel)
             this.dockManager.resumeLayout(this.dialog.panel);
+
+        this.dockManager.notifyOnContainerResized(this);
     }
 
     onMouseDown(handle, event: TouchEvent | MouseEvent) {

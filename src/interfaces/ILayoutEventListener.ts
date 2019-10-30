@@ -14,6 +14,7 @@ export interface ILayoutEventListener {
     onHideDialog?(dockManager: DockManager, dialog: Dialog): void;
     onShowDialog?(dockManager: DockManager, dialog: Dialog): void;
     onChangeDialogPosition?(dockManager: DockManager, dialog: Dialog, x: number, y: number): void;
+    onContainerResized?(dockManager: DockManager, dockContainer: IDockContainer): void;
     onTabChanged?(dockManager: DockManager, tabpage: TabPage): void;
     onActivePanelChange?(dockManager: DockManager, panel: PanelContainer): void;
 

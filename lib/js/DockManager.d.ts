@@ -118,6 +118,7 @@ export declare class DockManager {
     notifyOnHideDialog(dialog: Dialog): void;
     notifyOnShowDialog(dialog: Dialog): void;
     notifyOnChangeDialogPosition(dialog: Dialog, x: number, y: number): void;
+    notifyOnContainerResized(dockContainer: IDockContainer): void;
     notifyOnTabChange(tabpage: TabPage): void;
     notifyOnActivePanelChange(panel: PanelContainer): void;
     saveState(): string;

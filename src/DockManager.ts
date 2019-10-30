@@ -590,6 +590,14 @@ export class DockManager {
         });
     }
 
+    notifyOnContainerResized(dockContainer: IDockContainer) {
+        this.layoutEventListeners.forEach((listener) => {
+            if (listener.onContainerResized) {
+                listener.onContainerResized(this, dockContainer);
+            }
+        });
+    }
+
     notifyOnTabChange(tabpage: TabPage) {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onTabChanged) {
