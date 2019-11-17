@@ -37,6 +37,7 @@ export class DockManager {
     backgroundContext: HTMLElement;
     _undockEnabled: boolean;
     zIndexCounter: number;
+    zIndexDialogCounter: number;
     _activePanel: PanelContainer;
     onKeyPressBound: any;
     private _config: DockConfig;
@@ -73,6 +74,7 @@ export class DockManager {
         this._undockEnabled = true;
         this.rebuildLayout(this.context.model.rootNode);
         this.zIndexCounter = 1001;
+        this.zIndexDialogCounter = 10001;
         if (this.backgroundContext != null) {
             (<FillDockContainer>this.context.model.rootNode.container).tabHost.hostElement
                 .insertBefore(this.backgroundContext, (<FillDockContainer>this.context.model.rootNode.container).tabHost.hostElement.firstChild);

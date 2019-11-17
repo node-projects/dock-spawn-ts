@@ -27,6 +27,7 @@ export declare class DockManager {
     backgroundContext: HTMLElement;
     _undockEnabled: boolean;
     zIndexCounter: number;
+    zIndexDialogCounter: number;
     _activePanel: PanelContainer;
     onKeyPressBound: any;
     private _config;
