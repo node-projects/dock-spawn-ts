@@ -134,7 +134,7 @@ export class Dialog {
     }
 
     show() {
-        this.elementDialog.style.zIndex = '1001';
+        this.elementDialog.style.zIndex = '10001';
         this.elementDialog.style.display = 'block';
         if (this.isHidden) {
             this.isHidden = false;
