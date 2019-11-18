@@ -607,8 +607,6 @@ export class DockManager {
     }
 
     notifyOnActivePanelChange(panel: PanelContainer) {
-        console.log("active:", panel);
-
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onActivePanelChange) {
                 listener.onActivePanelChange(this, panel);

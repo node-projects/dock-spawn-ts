@@ -25,7 +25,7 @@ export class UndockInitiator {
 
     constructor(element: Element, undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number) {
         if (!thresholdPixels) {
-            thresholdPixels = 5;
+            thresholdPixels = 7;
         }
 
         this.element = element as HTMLElement;

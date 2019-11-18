@@ -11,12 +11,10 @@ export declare class TabHandle {
     elementText: HTMLDivElement;
     elementCloseButton: HTMLDivElement;
     undockInitiator: UndockInitiator;
-    mouseClickHandler: EventHandler;
     mouseDownHandler: EventHandler;
     closeButtonHandler: EventHandler;
     auxClickHandler: EventHandler;
     contextMenuHandler: EventHandler;
-    moveThreshold: number;
     zIndexCounter: number;
     mouseMoveHandler: EventHandler;
     touchMoveHandler: EventHandler;
@@ -44,14 +42,12 @@ export declare class TabHandle {
     windowsContextMenuClose(e: Event): void;
     onMouseDown(e: any): void;
     onMouseUp(e: any): void;
-    generateMoveTabEvent(event: any, pos: any): void;
     moveTabEvent(that: any, state: any): void;
     onMouseMove(e: any): void;
     hideCloseButton(state: any): void;
     updateTitle(): void;
     destroy(): void;
     _performUndock(e: any, dragOffset: any): import("./Dialog.js").Dialog;
-    onMouseClicked(e: any): void;
     onCloseButtonClicked(e: any): void;
     setSelected(isSelected: boolean): void;
     setActive(isActive: boolean): void;

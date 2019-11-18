@@ -15,12 +15,10 @@ export class TabHandle {
     elementText: HTMLDivElement;
     elementCloseButton: HTMLDivElement;
     undockInitiator: UndockInitiator;
-    mouseClickHandler: EventHandler;
     mouseDownHandler: EventHandler;
     closeButtonHandler: EventHandler;
     auxClickHandler: EventHandler;
     contextMenuHandler: EventHandler;
-    moveThreshold: number;
     zIndexCounter: number;
     mouseMoveHandler: EventHandler;
     touchMoveHandler: EventHandler;
@@ -70,13 +68,11 @@ export class TabHandle {
 
         this.undockInitiator = new UndockInitiator(this.elementBase, undockHandler);
         this.undockInitiator.enabled = true;
-        this.mouseClickHandler = new EventHandler(this.elementBase, 'click', this.onMouseClicked.bind(this));
         this.mouseDownHandler = new EventHandler(this.elementBase, 'mousedown', this.onMouseDown.bind(this));
         this.closeButtonHandler = new EventHandler(this.elementCloseButton, 'mousedown', this.onCloseButtonClicked.bind(this));
         this.auxClickHandler = new EventHandler(this.elementBase, 'auxclick', this.onCloseButtonClicked.bind(this));
         this.contextMenuHandler = new EventHandler(this.elementBase, 'contextmenu', this.oncontextMenuClicked.bind(this));
 
-        this.moveThreshold = 3;
         this.zIndexCounter = 100;
     }
 
@@ -141,7 +137,7 @@ export class TabHandle {
         }
     }
 
-    closeContextMenu() {  
+    closeContextMenu() {
         if (this._ctxMenu) {
             document.body.removeChild(this._ctxMenu);
             delete this._ctxMenu;
@@ -160,6 +156,8 @@ export class TabHandle {
     }
 
     onMouseDown(e) {
+        this.parent.onSelected();
+
         if (this.mouseMoveHandler) {
             this.mouseMoveHandler.cancel();
             delete this.mouseMoveHandler;
@@ -177,8 +175,8 @@ export class TabHandle {
             delete this.touchUpHandler;
         }
         this.stargDragPosition = e.clientX;
-        this.mouseMoveHandler = new EventHandler(this.elementBase, 'mousemove', this.onMouseMove.bind(this));
-        this.touchMoveHandler = new EventHandler(this.elementBase, 'touchmove', this.onMouseMove.bind(this));
+        this.mouseMoveHandler = new EventHandler(window, 'mousemove', this.onMouseMove.bind(this));
+        this.touchMoveHandler = new EventHandler(window, 'touchmove', this.onMouseMove.bind(this));
         this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
         this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
     }
@@ -202,13 +200,6 @@ export class TabHandle {
         delete this.touchUpHandler;
     }
 
-    generateMoveTabEvent(event, pos) {
-        let contain = pos > event.rect.left && pos < event.rect.right;
-        let m = Math.abs(event.bound - pos);
-        if (m < this.moveThreshold && contain)
-            this.moveTabEvent(this, event.state);
-    }
-
     moveTabEvent(that, state) {
         that.eventListeners.forEach((listener) => {
             if (listener.onMoveTab) {
@@ -230,7 +221,8 @@ export class TabHandle {
             let event = this.direction < 0
                 ? { state: 'left', bound: tabRect.left, rect: tabRect }
                 : { state: 'right', bound: tabRect.right, rect: tabRect };
-            if (this.direction !== 0) this.generateMoveTabEvent(event, this.current);
+            if ((e.clientX < tabRect.left && this.direction < 0) || (e.clientX > tabRect.left + tabRect.width && this.direction > 0))
+                this.moveTabEvent(this, event.state);
         }
     }
 
@@ -250,7 +242,6 @@ export class TabHandle {
         let panel = this.parent.container as PanelContainer;
         panel.removeListener(this.undockListener);
 
-        this.mouseClickHandler.cancel();
         this.mouseDownHandler.cancel();
         this.closeButtonHandler.cancel();
         this.auxClickHandler.cancel();
@@ -281,19 +272,12 @@ export class TabHandle {
             return null;
     }
 
-    onMouseClicked(e) {
-        this.parent.onSelected();
-    }
-
     onCloseButtonClicked(e) {
         if (e.button !== 2) {
             // If the page contains a panel element, undock it and destroy it
             if (this.parent.container.containerType === 'panel') {
                 let panel = this.parent.container as PanelContainer;
                 panel.close();
-                // this.undockInitiator.enabled = false;
-                // let panel = this.parent.container;
-                // panel.performUndock();
             }
         }
     }
