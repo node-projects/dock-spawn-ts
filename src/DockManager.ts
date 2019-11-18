@@ -18,8 +18,6 @@ import { DockModel } from "./DockModel.js";
 import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
 import { DockConfig } from "./DockConfig.js";
 
-
-
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.
  * It owns a Html Div element inside which all panels are docked
@@ -609,6 +607,8 @@ export class DockManager {
     }
 
     notifyOnActivePanelChange(panel: PanelContainer) {
+        console.log("active:", panel);
+
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onActivePanelChange) {
                 listener.onActivePanelChange(this, panel);
@@ -710,8 +710,27 @@ export class DockManager {
     }
     set activePanel(value: PanelContainer) {
         if (value !== this._activePanel) {
+            if (this.activePanel) {
+                this.activePanel.elementTitle.classList.remove("dockspan-panel-active");
+                this.activePanel.elementTitleText.classList.remove("dockspan-panel-titlebar-text-active");
+                if (this.activePanel.tabPage) {
+                    this.activePanel.tabPage.host.setActive(false);
+                }
+            }
             this._activePanel = value;
             this.notifyOnActivePanelChange(value);
+            if (value) {
+                value.elementTitle.classList.add("dockspan-panel-active");
+                value.elementTitleText.classList.add("dockspan-panel-titlebar-text-active");
+                if (value.tabPage) {
+                    value.tabPage.host.setActive(true);
+                }
+            }
+        }
+        else {
+            if (value && value.tabPage) {
+                value.tabPage.host.setActive(true);
+            }
         }
     }
 }

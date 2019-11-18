@@ -20,6 +20,7 @@ export class Dialog {
     noDocking: boolean;
     isHidden: boolean;
     keyPressHandler: EventHandler;
+    focusHandler: EventHandler;
 
     constructor(panel: PanelContainer, dockManager: DockManager) {
         this.panel = panel;
@@ -52,6 +53,7 @@ export class Dialog {
         this.dockManager.config.dialogRootElement.appendChild(this.elementDialog);
         this.elementDialog.classList.add('dialog-floating');
 
+        this.focusHandler = new EventHandler(this.elementDialog, 'focus', this.onFocus.bind(this), true);
         this.mouseDownHandler = new EventHandler(this.elementDialog, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementDialog, 'touchstart', this.onMouseDown.bind(this));
         this.keyPressHandler = new EventHandler(this.elementDialog, 'keypress', this.dockManager.onKeyPressBound, true);
@@ -72,11 +74,20 @@ export class Dialog {
         return new Point(this.position ? this.position.x : 0, this.position ? this.position.y : 0);
     }
 
-    onMouseDown() {
+    onFocus() {
+        if (this.dockManager.activePanel != this.panel)
+            this.dockManager.activePanel = this.panel;
+    }
+
+    onMouseDown() { 
         this.bringToFront();
     }
 
     destroy() {
+        if (this.focusHandler) {
+            this.focusHandler.cancel();
+            delete this.focusHandler;
+        }
         if (this.mouseDownHandler) {
             this.mouseDownHandler.cancel();
             delete this.mouseDownHandler;

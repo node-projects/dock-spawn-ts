@@ -10,6 +10,7 @@ import { Point } from "./Point.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { PanelType } from "./enums/PanelType.js";
 import { Dialog } from "./Dialog.js";
+import { TabPage } from './TabPage.js';
 
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
@@ -42,6 +43,7 @@ export class PanelContainer implements IDockContainerWithSize {
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     panelType: PanelType;
+    tabPage?: TabPage;
 
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
         if (!title)

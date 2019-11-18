@@ -54,6 +54,7 @@ export declare class TabHandle {
     onMouseClicked(e: any): void;
     onCloseButtonClicked(e: any): void;
     setSelected(isSelected: boolean): void;
+    setActive(isActive: boolean): void;
     setZIndex(zIndex: number): void;
     _bringToFront(element: HTMLElement): void;
 }

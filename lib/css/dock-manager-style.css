@@ -126,13 +126,14 @@
 	color:#D5D5D5;
 	box-shadow: 0px 5px 20px #000;
 }
+
 .dockspan-tab-handle:hover {
     background-color: #006729;
 	color:#fff;
 }
 
 .dockspan-tab-handle-selected {
-    background-color: #008749;
+    background-color: #333;
 	color:#fff;
 }
 
@@ -156,5 +157,20 @@
 }
 
 .dockspan-tab-handle-content-seperator {
+	background-color:  #333;
+}
+
+.dockspan-tab-handle-content-seperator-active {
 	background-color: #008749;
+}
+
+.dockspan-tab-handle-active {
+	background-color: #008749;
+}
+
+.dockspan-panel-active {
+	background-color: #008749;
+}
+.dockspan-panel-titlebar-text-active {
+	color: white;
 }

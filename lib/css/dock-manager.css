@@ -306,8 +306,7 @@
 	vertical-align: top;
 }
 
-.dockspan-tab-handle-close-button {
-}
+.dockspan-tab-handle-close-button {}
 
 .dockspan-tab-handle-close-button::after {
 	margin-right: 5px;
@@ -335,6 +334,8 @@
 .dockspan-tab-handle-content-seperator {
 	height: 4px;
 }
+
+.dockspan-tab-handle-content-seperator-selected {}
 
 .dockspab-tab-handle-context-menu {
 	position: absolute;

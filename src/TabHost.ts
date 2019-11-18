@@ -5,6 +5,7 @@ import { TabHandle } from "./TabHandle.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { DockManager } from "./DockManager.js";
 import { PanelContainer } from "./PanelContainer.js";
+import { EventHandler } from './EventHandler.js';
 
 /**
  * Tab Host control contains tabs known as TabPages.
@@ -18,12 +19,13 @@ export class TabHost {
     tabListElement: HTMLDivElement;
     separatorElement: HTMLDivElement;
     contentElement: HTMLDivElement;
-    createTabPage: (tabHost: any, container: any) => any;
+    createTabPage: (tabHost: TabHost, container: IDockContainer) => any;
     tabHandleListener: { onMoveTab: (e: any) => void; };
     eventListeners: any[];
     pages: TabPage[];
     activeTab: TabPage;
-    _resizeRequested : boolean;
+    _resizeRequested: boolean;
+    mouseDownHandler: EventHandler;
 
     constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean) {
         /**
@@ -57,13 +59,11 @@ export class TabHost {
             this.hostElement.appendChild(this.contentElement);
             this.hostElement.appendChild(this.separatorElement);
             this.hostElement.appendChild(this.tabListElement);
-        }
-        else if (this.tabStripDirection === TabHostDirection.TOP) {
+        } else if (this.tabStripDirection === TabHostDirection.TOP) {
             this.hostElement.appendChild(this.tabListElement);
             this.hostElement.appendChild(this.separatorElement);
             this.hostElement.appendChild(this.contentElement);
-        }
-        else {
+        } else {
             throw new Error('Only top and bottom tab strip orientations are supported');
         }
 
@@ -71,10 +71,26 @@ export class TabHost {
         this.tabListElement.classList.add('dockspan-tab-handle-list-container');
         this.separatorElement.classList.add('dockspan-tab-handle-content-seperator');
         this.contentElement.classList.add('dockspan-tab-content');
+        this.contentElement.tabIndex = 0;
+        this.mouseDownHandler = new EventHandler(this.contentElement, 'mousedown', this.onMousedown.bind(this), {});
+    }
+
+    setActive(isActive: boolean) {
+        if (isActive) {
+            this.separatorElement.classList.add('dockspan-tab-handle-content-seperator-active');
+        } else {
+            this.separatorElement.classList.remove('dockspan-tab-handle-content-seperator-active');
+        }
+        if (this.activeTab)
+            this.activeTab.handle.setActive(isActive);
+    }
+
+    onMousedown() {
+        if (this.activeTab && this.dockManager.activePanel != this.activeTab.panel)
+            this.dockManager.activePanel = this.activeTab.panel;
     }
 
     onMoveTab(e) {
-        // this.tabListElement;
         let index = Array.prototype.slice.call(this.tabListElement.childNodes).indexOf(e.self.elementBase);
         this.change(this, /*handle*/e.self, e.state, index);
     }

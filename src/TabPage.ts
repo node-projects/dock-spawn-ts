@@ -4,7 +4,6 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { TabHost } from "./TabHost.js";
 
 export class TabPage {
-
     selected: boolean;
     host: TabHost;
     container: IDockContainer;
@@ -29,6 +28,8 @@ export class TabPage {
             this.panel = container;
             this.panel.onTitleChanged = this.onTitleChanged.bind(this);
         }
+
+        container.tabPage = this;
     }
 
     onTitleChanged(/*sender, title*/) {
@@ -42,6 +43,11 @@ export class TabPage {
             let panel = this.container;
             delete panel.onTitleChanged;
         }
+
+        if (this.host.dockManager.activePanel == this.panel)
+            this.host.dockManager.activePanel = null;
+
+        this.container.tabPage = null;
     }
 
     onSelected() {
@@ -50,7 +56,6 @@ export class TabPage {
             let panel = this.container;
             panel.dockManager.notifyOnTabChange(this);
         }
-
     }
 
     setSelected(flag: boolean) {

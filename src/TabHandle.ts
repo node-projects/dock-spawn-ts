@@ -10,7 +10,6 @@ import { DockNode } from "./DockNode.js";
  * A tab handle represents the tab button on the tab strip
  */
 export class TabHandle {
-
     parent: TabPage;
     elementBase: HTMLDivElement;
     elementText: HTMLDivElement;
@@ -142,13 +141,11 @@ export class TabHandle {
         }
     }
 
-    closeContextMenu() {
+    closeContextMenu() {  
         if (this._ctxMenu) {
-            if (this._ctxMenu) {
-                document.body.removeChild(this._ctxMenu);
-                delete this._ctxMenu;
-                window.removeEventListener('mouseup', this._windowsContextMenuCloseBound);
-            }
+            document.body.removeChild(this._ctxMenu);
+            delete this._ctxMenu;
+            window.removeEventListener('mouseup', this._windowsContextMenuCloseBound);
         }
     }
 
@@ -302,11 +299,21 @@ export class TabHandle {
     }
 
     setSelected(isSelected: boolean) {
-        let selectedClassName = 'dockspan-tab-handle-selected';
         if (isSelected)
-            this.elementBase.classList.add(selectedClassName);
-        else
-            this.elementBase.classList.remove(selectedClassName);
+            this.elementBase.classList.add('dockspan-tab-handle-selected');
+        else {
+            this.elementBase.classList.remove('dockspan-tab-handle-selected');
+            this.elementBase.classList.remove('dockspan-tab-handle-active');
+        }
+    }
+
+    setActive(isActive: boolean) {
+        if (this.elementBase) {
+            if (isActive)
+                this.elementBase.classList.add('dockspan-tab-handle-active');
+            else
+                this.elementBase.classList.remove('dockspan-tab-handle-active');
+        }
     }
 
     setZIndex(zIndex: number) {

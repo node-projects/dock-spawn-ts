@@ -20,12 +20,14 @@ export declare class Dialog {
     noDocking: boolean;
     isHidden: boolean;
     keyPressHandler: EventHandler;
+    focusHandler: EventHandler;
     constructor(panel: PanelContainer, dockManager: DockManager);
     saveState(x: number, y: number): void;
     static fromElement(id: string, dockManager: DockManager): Dialog;
     _initialize(): void;
     setPosition(x: number, y: number): void;
     getPosition(): Point;
+    onFocus(): void;
     onMouseDown(): void;
     destroy(): void;
     resize(width: number, height: number): void;
