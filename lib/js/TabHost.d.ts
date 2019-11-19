@@ -25,7 +25,9 @@ export declare class TabHost {
     activeTab: TabPage;
     _resizeRequested: boolean;
     mouseDownHandler: EventHandler;
+    focusHandler: EventHandler;
     constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean);
+    onFocus(): void;
     setActive(isActive: boolean): void;
     onMousedown(): void;
     onMoveTab(e: any): void;
