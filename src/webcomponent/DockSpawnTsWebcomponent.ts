@@ -6,7 +6,7 @@ import { DockNode } from "../DockNode.js";
 export class DockSpawnTsWebcomponent extends HTMLElement {
     public static cssRootDirectory = "../../lib/css/";
 
-    private dockManager: DockManager;
+    public dockManager: DockManager;
     private slotId: number = 0;
     private windowResizedBound;
     private slotElementMap: Map<HTMLSlotElement, HTMLElement>;
@@ -81,7 +81,6 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let slot = document.createElement('slot');
         let slotName = 'slot_' + this.slotId++;
         slot.name = slotName;
-        element.slot = slotName;
         let container = new PanelContainer(slot, this.dockManager, element.title);
 
         this.elementContainerMap.set(element, container);
@@ -114,6 +113,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         if ((<HTMLElement>element).style.display == 'none')
             (<HTMLElement>element).style.display = 'block';
         this.slotElementMap.set(slot, (<HTMLElement>element));
+        element.slot = slotName;
     }
 
     private handleRemovedChildNode(element: HTMLElement) {
