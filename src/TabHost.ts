@@ -258,7 +258,7 @@ export class TabHost {
 
         // adjust the zIndex of the tabs to have proper shadow/depth effect
         let zIndexDelta = 1;
-        let zIndex = DockManager.zIndexTabHost;
+        let zIndex = this.dockManager.zIndexTabHost;
         this.pages.forEach((tabPage) => {
             tabPage.handle.setZIndex(zIndex);
             let selected = (tabPage === page);
