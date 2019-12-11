@@ -138,12 +138,14 @@ export class DraggableContainer implements IDockContainer {
     }
 
     _startDragging(event: { clientX: number, clientY: number }) {
+        this.containerElement.classList.add("draggable-dragging-active");
         if (this.dialog.eventListener)
             this.dialog.eventListener._onDialogDragStarted(this.dialog, event);
         Utils.disableGlobalTextSelection(this.dockManager.config.dialogRootElement);
     }
 
     _stopDragging(event) {
+        this.containerElement.classList.remove("draggable-dragging-active");
         if (this.dialog.eventListener)
             this.dialog.eventListener._onDialogDragEnded(this.dialog, event);
         Utils.enableGlobalTextSelection(this.dockManager.config.dialogRootElement);

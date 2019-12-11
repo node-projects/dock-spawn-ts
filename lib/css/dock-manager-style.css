@@ -32,6 +32,12 @@
 	box-shadow: 5px 5px 20px #000;
 }
 
+/************ Dragging decorator ************/
+
+.draggable-dragging-active {
+	opacity: 0.95;
+}
+
 /************ Resize decorator ************/
 .resize-handle {
 }
