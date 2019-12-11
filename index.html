@@ -145,6 +145,13 @@ dockManager.initialize();
 			Existing elements in the DOM can be converted to <em>Dock Panels</em> which would enable them
 			to be docked on to the dock manager created above.   A dock panel wraps the provided content element
 			around a frame with a title bar and a close button.
+			<br><br>
+			You can also provide some options in a config object as a second parameter to the DockManager constructor.
+			<ul>
+				<li><b>escClosesWindow</b> - Escape Key closes Dialogs (default: true)</li>
+				<li><b>dialogRootElement</b> - Wich element should be used as root for dialogs (default: document.body)</li>
+				<li><b>moveOnlyWithinDockConatiner</b> - Move Dialogs only within DockSpawn root elment (default: false)</li>
+			</ul>
 			</p>
 			<p>
 			There are 2 different types for PanelContainer. "document" and "panel". 
@@ -194,7 +201,7 @@ dockManager.floatDialog(infovis, 50, 70);
 // Convert a div to the dock manager. Panels can then be docked on to it
 let divDockContainer = document.getElementById('dock_div');
 let divDockManager = document.getElementById('my_dock_manager');
-dockManager = new DockManager(divDockManager
+dockManager = new DockManager(divDockManager);
 dockManager.initialize();
 
 // Let the dock manager element fill in the entire screen
