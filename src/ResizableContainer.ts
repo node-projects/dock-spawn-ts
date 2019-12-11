@@ -136,7 +136,7 @@ export class ResizableContainer implements IDockContainer {
     removeDecorator() {
     }
 
-    onMouseMoved(handle, event: TouchEvent | MouseEvent) {
+    onMouseMoved(handle: ResizeHandle, event: TouchEvent | MouseEvent) {
         let touchOrMouseData: { clientX: number, clientY: number } = null;
         if ((<TouchEvent>event).changedTouches) {
             if ((<TouchEvent>event).changedTouches.length > 1)
@@ -153,8 +153,8 @@ export class ResizableContainer implements IDockContainer {
         if (this.dialog.panel)
             this.dockManager.suspendLayout(this.dialog.panel);
         let currentMousePosition = new Point(touchOrMouseData.clientX, touchOrMouseData.clientY);
-        let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
-        let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
+        let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, handle.west, handle.east);
+        let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, handle.north, handle.south);
         this._performDrag(handle, dx, dy);
         this.previousMousePosition = currentMousePosition;
         this.readyToProcessNextResize = true;

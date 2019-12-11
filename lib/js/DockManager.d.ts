@@ -37,8 +37,10 @@ export declare class DockManager {
     readonly config: DockConfig;
     initialize(): void;
     onKeyPress(e: KeyboardEvent): void;
-    checkXBounds(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point): number;
-    checkYBounds(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point): number;
+    checkXBounds(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeWest: boolean, resizeEast: boolean): number;
+    checkXBoundsWithinDockContainer(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeWest: boolean, resizeEast: boolean): number;
+    checkYBounds(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeNorth: boolean, resizeSouth: boolean): number;
+    checkYBoundsWithinDockContainer(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeNorth: boolean, resizeSouth: boolean): number;
     rebuildLayout(node: DockNode): void;
     invalidate(): void;
     resize(width: number, height: number): void;

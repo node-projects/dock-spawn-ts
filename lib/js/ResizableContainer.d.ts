@@ -36,7 +36,7 @@ export declare class ResizableContainer implements IDockContainer {
     performLayout(children: any): void;
     destroy(): void;
     removeDecorator(): void;
-    onMouseMoved(handle: any, event: TouchEvent | MouseEvent): void;
+    onMouseMoved(handle: ResizeHandle, event: TouchEvent | MouseEvent): void;
     onMouseDown(handle: any, event: TouchEvent | MouseEvent): void;
     onMouseUp(handle: any): void;
     _performDrag(handle: any, dx: number, dy: number): void;

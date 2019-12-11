@@ -24,7 +24,7 @@ export class DraggableContainer implements IDockContainer {
     touchMoveHandler: EventHandler;
     mouseUpHandler: EventHandler;
     touchUpHandler: EventHandler;
-
+   
     constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, dragHandle: HTMLElement) {
         this.dialog = dialog;
         this.delegate = delegate;
@@ -137,7 +137,7 @@ export class DraggableContainer implements IDockContainer {
         delete this.touchUpHandler;
     }
 
-    _startDragging(event) {
+    _startDragging(event: { clientX: number, clientY: number }) {
         if (this.dialog.eventListener)
             this.dialog.eventListener._onDialogDragStarted(this.dialog, event);
         Utils.disableGlobalTextSelection(this.dockManager.config.dialogRootElement);
@@ -181,8 +181,8 @@ export class DraggableContainer implements IDockContainer {
 
         let currentMousePosition = new Point(touchOrMouseData.clientX, touchOrMouseData.clientY);
 
-        let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
-        let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition);
+        let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, false, false);
+        let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, false, false);
         this._performDrag(dx, dy);
         this.previousMousePosition = currentMousePosition;
     }
