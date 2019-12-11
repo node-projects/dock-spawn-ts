@@ -119,7 +119,7 @@ export class DockManager {
     }
 
     checkXBoundsWithinDockContainer(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeWest: boolean, resizeEast: boolean) {
-        let dx = Math.floor(currentMousePosition.x - previousMousePosition.x);
+        let dx = currentMousePosition.x - previousMousePosition.x;
         let bbOuter = this.element.getBoundingClientRect();
         let bbInner = container.getBoundingClientRect();
         let leftBounds = dx < 0 && bbInner.left + dx < bbOuter.left && !resizeEast;
@@ -139,7 +139,7 @@ export class DockManager {
 
     checkYBounds(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeNorth: boolean, resizeSouth: boolean) {
         if (this._config.moveOnlyWithinDockConatiner)
-            return this.checkXBoundsWithinDockContainer(container, currentMousePosition, previousMousePosition, resizeNorth, resizeSouth);
+            return this.checkYBoundsWithinDockContainer(container, currentMousePosition, previousMousePosition, resizeNorth, resizeSouth);
 
         let dy = Math.floor(currentMousePosition.y - previousMousePosition.y);
         let topBounds = container.offsetTop + dy < 0;
@@ -158,7 +158,7 @@ export class DockManager {
     }
 
     checkYBoundsWithinDockContainer(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeNorth: boolean, resizeSouth: boolean) {
-        let dy = Math.floor(currentMousePosition.y - previousMousePosition.y);
+        let dy = currentMousePosition.y - previousMousePosition.y;
         let bbOuter = this.element.getBoundingClientRect();
         let bbInner = container.getBoundingClientRect();
         let topBounds = dy < 0 && bbInner.top + dy < bbOuter.top && !resizeSouth;
