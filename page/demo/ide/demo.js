@@ -4,6 +4,9 @@ import { PanelType } from "../../../lib/js/enums/PanelContainerType.js";
 
 let dockManager,
     storeKey = 'lastState';
+let infovis;
+let outlineNode;
+let solution;
 
 function refresh() {
     localStorage.setItem(storeKey, '');
@@ -87,7 +90,7 @@ window.onload = () => {
         // They can then be docked on to the dock manager
         // Panels get a titlebar and a close button, and can also be
         // converted to a floating dialog box which can be dragged / resized
-        let solution = new PanelContainer(document.getElementById("solution_window"), dockManager);
+        solution = new PanelContainer(document.getElementById("solution_window"), dockManager);
         let properties = new PanelContainer(document.getElementById("properties_window"), dockManager);
         let toolbox = new PanelContainer(document.getElementById("toolbox_window"), dockManager);
         let outline = new PanelContainer(document.getElementById("outline_window"), dockManager);
@@ -96,13 +99,13 @@ window.onload = () => {
         let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager, null, PanelType.document);
         let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager, null, PanelType.document);
         editor2.hideCloseButton(true);
-        let infovis = new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
+        infovis = new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
         infovis.width = 600;
         infovis.height = 400;
 
         // Dock the panels on the dock manager
         let documentNode = dockManager.context.model.documentManagerNode;
-        let outlineNode = dockManager.dockLeft(documentNode, outline, 0.15);
+        outlineNode = dockManager.dockLeft(documentNode, outline, 0.15);
         dockManager.dockFill(outlineNode, solution);
         dockManager.dockDown(outlineNode, properties, 0.6);
         let outputNode = dockManager.dockDown(documentNode, output, 0.2);
@@ -164,3 +167,15 @@ window.onload = () => {
 
     InitDebugTreeVis(window.dockManager);
 };
+
+function openDlg() {
+    dockManager.floatDialog(infovis, 50, 50);
+}
+//@ts-ignore
+window.openDlg = openDlg;
+
+function openSide() {
+    dockManager.dockFill(outlineNode, solution);
+}
+//@ts-ignore
+window.openSide = openSide;

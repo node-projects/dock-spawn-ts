@@ -338,8 +338,8 @@ export class PanelContainer implements IDockContainerWithSize {
     close() {
         if (this.isDialog) {
             if (this.floatingDialog) {
-                this.floatingDialog.hide();
-                this.floatingDialog.remove();
+                //this.floatingDialog.hide();
+                this.floatingDialog.close();
             }
         }
         else {
