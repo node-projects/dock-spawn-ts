@@ -34,7 +34,7 @@ export declare class DockManager {
     onKeyPressBound: any;
     private _config;
     constructor(element: HTMLElement, config?: DockConfig);
-    readonly config: DockConfig;
+    get config(): DockConfig;
     initialize(): void;
     onKeyPress(e: KeyboardEvent): void;
     checkXBounds(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeWest: boolean, resizeEast: boolean): number;
@@ -135,5 +135,6 @@ export declare class DockManager {
     updatePanels(ids: string[]): PanelContainer[];
     getVisiblePanels(): PanelContainer[];
     _allPanels(node: DockNode, panels: PanelContainer[]): void;
-    activePanel: PanelContainer;
+    get activePanel(): PanelContainer;
+    set activePanel(value: PanelContainer);
 }

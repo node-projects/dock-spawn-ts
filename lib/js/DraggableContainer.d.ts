@@ -27,9 +27,10 @@ export declare class DraggableContainer implements IDockContainer {
     saveState(state: IState): void;
     loadState(state: IState): void;
     setActiveChild(): void;
-    readonly width: number;
-    readonly height: number;
-    name: string;
+    get width(): number;
+    get height(): number;
+    get name(): string;
+    set name(value: string);
     resize(width: number, height: number): void;
     performLayout(children: IDockContainer[]): void;
     removeDecorator(): void;

@@ -19,7 +19,8 @@ export declare class DockWheel {
     _visible: boolean;
     constructor(dockManager: DockManager);
     /** The node over which the dock wheel is being displayed on */
-    activeNode: DockNode;
+    get activeNode(): DockNode;
+    set activeNode(value: DockNode);
     showWheel(): void;
     _setWheelButtonPosition(wheelId: WheelTypes, left: number, top: number): void;
     hideWheel(): void;

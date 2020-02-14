@@ -22,7 +22,8 @@ export declare class UndockInitiator {
     _undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog;
     touchDownUndockedHandler: EventHandler;
     constructor(element: Element, undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number);
-    enabled: boolean;
+    get enabled(): boolean;
+    set enabled(value: boolean);
     onMouseDown(e: any): void;
     onMouseUp(): void;
     onMouseMove(e: IMouseOrTouchEvent): void;

@@ -21,7 +21,7 @@
     "webpack-cli": "^3.3.9",
     "yarn": "^1.17.3"
   },
-  "main": "/dist/Exports.js",
+  "main": "./lib/js/index.js",
   "files": [
     "lib/**/*",
     "src/**/*"
