@@ -598,11 +598,12 @@ export class DockManager {
 
     notifyOnClosePanel(panel: PanelContainer) {
         this._checkShowBackgroundContext();
-        this.layoutEventListeners.forEach((listener) => {
-            if (listener.onClosePanel) {
-                listener.onClosePanel(this, panel);
+        for (const listener of this.layoutEventListeners) {
+            if (listener.onClosePanel?.(this, panel)) {
+                return true;
             }
-        });
+        }
+        return false;
     }
 
     notifyOnCreateDialog(dialog: Dialog) {

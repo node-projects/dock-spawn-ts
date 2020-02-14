@@ -9,7 +9,7 @@ export interface ILayoutEventListener {
     onDock?(dockManager: DockManager, dockNode: DockNode): void;
     onTabsReorder?(dockManager: DockManager, dockNode: DockNode): void;
     onUndock?(dockManager: DockManager, dockNode: DockNode): void;
-    onClosePanel?(dockManager: DockManager, panel: PanelContainer): void;
+    onClosePanel?(dockManager: DockManager, panel: PanelContainer): boolean | void;
     onCreateDialog?(dockManager: DockManager, dialog: Dialog): void;
     onHideDialog?(dockManager: DockManager, dialog: Dialog): void;
     onShowDialog?(dockManager: DockManager, dialog: Dialog): void;

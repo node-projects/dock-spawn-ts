@@ -337,6 +337,9 @@ export class PanelContainer implements IDockContainerWithSize {
     }
 
     close() {
+        if (this.dockManager.notifyOnClosePanel(this)) {
+            return;
+        }
         if (this.isDialog) {
             if (this.floatingDialog) {
                 //this.floatingDialog.hide();
@@ -346,6 +349,5 @@ export class PanelContainer implements IDockContainerWithSize {
         else {
             this.performClose();
         }
-        this.dockManager.notifyOnClosePanel(this);
     }
 }

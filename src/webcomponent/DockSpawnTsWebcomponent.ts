@@ -49,7 +49,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
             onClosePanel: (dockManager, dockNode) => {
                 let slot = dockNode.elementContent as any as HTMLSlotElement;
                 let element = this.slotElementMap.get(slot);
-                this.removeChild(element);
+                this.removeChild(element!);
                 this.slotElementMap.delete(slot);
             }
         });
