@@ -79,7 +79,7 @@ export class Dialog {
             this.dockManager.activePanel = this.panel;
     }
 
-    onMouseDown() { 
+    onMouseDown() {
         this.bringToFront();
     }
 
@@ -136,7 +136,7 @@ export class Dialog {
     close() {
         this.hide();
         this.remove();
-        this.dockManager.notifyOnClosePanel(this.panel);
+        // this.dockManager.notifyOnClosePanel(this.panel); // causes the event to be called twice when closing a panel, but closing the dialog directly will result in the event not being called at all
         this.destroy();
     }
 

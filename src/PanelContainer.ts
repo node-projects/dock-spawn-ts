@@ -68,7 +68,7 @@ export class PanelContainer implements IDockContainerWithSize {
 
     canUndock(state: boolean) {
         this._canUndock = state;
-        this.undockInitiator.enabled = state;
+        this.undockInitiator.enabled = state && !this.isDialog;
         this.eventListeners.forEach((listener) => {
             if (listener.onDockEnabled) {
                 listener.onDockEnabled({ self: this, state: state });
