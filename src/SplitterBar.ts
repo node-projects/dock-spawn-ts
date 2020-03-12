@@ -127,10 +127,12 @@ export class SplitterBar {
         this.touchMovedHandler = new EventHandler(window, 'touchmove', this.onMouseMoved.bind(this));
         this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
 
-        if (this.previousContainer.dockManager.iframes){
-            for (let f of this.previousContainer.dockManager.iframes){
-                this.iframeEventHandlers.push(new EventHandler(f, 'mouseup', this.onMouseUp.bind(this)));
-                this.iframeEventHandlers.push(new EventHandler(f, 'touchend', this.onMouseUp.bind(this)));
+        if (this.previousContainer.dockManager.iframes) {
+            for (let f of this.previousContainer.dockManager.iframes) {
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mousemove', this.onMouseMoved.bind(this)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mouseup', this.onMouseUp.bind(this)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchmove', this.onMouseMoved.bind(this)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchend', this.onMouseUp.bind(this)));
             }
         }
 
