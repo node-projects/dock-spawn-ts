@@ -26,6 +26,8 @@ export declare class FillDockContainer implements IDockContainerWithSize {
     destroy(): void;
     saveState(state: IState): void;
     loadState(state: IState): void;
-    width: number;
-    height: number;
+    get width(): number;
+    set width(value: number);
+    get height(): number;
+    set height(value: number);
 }

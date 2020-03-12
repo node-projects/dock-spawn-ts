@@ -28,9 +28,10 @@ export declare class ResizableContainer implements IDockContainer {
     _buildResizeHandle(east: boolean, west: boolean, north: boolean, south: boolean): void;
     saveState(state: IState): void;
     loadState(state: IState): void;
-    readonly width: number;
-    readonly height: number;
-    name: string;
+    get width(): number;
+    get height(): number;
+    get name(): string;
+    set name(value: string);
     resize(width: number, height: number): void;
     _adjustResizeHandles(width: number, height: number): void;
     performLayout(children: any): void;

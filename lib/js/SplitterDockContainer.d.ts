@@ -30,6 +30,6 @@ export declare abstract class SplitterDockContainer implements IDockContainerWit
     setRatios(ratios: number[]): void;
     saveState(state: IState): void;
     loadState(state: IState): void;
-    readonly width: number;
-    readonly height: number;
+    get width(): number;
+    get height(): number;
 }

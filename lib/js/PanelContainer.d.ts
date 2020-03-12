@@ -48,12 +48,13 @@ export declare class PanelContainer implements IDockContainerWithSize {
     canUndock(state: boolean): void;
     addListener(listener: any): void;
     removeListener(listener: any): void;
-    floatingDialog: Dialog;
+    get floatingDialog(): Dialog;
+    set floatingDialog(value: Dialog);
     static loadFromState(state: IState, dockManager: DockManager): PanelContainer;
     saveState(state: IState): void;
     loadState(state: IState): void;
     setActiveChild(): void;
-    readonly containerElement: HTMLDivElement;
+    get containerElement(): HTMLDivElement;
     _initialize(): void;
     onMouseDown(): void;
     hideCloseButton(state: boolean): void;
@@ -72,8 +73,10 @@ export declare class PanelContainer implements IDockContainerWithSize {
      */
     performUndock(): void;
     prepareForDocking(): void;
-    width: number;
-    height: number;
+    get width(): number;
+    set width(value: number);
+    get height(): number;
+    set height(value: number);
     resize(width: number, height: number): void;
     _setPanelDimensions(width: number, height: number): void;
     setTitle(title: string): void;
