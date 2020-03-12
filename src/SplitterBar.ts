@@ -13,7 +13,7 @@ export class SplitterBar {
     minPanelSize: number;
     readyToProcessNextDrag: boolean;
     dockSpawnResizedEvent: CustomEvent<{}>;
-    previousMouseEvent: IMouseOrTouchEvent;
+    previousMouseEvent: { x: number, y: number };
     mouseMovedHandler: EventHandler;
     mouseUpHandler: EventHandler;
     touchMovedHandler: EventHandler;
@@ -32,7 +32,7 @@ export class SplitterBar {
         this.touchDownHandler = new EventHandler(this.barElement, 'touchstart', this.onMouseDown.bind(this));
         this.minPanelSize = 50; // TODO: Get from container configuration
         this.readyToProcessNextDrag = true;
-        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed : true, bubbles : true });
+        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed: true, bubbles: true });
         this.iframeEventHandlers = [];
     }
 
@@ -49,22 +49,33 @@ export class SplitterBar {
         this._stopDragging();
     }
 
+    onMouseMovedIframe(e: IMouseOrTouchEvent, iframe: HTMLIFrameElement) {
+        if (e.changedTouches != null) {
+            e = e.changedTouches[0];
+        }
+        let posIf = iframe.getBoundingClientRect();
+        this.handleMoveEvent({ x: e.clientX + posIf.x, y: e.clientY + posIf.y });
+    }
+
     onMouseMoved(e: IMouseOrTouchEvent) {
+        if (e.changedTouches != null) {
+            e = e.changedTouches[0];
+        }
+        this.handleMoveEvent({ x: e.clientX, y: e.clientY });
+    }
+
+    handleMoveEvent(pos: { x: number, y: number }) {
         if (!this.readyToProcessNextDrag)
             return;
         this.readyToProcessNextDrag = false;
 
-        if (e.changedTouches != null) { // TouchMove Event
-            e = e.changedTouches[0];
-        }
-
         let dockManager = this.previousContainer.dockManager;
         dockManager.suspendLayout(this.previousContainer);
         dockManager.suspendLayout(this.nextContainer);
-        let dx = e.clientX - this.previousMouseEvent.clientX;
-        let dy = e.clientY - this.previousMouseEvent.clientY;
+        let dx = pos.x - this.previousMouseEvent.x;
+        let dy = pos.y - this.previousMouseEvent.y;
         this._performDrag(dx, dy);
-        this.previousMouseEvent = e;
+        this.previousMouseEvent = pos;
         this.readyToProcessNextDrag = true;
         dockManager.resumeLayout(this.previousContainer);
         dockManager.resumeLayout(this.nextContainer);
@@ -129,14 +140,15 @@ export class SplitterBar {
 
         if (this.previousContainer.dockManager.iframes) {
             for (let f of this.previousContainer.dockManager.iframes) {
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mousemove', this.onMouseMoved.bind(this)));
+                let mmi = this.onMouseMovedIframe.bind(this);
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mousemove', (e) => mmi(e, f)));
                 this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mouseup', this.onMouseUp.bind(this)));
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchmove', this.onMouseMoved.bind(this)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchmove', (e) => mmi(e, f)));
                 this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchend', this.onMouseUp.bind(this)));
             }
         }
 
-        this.previousMouseEvent = e;
+        this.previousMouseEvent = { x: e.clientX, y: e.clientY };
     }
 
     _stopDragging() {
@@ -157,7 +169,7 @@ export class SplitterBar {
             this.touchUpHandler.cancel();
             delete this.touchUpHandler;
         }
-        for (let e of this.iframeEventHandlers){
+        for (let e of this.iframeEventHandlers) {
             e.cancel();
         }
         this.iframeEventHandlers = [];
