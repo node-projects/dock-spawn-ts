@@ -18,6 +18,7 @@ export class SplitterBar {
     mouseUpHandler: EventHandler;
     touchMovedHandler: EventHandler;
     touchUpHandler: EventHandler;
+    private iframeEventHandlers: EventHandler[];
 
     constructor(previousContainer: IDockContainer, nextContainer: IDockContainer, stackedVertical: boolean) {
         // The panel to the left/top side of the bar, depending on the bar orientation
@@ -32,6 +33,7 @@ export class SplitterBar {
         this.minPanelSize = 50; // TODO: Get from container configuration
         this.readyToProcessNextDrag = true;
         this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed : true, bubbles : true });
+        this.iframeEventHandlers = [];
     }
 
     onMouseDown(e: IMouseOrTouchEvent) {
@@ -124,6 +126,14 @@ export class SplitterBar {
         this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
         this.touchMovedHandler = new EventHandler(window, 'touchmove', this.onMouseMoved.bind(this));
         this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
+
+        if (this.previousContainer.dockManager.iframes){
+            for (let f of this.previousContainer.dockManager.iframes){
+                this.iframeEventHandlers.push(new EventHandler(f, 'mouseup', this.onMouseUp.bind(this)));
+                this.iframeEventHandlers.push(new EventHandler(f, 'touchend', this.onMouseUp.bind(this)));
+            }
+        }
+
         this.previousMouseEvent = e;
     }
 
@@ -145,5 +155,9 @@ export class SplitterBar {
             this.touchUpHandler.cancel();
             delete this.touchUpHandler;
         }
+        for (let e of this.iframeEventHandlers){
+            e.cancel();
+        }
+        this.iframeEventHandlers = [];
     }
 }

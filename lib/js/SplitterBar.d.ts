@@ -16,6 +16,7 @@ export declare class SplitterBar {
     mouseUpHandler: EventHandler;
     touchMovedHandler: EventHandler;
     touchUpHandler: EventHandler;
+    private iframeEventHandlers;
     constructor(previousContainer: IDockContainer, nextContainer: IDockContainer, stackedVertical: boolean);
     onMouseDown(e: IMouseOrTouchEvent): void;
     onMouseUp(): void;

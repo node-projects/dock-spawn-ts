@@ -10,16 +10,16 @@
     "start": "http-server"
   },
   "devDependencies": {
-    "@babel/cli": "^7.6.2",
-    "@babel/core": "^7.6.2",
-    "@babel/preset-env": "^7.6.2",
-    "@types/node": "^12.7.8",
-    "http-server": "^0.11.1",
-    "typescript": "^3.6.3",
-    "uglify-js": "^3.6.0",
-    "webpack": "^4.41.0",
-    "webpack-cli": "^3.3.9",
-    "yarn": "^1.17.3"
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
+    "@types/node": "^13.9.0",
+    "http-server": "^0.12.1",
+    "typescript": "^3.8.3",
+    "uglify-js": "^3.8.0",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11",
+    "yarn": "^1.22.4"
   },
   "main": "/dist/Exports.js",
   "files": [

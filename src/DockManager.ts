@@ -24,23 +24,26 @@ import { DockConfig } from "./DockConfig.js";
  * Initially the document manager takes up the central space and acts as the root node
  */
 export class DockManager {
-    element: HTMLElement;
-    context: DockManagerContext;
-    dockWheel: DockWheel;
-    layoutEngine: DockLayoutEngine;
-    mouseMoveHandler: any;
-    touchMoveHandler: any;
-    layoutEventListeners: ILayoutEventListener[];
-    defaultDialogPosition: Point;
-    backgroundContext: HTMLElement;
-    _undockEnabled: boolean;
-    zIndexCounter: number;
-    zIndexTabHost: number;
-    zIndexTabHandle: number;
-    zIndexDialogCounter: number;
-    _activePanel: PanelContainer;
-    onKeyPressBound: any;
+
+    public element: HTMLElement;
+    public context: DockManagerContext;
+    public dockWheel: DockWheel;
+    public layoutEngine: DockLayoutEngine;
+    public mouseMoveHandler: EventHandler;
+    public touchMoveHandler: EventHandler;
+    public layoutEventListeners: ILayoutEventListener[];
+    public defaultDialogPosition: Point;
+    public backgroundContext: HTMLElement;
+    public zIndexCounter: number;
+    public zIndexTabHost: number;
+    public zIndexTabHandle: number;
+    public zIndexDialogCounter: number;
+    public onKeyPressBound: any;
+    public iframes: HTMLIFrameElement[];
+    public _undockEnabled: boolean;
+
     private _config: DockConfig;
+    private _activePanel: PanelContainer;
 
     constructor(element: HTMLElement, config?: DockConfig) {
         if (element === undefined)
