@@ -26,6 +26,7 @@ export class ResizableContainer implements IDockContainer {
     dockSpawnResizedEvent: CustomEvent<{}>;
     resizeHandles: ResizeHandle[];
     previousMousePosition: Point;
+    private iframeEventHandlers: EventHandler[];
 
     constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement) {
         this.dialog = dialog;
@@ -39,7 +40,8 @@ export class ResizableContainer implements IDockContainer {
         this.minimumAllowedChildNodes = delegate.minimumAllowedChildNodes;
         this._buildResizeHandles();
         this.readyToProcessNextResize = true;
-        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed : true, bubbles : true });
+        this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed: true, bubbles: true });
+        this.iframeEventHandlers = [];
     }
 
     setActiveChild(/*child*/) {
@@ -136,7 +138,12 @@ export class ResizableContainer implements IDockContainer {
     removeDecorator() {
     }
 
-    onMouseMoved(handle: ResizeHandle, event: TouchEvent | MouseEvent) {
+    onMouseMovedIframe(handle, e: MouseEvent, iframe: HTMLIFrameElement) {
+        let posIf = iframe.getBoundingClientRect();
+        this.onMouseMoved(handle, e, { x: posIf.x, y: posIf.y });
+    }
+
+    onMouseMoved(handle: ResizeHandle, event: TouchEvent | MouseEvent, iframeOffset?: { x: number, y: number }) {
         let touchOrMouseData: { clientX: number, clientY: number } = null;
         if ((<TouchEvent>event).changedTouches) {
             if ((<TouchEvent>event).changedTouches.length > 1)
@@ -153,6 +160,8 @@ export class ResizableContainer implements IDockContainer {
         if (this.dialog.panel)
             this.dockManager.suspendLayout(this.dialog.panel);
         let currentMousePosition = new Point(touchOrMouseData.clientX, touchOrMouseData.clientY);
+        if (iframeOffset)
+            currentMousePosition = new Point(touchOrMouseData.clientX + iframeOffset.x, touchOrMouseData.clientY + iframeOffset.y);
         let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, handle.west, handle.east);
         let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, handle.north, handle.south);
         this._performDrag(handle, dx, dy);
@@ -191,12 +200,26 @@ export class ResizableContainer implements IDockContainer {
             handle.touchUpHandler.cancel();
             delete handle.touchUpHandler;
         }
+        for (let e of this.iframeEventHandlers) {
+            e.cancel();
+        }
+        this.iframeEventHandlers = [];
 
         // Create the mouse event handlers
         handle.mouseMoveHandler = new EventHandler(window, 'mousemove', (e) => { this.onMouseMoved(handle, <MouseEvent>e); });
         handle.touchMoveHandler = new EventHandler(window, 'touchmove', (e) => { this.onMouseMoved(handle, <TouchEvent>e); });
         handle.mouseUpHandler = new EventHandler(window, 'mouseup', (e) => { this.onMouseUp(handle); });
         handle.touchUpHandler = new EventHandler(window, 'touchend', (e) => { this.onMouseUp(handle); });
+
+        if (this.dockManager.iframes) {
+            for (let f of this.dockManager.iframes) {
+                let mmi = this.onMouseMovedIframe.bind(this);
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mousemove', (e) => mmi(handle, e, f)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mouseup', (e) => this.onMouseUp(handle)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchmove', (e) => mmi(handle, e, f)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchend', (e) => this.onMouseUp(handle)));
+            }
+        }
 
         Utils.disableGlobalTextSelection(this.dockManager.config.dialogRootElement);
     }
@@ -210,6 +233,10 @@ export class ResizableContainer implements IDockContainer {
         delete handle.touchMoveHandler;
         delete handle.mouseUpHandler;
         delete handle.touchUpHandler;
+        for (let e of this.iframeEventHandlers) {
+            e.cancel();
+        }
+        this.iframeEventHandlers = [];
 
         Utils.enableGlobalTextSelection(this.dockManager.config.dialogRootElement);
     }

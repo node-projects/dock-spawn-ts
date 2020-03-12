@@ -22,6 +22,7 @@ export declare class ResizableContainer implements IDockContainer {
     dockSpawnResizedEvent: CustomEvent<{}>;
     resizeHandles: ResizeHandle[];
     previousMousePosition: Point;
+    private iframeEventHandlers;
     constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement);
     setActiveChild(): void;
     _buildResizeHandles(): void;
@@ -37,7 +38,11 @@ export declare class ResizableContainer implements IDockContainer {
     performLayout(children: any): void;
     destroy(): void;
     removeDecorator(): void;
-    onMouseMoved(handle: ResizeHandle, event: TouchEvent | MouseEvent): void;
+    onMouseMovedIframe(handle: any, e: MouseEvent, iframe: HTMLIFrameElement): void;
+    onMouseMoved(handle: ResizeHandle, event: TouchEvent | MouseEvent, iframeOffset?: {
+        x: number;
+        y: number;
+    }): void;
     onMouseDown(handle: any, event: TouchEvent | MouseEvent): void;
     onMouseUp(handle: any): void;
     _performDrag(handle: any, dx: number, dy: number): void;
