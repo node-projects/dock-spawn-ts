@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "2.42.0",
+  "version": "2.43.0",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -13,7 +13,7 @@
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
-    "@types/node": "^13.9.0",
+    "@types/node": "^13.9.2",
     "http-server": "^0.12.1",
     "typescript": "^3.8.3",
     "uglify-js": "^3.8.0",

@@ -82,7 +82,8 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let slotName = 'slot_' + this.slotId++;
         slot.name = slotName;
         let container = new PanelContainer(slot, this.dockManager, element.title);
-
+        element.slot = slotName;
+        this.slotElementMap.set(slot, (<HTMLElement>element));
         this.elementContainerMap.set(element, container);
 
         let dockRatio: number = 0.5;
@@ -112,8 +113,6 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
 
         if ((<HTMLElement>element).style.display == 'none')
             (<HTMLElement>element).style.display = 'block';
-        this.slotElementMap.set(slot, (<HTMLElement>element));
-        element.slot = slotName;
     }
 
     private handleRemovedChildNode(element: HTMLElement) {
