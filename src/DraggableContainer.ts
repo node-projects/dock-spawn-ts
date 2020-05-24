@@ -173,6 +173,8 @@ export class DraggableContainer implements IDockContainer {
     }
 
     onMouseMove(event: TouchEvent | MouseEvent, iframeOffset?: { x: number, y: number }) {
+        event.preventDefault();
+        
         let br = document.body.getBoundingClientRect();
 
         if ((<TouchEvent>event).touches != null) {
