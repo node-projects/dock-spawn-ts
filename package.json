@@ -18,8 +18,7 @@
     "typescript": "^3.9.3",
     "uglify-js": "^3.9.3",
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "yarn": "^1.22.4"
+    "webpack-cli": "^3.3.11"
   },
   "main": "/dist/Exports.js",
   "files": [

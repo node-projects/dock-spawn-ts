@@ -122,7 +122,7 @@ export class DraggableContainer implements IDockContainer {
         }
 
         this.mouseMoveHandler = new EventHandler(window, 'mousemove', this.onMouseMove.bind(this));
-        this.touchMoveHandler = new EventHandler(<Element>event.target, 'touchmove', this.onMouseMove.bind(this));
+        this.touchMoveHandler = new EventHandler(<Element>event.target, 'touchmove', this.onMouseMove.bind(this), { passive: false });
         this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
         this.touchUpHandler = new EventHandler(<Element>event.target, 'touchend', this.onMouseUp.bind(this));
 
@@ -174,7 +174,7 @@ export class DraggableContainer implements IDockContainer {
 
     onMouseMove(event: TouchEvent | MouseEvent, iframeOffset?: { x: number, y: number }) {
         event.preventDefault();
-        
+
         let br = document.body.getBoundingClientRect();
 
         if ((<TouchEvent>event).touches != null) {
