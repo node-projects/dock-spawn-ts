@@ -93,6 +93,8 @@ export class DraggableContainer implements IDockContainer {
     }
 
     onMouseDown(event: TouchEvent | MouseEvent) {
+        event.preventDefault();
+        
         let touchOrMouseData: { clientX: number, clientY: number } = null;
         if ((<TouchEvent>event).touches) {
             if ((<TouchEvent>event).touches.length > 1)

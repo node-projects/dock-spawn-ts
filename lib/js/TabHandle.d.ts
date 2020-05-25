@@ -12,6 +12,7 @@ export declare class TabHandle {
     elementCloseButton: HTMLDivElement;
     undockInitiator: UndockInitiator;
     mouseDownHandler: EventHandler;
+    touchDownHandler: EventHandler;
     closeButtonHandler: EventHandler;
     auxClickHandler: EventHandler;
     contextMenuHandler: EventHandler;

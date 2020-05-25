@@ -50,7 +50,7 @@ export class UndockInitiator {
             }
 
             this.mouseDownHandler = new EventHandler(this.element, 'mousedown', this.onMouseDown.bind(this));
-            this.touchDownHandler = new EventHandler(this.element, 'touchstart', this.onMouseDown.bind(this));
+            this.touchDownHandler = new EventHandler(this.element, 'touchstart', this.onMouseDown.bind(this), { passive: false });
         }
         else {
             if (this.mouseDownHandler) {
@@ -85,7 +85,9 @@ export class UndockInitiator {
         }
     }
 
-    onMouseDown(e: any) {
+    onMouseDown(e) {
+        e.preventDefault();
+
         // Make sure we dont do this on floating dialogs
         if (this.enabled) {
             if (e.touches) {

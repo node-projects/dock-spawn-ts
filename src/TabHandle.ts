@@ -16,6 +16,7 @@ export class TabHandle {
     elementCloseButton: HTMLDivElement;
     undockInitiator: UndockInitiator;
     mouseDownHandler: EventHandler;
+    touchDownHandler: EventHandler;
     closeButtonHandler: EventHandler;
     auxClickHandler: EventHandler;
     contextMenuHandler: EventHandler;
@@ -34,7 +35,7 @@ export class TabHandle {
     direction: number;
     _ctxMenu: HTMLDivElement;
     _windowsContextMenuCloseBound: any;
-
+    
     constructor(parent: TabPage) {
         this.parent = parent;
         let undockHandler = this._performUndock.bind(this);
@@ -69,6 +70,7 @@ export class TabHandle {
         this.undockInitiator = new UndockInitiator(this.elementBase, undockHandler);
         this.undockInitiator.enabled = true;
         this.mouseDownHandler = new EventHandler(this.elementBase, 'mousedown', this.onMouseDown.bind(this));
+        this.touchDownHandler = new EventHandler(this.elementBase, 'touchstart', this.onMouseDown.bind(this), { passive: false });
         this.closeButtonHandler = new EventHandler(this.elementCloseButton, 'mousedown', this.onCloseButtonClicked.bind(this));
         this.auxClickHandler = new EventHandler(this.elementBase, 'auxclick', this.onCloseButtonClicked.bind(this));
         this.contextMenuHandler = new EventHandler(this.elementBase, 'contextmenu', this.oncontextMenuClicked.bind(this));
@@ -156,6 +158,8 @@ export class TabHandle {
     }
 
     onMouseDown(e) {
+        e.preventDefault();
+
         this.parent.onSelected();
 
         if (this.mouseMoveHandler) {
@@ -176,7 +180,7 @@ export class TabHandle {
         }
         this.stargDragPosition = e.clientX;
         this.mouseMoveHandler = new EventHandler(window, 'mousemove', this.onMouseMove.bind(this));
-        this.touchMoveHandler = new EventHandler(window, 'touchmove', this.onMouseMove.bind(this));
+        this.touchMoveHandler = new EventHandler(window, 'touchmove', this.onMouseMove.bind(this), { passive: false });
         this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
         this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
     }
@@ -209,6 +213,8 @@ export class TabHandle {
     }
 
     onMouseMove(e) {
+        e.preventDefault();
+
         if (Math.abs(this.stargDragPosition - e.clientX) < 10)
             return;
         if (this.elementBase != null) { //Todo: because of this is null, we need to drag 2 times, needs fix
@@ -243,6 +249,7 @@ export class TabHandle {
         panel.removeListener(this.undockListener);
 
         this.mouseDownHandler.cancel();
+        this.touchDownHandler.cancel();
         this.closeButtonHandler.cancel();
         this.auxClickHandler.cancel();
 
