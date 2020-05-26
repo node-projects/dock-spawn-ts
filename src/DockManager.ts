@@ -672,10 +672,10 @@ export class DockManager {
         });
     }
 
-    notifyOnActivePanelChange(panel: PanelContainer) {
+    notifyOnActivePanelChange(panel: PanelContainer, oldActive: PanelContainer) {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onActivePanelChange) {
-                listener.onActivePanelChange(this, panel);
+                listener.onActivePanelChange(this, panel, oldActive);
             }
         });
     }
@@ -774,6 +774,7 @@ export class DockManager {
     }
     set activePanel(value: PanelContainer) {
         if (value !== this._activePanel) {
+            let oldActive = this.activePanel; 
             if (this.activePanel) {
                 this.activePanel.elementTitle.classList.remove("dockspan-panel-active");
                 this.activePanel.elementTitleText.classList.remove("dockspan-panel-titlebar-text-active");
@@ -782,7 +783,7 @@ export class DockManager {
                 }
             }
             this._activePanel = value;
-            this.notifyOnActivePanelChange(value);
+            this.notifyOnActivePanelChange(value, oldActive);
             if (value) {
                 value.elementTitle.classList.add("dockspan-panel-active");
                 value.elementTitleText.classList.add("dockspan-panel-titlebar-text-active");
