@@ -1,6 +1,6 @@
 import { DockManager } from "../../../lib/js/DockManager.js";
 import { PanelContainer } from "../../../lib/js/PanelContainer.js";
-import { PanelType } from "../../../lib/js/enums/PanelContainerType.js";
+import { PanelType } from "../../../lib/js/enums/PanelType.js";
 
 let dockManager,
     storeKey = 'lastState';
@@ -96,9 +96,9 @@ window.onload = () => {
         let outline = new PanelContainer(document.getElementById("outline_window"), dockManager);
         let problems = new PanelContainer(document.getElementById("problems_window"), dockManager);
         let output = new PanelContainer(document.getElementById("output_window"), dockManager);
-        let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager, null, PanelType.document);
-        let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager, null, PanelType.document);
-        editor2.hideCloseButton(true);
+        let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager, null, PanelType.document, false);
+        let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager, null, PanelType.document, true);
+        //editor2.hideCloseButton(true);
         infovis = new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
         infovis.width = 600;
         infovis.height = 400;

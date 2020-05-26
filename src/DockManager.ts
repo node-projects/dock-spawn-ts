@@ -522,6 +522,21 @@ export class DockManager {
         return node;
     }
 
+    getNodeByElementId(id: string): DockNode {
+        let stack = [];
+        stack.push(this.context.model.rootNode);
+
+        while (stack.length > 0) {
+            let topNode = stack.pop();
+
+            if (topNode.container instanceof PanelContainer && topNode.container.elementContent.id === id)
+                return topNode;
+            [].push.apply(stack, topNode.children);
+        }
+
+        return null;
+    }
+
     /** Finds the node that owns the specified [container] */
     private _findNodeFromContainer(container: IDockContainer): DockNode {
         let stack = [];
