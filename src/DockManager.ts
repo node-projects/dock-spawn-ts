@@ -17,6 +17,7 @@ import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { DockModel } from "./DockModel.js";
 import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
 import { DockConfig } from "./DockConfig.js";
+import { PanelType } from "./enums/PanelType.js";
 
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.
@@ -44,6 +45,7 @@ export class DockManager {
 
     private _config: DockConfig;
     private _activePanel: PanelContainer;
+    private _activeDocument: PanelContainer;
 
     constructor(element: HTMLElement, config?: DockConfig) {
         if (element === undefined)
@@ -769,6 +771,10 @@ export class DockManager {
         }
     }
 
+    get activeDocument(): PanelContainer {
+        return this._activeDocument;
+    }
+
     get activePanel(): PanelContainer {
         return this._activePanel;
     }
@@ -783,6 +789,9 @@ export class DockManager {
                 }
             }
             this._activePanel = value;
+            if (value.panelType == PanelType.document) {
+                this._activeDocument = value;
+            }
             this.notifyOnActivePanelChange(value, oldActive);
             if (value) {
                 value.elementTitle.classList.add("dockspan-panel-active");

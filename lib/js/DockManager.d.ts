@@ -35,6 +35,7 @@ export declare class DockManager {
     _undockEnabled: boolean;
     private _config;
     private _activePanel;
+    private _activeDocument;
     constructor(element: HTMLElement, config?: DockConfig);
     get config(): DockConfig;
     initialize(): void;
@@ -138,6 +139,7 @@ export declare class DockManager {
     updatePanels(ids: string[]): PanelContainer[];
     getVisiblePanels(): PanelContainer[];
     _allPanels(node: DockNode, panels: PanelContainer[]): void;
+    get activeDocument(): PanelContainer;
     get activePanel(): PanelContainer;
     set activePanel(value: PanelContainer);
 }
