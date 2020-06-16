@@ -35,6 +35,7 @@ export class PanelContainer implements IDockContainerWithSize {
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
     closeButtonClickedHandler: EventHandler;
+    closeButtonTouchedHandler: EventHandler;
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     panelType: PanelType;
@@ -161,6 +162,8 @@ export class PanelContainer implements IDockContainerWithSize {
         if (!this._hideCloseButton) {
             this.closeButtonClickedHandler =
                 new EventHandler(this.elementButtonClose, 'click', this.onCloseButtonClicked.bind(this));
+            this.closeButtonTouchedHandler =
+                new EventHandler(this.elementButtonClose, 'touchstart', this.onCloseButtonClicked.bind(this));
         }
 
         Utils.removeNode(this.elementContent);
@@ -210,6 +213,10 @@ export class PanelContainer implements IDockContainerWithSize {
         if (this.closeButtonClickedHandler) {
             this.closeButtonClickedHandler.cancel();
             delete this.closeButtonClickedHandler;
+        }
+        if (this.closeButtonTouchedHandler) {
+            this.closeButtonTouchedHandler.cancel();
+            delete this.closeButtonTouchedHandler;
         }
     }
 

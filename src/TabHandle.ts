@@ -18,6 +18,7 @@ export class TabHandle {
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     closeButtonHandler: EventHandler;
+    closeButtonTouchHandler: EventHandler;
     auxClickHandler: EventHandler;
     contextMenuHandler: EventHandler;
     zIndexCounter: number;
@@ -71,7 +72,8 @@ export class TabHandle {
         this.undockInitiator.enabled = true;
         this.mouseDownHandler = new EventHandler(this.elementBase, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementBase, 'touchstart', this.onMouseDown.bind(this), { passive: false });
-        this.closeButtonHandler = new EventHandler(this.elementCloseButton, 'mousedown', this.onCloseButtonClicked.bind(this));
+        this.closeButtonHandler = new EventHandler(this.elementCloseButton, 'click', this.onCloseButtonClicked.bind(this));
+        this.closeButtonTouchHandler = new EventHandler(this.elementCloseButton, 'touchstart', this.onCloseButtonClicked.bind(this));
         this.auxClickHandler = new EventHandler(this.elementBase, 'auxclick', this.onCloseButtonClicked.bind(this));
         this.contextMenuHandler = new EventHandler(this.elementBase, 'contextmenu', this.oncontextMenuClicked.bind(this));
 
@@ -251,6 +253,7 @@ export class TabHandle {
         this.mouseDownHandler.cancel();
         this.touchDownHandler.cancel();
         this.closeButtonHandler.cancel();
+        this.closeButtonTouchHandler.cancel();
         this.auxClickHandler.cancel();
 
         if (this.mouseUpHandler) {

@@ -14,6 +14,7 @@ export declare class TabHandle {
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     closeButtonHandler: EventHandler;
+    closeButtonTouchHandler: EventHandler;
     auxClickHandler: EventHandler;
     contextMenuHandler: EventHandler;
     zIndexCounter: number;

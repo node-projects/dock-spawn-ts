@@ -35,6 +35,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
     closeButtonClickedHandler: EventHandler;
+    closeButtonTouchedHandler: EventHandler;
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
     panelType: PanelType;
