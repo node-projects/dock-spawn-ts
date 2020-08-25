@@ -283,11 +283,14 @@ export class TabHandle {
     }
 
     onCloseButtonClicked(e) {
-        if (e.button !== 2) {
-            // If the page contains a panel element, undock it and destroy it
-            if (this.parent.container.containerType === 'panel') {
-                let panel = this.parent.container as PanelContainer;
-                panel.close();
+        if (this.elementCloseButton.style.display !== 'none')
+        {
+            if (e.button !== 2) {
+                // If the page contains a panel element, undock it and destroy it
+                if (this.parent.container.containerType === 'panel') {
+                    let panel = this.parent.container as PanelContainer;
+                    panel.close();
+                }
             }
         }
     }

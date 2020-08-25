@@ -329,10 +329,20 @@
 .dockspan-tab-handle-list-container {
 	height: 22px;
 	overflow: hidden;
+	display: none;
+}
+
+.dockspan-tab-handle-list-container-visible {
+	display: flex;
 }
 
 .dockspan-tab-handle-content-seperator {
 	height: 4px;
+	display: none;
+}
+
+.dockspan-tab-handle-content-seperator-visible {
+	display: block;
 }
 
 .dockspan-tab-handle-content-seperator-selected {}

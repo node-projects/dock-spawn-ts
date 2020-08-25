@@ -92,10 +92,12 @@ export class DockManager {
     }
 
     onKeyPress(e: KeyboardEvent) {
-        if (this._config.escClosesWindow && e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
-            let panel = this.activePanel;
-            this.activePanel = null;
-            panel.close();
+        if (e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
+            if ((this.activePanel.isDialog && this._config.escClosesDialog) || (!this.activePanel.isDialog && this._config.escClosesWindow)) {
+                let panel = this.activePanel;
+                this.activePanel = null;
+                panel.close();
+            }
         }
     }
 
@@ -780,7 +782,7 @@ export class DockManager {
     }
     set activePanel(value: PanelContainer) {
         if (value !== this._activePanel) {
-            let oldActive = this.activePanel; 
+            let oldActive = this.activePanel;
             if (this.activePanel) {
                 this.activePanel.elementTitle.classList.remove("dockspan-panel-active");
                 this.activePanel.elementTitleText.classList.remove("dockspan-panel-titlebar-text-active");

@@ -245,8 +245,13 @@ export class TabHost {
     }
 
     _setTabHandlesVisible(visible: boolean) {
-        this.tabListElement.style.display = visible ? 'flex' : 'none';
-        this.separatorElement.style.display = visible ? 'block' : 'none';
+        if (visible) {
+            this.tabListElement.classList.add('dockspan-tab-handle-list-container-visible');
+            this.separatorElement.classList.add('dockspan-tab-handle-content-seperator-visible');
+        } else {
+            this.tabListElement.classList.remove('dockspan-tab-handle-list-container-visible');
+            this.separatorElement.classList.remove('dockspan-tab-handle-content-seperator-visible');
+        }
     }
 
     onTabPageSelected(page: TabPage) {
