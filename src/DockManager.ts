@@ -629,6 +629,10 @@ export class DockManager {
                 listener.onClosePanel(this, panel);
             }
         });
+        if (this.activePanel == panel)
+            this.activePanel = null;
+        if (this._activeDocument == panel)
+            this._activeDocument = null;
     }
 
     notifyOnCreateDialog(dialog: Dialog) {
