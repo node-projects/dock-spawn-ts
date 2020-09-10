@@ -484,6 +484,8 @@ export class DockManager {
         this.layoutEngine.close(node);
         if (this.activePanel == container)
             this.activePanel = null;
+        if (this._activeDocument == container)
+            this._activeDocument = null;
     }
 
     /**
