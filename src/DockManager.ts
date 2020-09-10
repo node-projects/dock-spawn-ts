@@ -482,6 +482,8 @@ export class DockManager {
     requestClose(container: PanelContainer) {
         let node = this._findNodeFromContainer(container);
         this.layoutEngine.close(node);
+        if (this.activePanel == container)
+            this.activePanel = null;
     }
 
     /**
