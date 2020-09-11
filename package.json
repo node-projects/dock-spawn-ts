@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "2.53.0",
+  "version": "2.54.0",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -20,7 +20,7 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
   },
-  "main": "/dist/Exports.js",
+  "main": "/lib/js/Exports.js",
   "files": [
     "lib/**/*",
     "src/**/*"
