@@ -45,6 +45,8 @@ export class DockManager {
 
     private _config: DockConfig;
     private _activePanel: PanelContainer;
+    private _lastPanelNotADialog: PanelContainer;
+
     private _activeDocument: PanelContainer;
 
     constructor(element: HTMLElement, config?: DockConfig) {
@@ -790,6 +792,8 @@ export class DockManager {
     }
     set activePanel(value: PanelContainer) {
         if (value !== this._activePanel) {
+            if (value && !value.isDialog) //todo store compliete list of panels, remove the closed ones and switch back focus
+                this._lastPanelNotADialog = value;
             let oldActive = this.activePanel;
             if (this.activePanel) {
                 this.activePanel.elementTitle.classList.remove("dockspan-panel-active");
@@ -809,6 +813,9 @@ export class DockManager {
                 if (value.tabPage) {
                     value.tabPage.host.setActive(true);
                 }
+            }
+            if (oldActive && oldActive.isDialog && value == null && this._lastPanelNotADialog && this.activePanel != this._lastPanelNotADialog) {
+                this.activePanel = this._lastPanelNotADialog;
             }
         }
         else {

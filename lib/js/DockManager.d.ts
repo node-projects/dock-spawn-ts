@@ -35,6 +35,7 @@ export declare class DockManager {
     _undockEnabled: boolean;
     private _config;
     private _activePanel;
+    private _lastPanelNotADialog;
     private _activeDocument;
     constructor(element: HTMLElement, config?: DockConfig);
     get config(): DockConfig;
