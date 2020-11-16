@@ -221,7 +221,7 @@ let solution = new PanelContainer(document.getElementById("solution_window"), do
 let properties = new PanelContainer(document.getElementById("properties_window"), dockManager);
 let toolbox = new PanelContainer(document.getElementById("toolbox_window"), dockManager);
 let outline = new PanelContainer(document.getElementById("outline_window"), dockManager);
-let problems = new PanelContainer(document.getElementById("problems_window"), dockManager);
+let state = new PanelContainer(document.getElementById("state_window"), dockManager);
 let output = new PanelContainer(document.getElementById("output_window"), dockManager);
 let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager, null, PanelType.document);
 let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager, null, PanelType.document);
@@ -236,7 +236,7 @@ let outlineNode = dockManager.dockLeft(documentNode, outline, 0.15);
 dockManager.dockFill(outlineNode, solution);
 dockManager.dockDown(outlineNode, properties, 0.6);
 let outputNode = dockManager.dockDown(documentNode, output, 0.2);
-dockManager.dockRight(outputNode, problems, 0.40);
+dockManager.dockRight(outputNode, state, 0.40);
 dockManager.dockRight(documentNode, toolbox, 0.20);
 dockManager.dockFill(documentNode, editor1);
 dockManager.dockFill(documentNode, editor2);

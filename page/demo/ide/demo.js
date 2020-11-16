@@ -7,6 +7,7 @@ let dockManager,
 let infovis;
 let outlineNode;
 let solution;
+let editorOutput;
 
 function refresh() {
     localStorage.setItem(storeKey, '');
@@ -26,9 +27,15 @@ window.onload = () => {
     dockManager.initialize();
 
     let lastState = localStorage.getItem(storeKey);
-    if (lastState) {
+    if (lastState && lastState.length > 0) {
         dockManager.loadState(lastState);
     }
+
+    // Output Window
+    editorOutput = CodeMirror(document.getElementById("output_window"), {
+        value: ""
+    });
+
 
     // Let the dock manager element fill in the entire screen
     window.onresize = () => {
@@ -39,49 +46,61 @@ window.onload = () => {
     };
     window.onresize(null);
 
+
+
     dockManager.addLayoutListener({
         onDock: (dockManager, dockNode) => {
-            console.log('onDock: ', dockManager, dockNode);
+            logOutput('onDock(dockNode:' + dockNode?.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
         onUndock: (dockManager, dockNode) => {
-            console.log('onUndock: ', dockManager, dockNode);
+            logOutput('onUndock(dockNode:' + dockNode?.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
         onCreateDialog: (dockManager, dialog) => {
-            console.log('onCreateDialog: ', dockManager, dialog);
+            logOutput('onCreateDialog(dialog:' + dialog.panel.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
         onChangeDialogPosition: (dockManager, dialog, x, y) => {
-            console.log('onCreateDialog: ', dockManager, dialog, x, y);
+            logOutput('onChangeDialogPosition(dialog:' + dialog.panel.title + ', x:' + x + ', y:' + y + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
         onResumeLayout: (dockManager, panel) => {
-            console.log('onResumeLayout: ', dockManager);
+            logOutput('onResumeLayout(panel:' + panel?.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
         onClosePanel: (dockManager, panel) => {
-            console.log('onClosePanel: ', dockManager, panel);
+            logOutput('onClosePanel(panel:' + panel?.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
         onHideDialog: (dockManager, dialog) => {
-            console.log('onHideDialog: ', dockManager, dialog);
+            logOutput('onHideDialog(dialog:' + dialog.panel.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
         onShowDialog: (dockManager, dialog) => {
-            console.log('onShowDialog: ', dockManager, dialog);
+            logOutput('onShowDialog(dialog:' + dialog.panel.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
         onTabsReorder: (dockManager, dialog) => {
-            console.log('onTabsReorder: ', dockManager, dialog);
+            logOutput('onTabsReorder(dialog:' + dialog.panel.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
         },
-        onActivePanelChange: (dockManger, panel) => {
-            console.log('onActivePanelChange: ', dockManager, panel);
+        onActivePanelChange: (dockManger, panel, previousPanel) => {
+            logOutput('onActivePanelChange(previousPanel:' + previousPanel?.title + ', panel:' + panel?.title + ')');
             if (panel && panel.panelType == PanelType.document && panel.elementContent.editor) {
                 // CodeMirror needs refresh wehn loaded into invisible div
                 panel.elementContent.editor.refresh()
             }
+            updateState();
         }
     });
 
@@ -94,7 +113,7 @@ window.onload = () => {
         let properties = new PanelContainer(document.getElementById("properties_window"), dockManager);
         let toolbox = new PanelContainer(document.getElementById("toolbox_window"), dockManager);
         let outline = new PanelContainer(document.getElementById("outline_window"), dockManager);
-        let problems = new PanelContainer(document.getElementById("problems_window"), dockManager);
+        let state = new PanelContainer(document.getElementById("state_window"), dockManager);
         let output = new PanelContainer(document.getElementById("output_window"), dockManager);
         let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager, null, PanelType.document, false);
         let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager, null, PanelType.document, true);
@@ -109,7 +128,7 @@ window.onload = () => {
         dockManager.dockFill(outlineNode, solution);
         dockManager.dockDown(outlineNode, properties, 0.6);
         let outputNode = dockManager.dockDown(documentNode, output, 0.2);
-        dockManager.dockRight(outputNode, problems, 0.40);
+        dockManager.dockRight(outputNode, state, 0.40);
         dockManager.dockRight(documentNode, toolbox, 0.20);
         dockManager.dockFill(documentNode, editor1);
         dockManager.dockFill(documentNode, editor2);
@@ -158,14 +177,11 @@ window.onload = () => {
     });
     editor2_window_div.editor = editor2;
 
-    // Output Window
-    var editorOutput = CodeMirror(document.getElementById("output_window"), {
-        value: "[info] program exited with code 0"
-    });
-
     ////////////////////////////////////////////////////////////////
 
     InitDebugTreeVis(window.dockManager);
+
+    updateState();
 };
 
 function openDlg() {
@@ -177,5 +193,20 @@ window.openDlg = openDlg;
 function openSide() {
     dockManager.dockFill(outlineNode, solution);
 }
+
+function logOutput(msg) {
+    editorOutput.setValue(editorOutput.getValue() + "\n" + msg);
+    editorOutput.setCursor(editorOutput.lineCount(), 0);
+}
+
+function updateState() {
+    let pblmWnd = document.getElementById("state_window");
+    if (pblmWnd) {
+        let html = 'Active Document : ' + dockManager.activeDocument?.title + '<br/>';
+        html += 'Active Panel : ' + dockManager.activePanel?.title + '<br/>';
+        pblmWnd.innerHTML = html;
+    }
+}
+
 //@ts-ignore
 window.openSide = openSide;

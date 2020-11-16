@@ -44,7 +44,7 @@ Usage Example is in page/demo/demo_simple_es5.html
     <div id="my_dock_manager" class="my-dock-manager" style="position: relative;"></div>
     <div id="solution_window" data-panel-caption="Solution Explorer" data-panel-icon="test.png" class="solution-window" hidden></div>
     <div id="properties_window" data-panel-caption="Properties" class="properties-window" hidden></div>
-    <div id="problems_window" data-panel-caption="Problems" class="problems-window" hidden></div>
+    <div id="state_window" data-panel-caption="state" class="state-window" hidden></div>
     <div id="editor1_window" data-panel-caption="Steering.h" class="editor1-window editor-host" hidden></div>
     <div id="editor2_window" data-panel-caption="Steering.cpp" class="editor2-window editor-host" hidden></div>
     <div id="infovis" data-panel-caption="Dock Tree Visualizer" class="editor2-window editor-host" hidden></div>
@@ -82,7 +82,7 @@ Usage Example is in page/demo/demo_simple_es5.html
     let properties = new PanelContainer(document.getElementById("#properties_window"), dockManager);
     let toolbox = new PanelContainer(document.getElementById("#toolbox_window"), dockManager);
     let outline = new PanelContainer(document.getElementById("#outline_window"), dockManager);
-    let problems = new PanelContainer(document.getElementById("#problems_window"), dockManager);
+    let state = new PanelContainer(document.getElementById("#state_window"), dockManager);
     let editor1 = new PanelContainer(document.getElementById("#editor1_window"), dockManager);
     let editor2 = new PanelContainer(document.getElementById("#editor2_window"), dockManager);
     let infovis = new PanelContainer(document.getElementById("infovis"), dockManager);
@@ -93,7 +93,7 @@ Usage Example is in page/demo/demo_simple_es5.html
     let outlineNode = dockManager.dockFill(solutionNode, outline);
     let propertiesNode = dockManager.dockDown(outlineNode, properties, 0.6);
     let outputNode = dockManager.dockDown(documentNode, output, 0.4);
-    let problemsNode = dockManager.dockRight(outputNode, problems, 0.40);
+    let stateNode = dockManager.dockRight(outputNode, state, 0.40);
     let toolboxNode = dockManager.dockRight(documentNode, toolbox, 0.20);
     let editor1Node = dockManager.dockFill(documentNode, editor1);
     let editor2Node = dockManager.dockFill(documentNode, editor2);
