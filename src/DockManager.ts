@@ -794,6 +794,8 @@ export class DockManager {
         if (value !== this._activePanel) {
             if (value && !value.isDialog) //todo store compliete list of panels, remove the closed ones and switch back focus
                 this._lastPanelNotADialog = value;
+            if (this._lastPanelNotADialog && this.getPanels().indexOf(this._lastPanelNotADialog) < 0)
+                this._lastPanelNotADialog = null;
             let oldActive = this.activePanel;
             if (this.activePanel) {
                 this.activePanel.elementTitle.classList.remove("dockspan-panel-active");
@@ -806,6 +808,12 @@ export class DockManager {
             if (value && value.panelType == PanelType.document) {
                 this._activeDocument = value;
             }
+
+            if (!value && oldActive && oldActive.isDialog && value == null && this._lastPanelNotADialog && this.activePanel != this._lastPanelNotADialog) {
+                value = this._lastPanelNotADialog;
+                this._lastPanelNotADialog = undefined;
+            }
+
             this.notifyOnActivePanelChange(value, oldActive);
             if (value) {
                 value.elementTitle.classList.add("dockspan-panel-active");
@@ -813,9 +821,6 @@ export class DockManager {
                 if (value.tabPage) {
                     value.tabPage.host.setActive(true);
                 }
-            }
-            if (oldActive && oldActive.isDialog && value == null && this._lastPanelNotADialog && this.activePanel != this._lastPanelNotADialog) {
-                this.activePanel = this._lastPanelNotADialog;
             }
         }
         else {
