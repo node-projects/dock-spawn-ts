@@ -33,7 +33,7 @@ export class DocumentTabPage extends TabPage {
         super.destroy();
 
         // Restore the panel content element back into the panel frame
-        Utils.removeNode(this.containerElement);
+        //Utils.removeNode(this.containerElement);
         this.panel.elementContentHost.appendChild(this.containerElement);
     }
 }

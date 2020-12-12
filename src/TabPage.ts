@@ -2,6 +2,7 @@ import { TabHandle } from "./TabHandle.js";
 import { PanelContainer } from "./PanelContainer.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { TabHost } from "./TabHost.js";
+import { Utils } from "./Utils.js";
 
 export class TabPage {
     selected: boolean;
@@ -48,6 +49,8 @@ export class TabPage {
             this.host.dockManager.activePanel = null;
 
         this.container.tabPage = null;
+
+        Utils.removeNode(this.containerElement);
     }
 
     onSelected() {
