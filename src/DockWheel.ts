@@ -70,6 +70,7 @@ export class DockWheel {
             Utils.removeNode(this.elementSideWheel);
             return;
         }
+
         let element = this.activeNode.container.containerElement;
         let containerWidth = element.clientWidth;
         let containerHeight = element.clientHeight;
@@ -86,7 +87,9 @@ export class DockWheel {
 
         Utils.removeNode(this.elementMainWheel);
         Utils.removeNode(this.elementSideWheel);
-        element.appendChild(this.elementMainWheel);
+        if (!this.activeNode.container.disableDocking) {
+            element.appendChild(this.elementMainWheel);
+        }
         this.dockManager.element.appendChild(this.elementSideWheel);
 
         this._setWheelButtonPosition(WheelTypes["left-s"], sideMargin, -dockManagerHeight / 2);

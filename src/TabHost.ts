@@ -6,6 +6,7 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { DockManager } from "./DockManager.js";
 import { PanelContainer } from "./PanelContainer.js";
 import { EventHandler } from './EventHandler.js';
+import { DocumentTabPage } from "./DocumentTabPage";
 
 /**
  * Tab Host control contains tabs known as TabPages.
@@ -27,6 +28,7 @@ export class TabHost {
     _resizeRequested: boolean;
     mouseDownHandler: EventHandler;
     focusHandler: EventHandler;
+    _tabHandleRemoved: boolean;
 
     constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean) {
         /**
@@ -38,7 +40,8 @@ export class TabHost {
         }
 
         if (displayCloseButton === undefined) {
-            displayCloseButton = false;
+            // Display close button by default if direction is top
+            displayCloseButton = tabStripDirection === TabHostDirection.TOP;
         }
 
         this.dockManager = dockManager;
@@ -102,6 +105,11 @@ export class TabHost {
         this.change(this, /*handle*/e.self, e.state, index);
     }
 
+    removeTabHandle() {
+        this.hostElement.removeChild(this.tabListElement);
+        this.hostElement.removeChild(this.separatorElement);
+        this._tabHandleRemoved = true;
+    }
     performTabsLayout(indexes: number[]) {
         this.pages = Utils.orderByIndexes(this.pages, indexes);
 
@@ -142,7 +150,7 @@ export class TabHost {
     }
 
     _createDefaultTabPage(tabHost: TabHost, container: IDockContainer) {
-        return new TabPage(tabHost, container);
+        return new DocumentTabPage(tabHost, container);
     }
 
     setActiveTab(container: IDockContainer) {
@@ -162,11 +170,11 @@ export class TabHost {
         this.hostElement.style.width = width + 'px';
         this.hostElement.style.height = height + 'px';
 
-        let tabHeight = this.tabListElement.clientHeight;
+        let tabHeight = this._tabHandleRemoved ? 0 : this.tabListElement.clientHeight;
         if (!this._resizeRequested)
             requestAnimationFrame(() => this.resizeTabListElement(width, height));
         this._resizeRequested = true;
-        let separatorHeight = this.separatorElement.clientHeight;
+        let separatorHeight = this._tabHandleRemoved ? 0 : this.separatorElement.clientHeight;
         let contentHeight = height - tabHeight - separatorHeight;
         this.contentElement.style.height = contentHeight + 'px';
 
@@ -200,12 +208,10 @@ export class TabHost {
             if (!children.some((x) => x == tab.container)) {
                 tab.handle.removeListener(this.tabHandleListener);
                 tab.destroy();
-                let index = this.pages.indexOf(tab);
-                if (index > -1) {
-                    this.pages.splice(index, 1);
-                }
             }
         });
+
+        this.pages = this.pages.filter((tab) => children.some((x) => x == tab.container))
 
         let oldActiveTab = this.activeTab;
         delete this.activeTab;

@@ -8,8 +8,8 @@ import { IState } from "./interfaces/IState.js";
  */
 export declare class DocumentManagerContainer extends FillDockContainer {
     minimumAllowedChildNodes: number;
-    constructor(dockManager: DockManager);
-    private _createDocumentTabPage;
+    disableDocking?: boolean;
+    constructor(dockManager: DockManager, disableDocking?: boolean);
     saveState(state: IState): void;
     /** Returns the selected document tab */
     selectedTab(): import("./TabPage.js").TabPage;

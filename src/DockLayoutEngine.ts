@@ -7,6 +7,7 @@ import { FillDockContainer } from "./FillDockContainer.js";
 import { IRectangle } from "./interfaces/IRectangle.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { TabHandle } from "./TabHandle.js";
+import { TabHostDirection } from "./enums/TabHostDirection";
 
 export class DockLayoutEngine {
 
@@ -56,6 +57,7 @@ export class DockLayoutEngine {
         if (parentNode.children.length < parentNode.container.minimumAllowedChildNodes) {
             // If the child count falls below the minimum threshold, destroy the parent and merge
             // the children with their grandparents
+
             let grandParent = parentNode.parent;
             for (let i = 0; i < parentNode.children.length; i++) {
                 let otherChild = parentNode.children[i];
@@ -65,9 +67,12 @@ export class DockLayoutEngine {
                     parentNode.detachFromParent();
                     let width = parentNode.container.containerElement.clientWidth;
                     let height = parentNode.container.containerElement.clientHeight;
-                    parentNode.container.destroy();
 
                     otherChild.container.resize(width, height);
+                    parentNode.container.destroy();
+                    if (parentNode.container instanceof FillDockContainer) {
+                        parentNode.container.performLayout([]);
+                    }
                     grandParent.performLayout(false);
                 }
                 else {
@@ -78,6 +83,7 @@ export class DockLayoutEngine {
                     this.dockManager.setRootNode(otherChild);
                 }
             }
+
         }
         else {
             // the node to be removed has 2 or more other siblings. So it is safe to continue
@@ -129,6 +135,9 @@ export class DockLayoutEngine {
                     let height = parentNode.container.containerElement.clientHeight;
                     otherChild.container.resize(width, height);
                     parentNode.container.destroy();
+                    if (parentNode.container instanceof FillDockContainer) {
+                        parentNode.container.performLayout([]);
+                    }
                     grandParent.performLayout(false);
                 } else {
                     // Parent is a root node.
@@ -280,7 +289,7 @@ export class DockLayoutEngine {
         if (containerType === 'vertical')
             return new VerticalDockContainer(this.dockManager, [newNode.container, referenceNode.container]);
         if (containerType === 'fill')
-            return new FillDockContainer(this.dockManager);
+            return new FillDockContainer(this.dockManager, TabHostDirection.TOP);
         throw new Error('Failed to create dock container of type: ' + containerType);
     }
 

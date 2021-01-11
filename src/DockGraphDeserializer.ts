@@ -11,6 +11,7 @@ import { Utils } from "./Utils.js";
 import { IPanelInfo } from "./interfaces/IPanelInfo.js";
 import { INodeInfo } from "./interfaces/INodeInfo.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { TabHostDirection } from "./enums/TabHostDirection";
 
 /**
  * Deserializes the dock layout hierarchy from JSON and creates a dock hierarhcy graph
@@ -84,13 +85,12 @@ export class DockGraphDeserializer {
         else if (containerType === 'fill') {
             // Check if this is a document manager
 
-            // TODO: Layout engine compares the string 'fill', so cannot create another subclass type
-            // called document_manager and have to resort to this hack. use RTTI in layout engine
             let typeDocumentManager = containerState.documentManager;
             if (typeDocumentManager)
-                container = new DocumentManagerContainer(this.dockManager);
+                container = new DocumentManagerContainer(this.dockManager, containerState.disableDocking);
             else
-                container = new FillDockContainer(this.dockManager);
+                container = new FillDockContainer(this.dockManager, TabHostDirection.TOP);
+
         }
         else
             throw new Error('Cannot create dock container of unknown type: ' + containerType);

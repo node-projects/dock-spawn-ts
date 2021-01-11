@@ -7,10 +7,11 @@ export class DockManagerContext {
     dockManager: DockManager;
     model: DockModel;
     documentManagerView: DocumentManagerContainer;
-    
+
     constructor(dockManager : DockManager) {
         this.dockManager = dockManager;
         this.model = new DockModel();
-        this.documentManagerView = new DocumentManagerContainer(this.dockManager);
+        // TODO Make disabled docking configurable
+        this.documentManagerView = new DocumentManagerContainer(this.dockManager, true);
     }
 }

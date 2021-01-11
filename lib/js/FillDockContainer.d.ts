@@ -19,6 +19,7 @@ export declare class FillDockContainer implements IDockContainerWithSize {
         onChange: (e: any) => void;
     };
     state: ISize;
+    disableDocking?: boolean;
     constructor(dockManager: DockManager, tabStripDirection?: TabHostDirection);
     setActiveChild(child: IDockContainer): void;
     resize(width: number, height: number): void;
@@ -30,4 +31,6 @@ export declare class FillDockContainer implements IDockContainerWithSize {
     set width(value: number);
     get height(): number;
     set height(value: number);
+    private _createDocumentTabPage;
+    private _createTabPage;
 }

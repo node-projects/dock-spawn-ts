@@ -4,6 +4,7 @@ import { TabHandle } from "./TabHandle.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { DockManager } from "./DockManager.js";
 import { EventHandler } from './EventHandler.js';
+import { DocumentTabPage } from "./DocumentTabPage";
 /**
  * Tab Host control contains tabs known as TabPages.
  * The tab strip can be aligned in different orientations
@@ -26,17 +27,19 @@ export declare class TabHost {
     _resizeRequested: boolean;
     mouseDownHandler: EventHandler;
     focusHandler: EventHandler;
+    _tabHandleRemoved: boolean;
     constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean);
     onFocus(): void;
     setActive(isActive: boolean): void;
     onMousedown(): void;
     onMoveTab(e: any): void;
+    removeTabHandle(): void;
     performTabsLayout(indexes: number[]): void;
     getActiveTab(): TabPage;
     addListener(listener: any): void;
     removeListener(listener: any): void;
     change(host: TabHost, handle: TabHandle, state: any, index: any): void;
-    _createDefaultTabPage(tabHost: TabHost, container: IDockContainer): TabPage;
+    _createDefaultTabPage(tabHost: TabHost, container: IDockContainer): DocumentTabPage;
     setActiveTab(container: IDockContainer): void;
     resize(width: number, height: number): void;
     resizeTabListElement(width: number, height?: number): void;
