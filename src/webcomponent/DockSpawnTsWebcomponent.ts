@@ -81,7 +81,13 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let slot = document.createElement('slot');
         let slotName = 'slot_' + this.slotId++;
         slot.name = slotName;
-        let container = new PanelContainer(slot, this.dockManager, element.title);
+        
+        let dockPanelType = PanelType.panel;
+        let dockPanelTypeAttribute = element.getAttribute('dock-spawn-panel-type');
+        if (dockPanelTypeAttribute)
+            dockPanelType = <PanelType><any>dockPanelTypeAttribute;
+
+        let container = new PanelContainer(slot, this.dockManager, element.title, dockPanelType);
         element.slot = slotName;
         this.slotElementMap.set(slot, (<HTMLElement>element));
         this.elementContainerMap.set(element, container);
