@@ -46,41 +46,43 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     }
 
     private cssLoaded() {
-        this.dockManager.initialize();
+        setTimeout(() => {
+            this.dockManager.initialize();
 
-        this.dockManager.addLayoutListener({
-            onClosePanel: (dockManager, dockNode) => {
-                let slot = dockNode.elementContent as any as HTMLSlotElement;
-                let element = this.slotElementMap.get(slot);
-                this.removeChild(element);
-                this.slotElementMap.delete(slot);
+            this.dockManager.addLayoutListener({
+                onClosePanel: (dockManager, dockNode) => {
+                    let slot = dockNode.elementContent as any as HTMLSlotElement;
+                    let element = this.slotElementMap.get(slot);
+                    this.removeChild(element);
+                    this.slotElementMap.delete(slot);
+                }
+            });
+
+            this.dockManager.resize(this.clientWidth, this.clientHeight);
+
+            for (let element of this.children) {
+                this.handleAddedChildNode(element as HTMLElement)
             }
-        });
 
-        this.dockManager.resize(this.clientWidth, this.clientHeight);
-
-        for (let element of this.children) {
-            this.handleAddedChildNode(element as HTMLElement)
-        }
-
-        this.observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    this.handleAddedChildNode(node as HTMLElement);
-                });
-                mutation.removedNodes.forEach((node) => {
-                    this.handleRemovedChildNode(node as HTMLElement);
+            this.observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        this.handleAddedChildNode(node as HTMLElement);
+                    });
+                    mutation.removedNodes.forEach((node) => {
+                        this.handleRemovedChildNode(node as HTMLElement);
+                    });
                 });
             });
-        });
-        this.observer.observe(this, { childList: true });
+            this.observer.observe(this, { childList: true });
+        }, 50);
     }
 
     private handleAddedChildNode(element: HTMLElement) {
         let slot = document.createElement('slot');
         let slotName = 'slot_' + this.slotId++;
         slot.name = slotName;
-        
+
         let dockPanelType = PanelType.panel;
         let dockPanelTypeAttribute = element.getAttribute('dock-spawn-panel-type');
         if (dockPanelTypeAttribute)
