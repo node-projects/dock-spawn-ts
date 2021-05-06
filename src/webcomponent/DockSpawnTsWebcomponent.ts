@@ -43,6 +43,9 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
 
         this.dockManager = new DockManager(dockSpawnDiv);
         this.dockManager.config.dialogRootElement = dockSpawnDiv;
+    }
+
+    private cssLoaded() {
         this.dockManager.initialize();
 
         this.dockManager.addLayoutListener({
@@ -54,10 +57,6 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
             }
         });
 
-        this.dockManager.resize(this.clientWidth, this.clientHeight);
-    }
-
-    private cssLoaded() {
         this.dockManager.resize(this.clientWidth, this.clientHeight);
 
         for (let element of this.children) {
