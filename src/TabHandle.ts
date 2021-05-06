@@ -36,7 +36,7 @@ export class TabHandle {
     direction: number;
     _ctxMenu: HTMLDivElement;
     _windowsContextMenuCloseBound: any;
-    
+
     constructor(parent: TabPage) {
         this.parent = parent;
         let undockHandler = this._performUndock.bind(this);
@@ -256,6 +256,12 @@ export class TabHandle {
         this.closeButtonTouchHandler.cancel();
         this.auxClickHandler.cancel();
 
+        if (this.mouseMoveHandler) {
+            this.mouseMoveHandler.cancel();
+        }
+        if (this.touchMoveHandler) {
+            this.touchMoveHandler.cancel();
+        }
         if (this.mouseUpHandler) {
             this.mouseUpHandler.cancel();
         }
@@ -283,8 +289,7 @@ export class TabHandle {
     }
 
     onCloseButtonClicked(e) {
-        if (this.elementCloseButton.style.display !== 'none')
-        {
+        if (this.elementCloseButton.style.display !== 'none') {
             if (e.button !== 2) {
                 // If the page contains a panel element, undock it and destroy it
                 if (this.parent.container.containerType === 'panel') {
