@@ -9,7 +9,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     public dockManager: DockManager;
     private slotId: number = 0;
     private windowResizedBound;
-    private slotElementMap: Map<HTMLSlotElement, HTMLElement>;
+    private slotElementMap: WeakMap<HTMLSlotElement, HTMLElement>;
     private observer: MutationObserver;
     private initialized = false;
     private elementContainerMap: Map<HTMLElement, PanelContainer> = new Map();
@@ -18,7 +18,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         super();
 
         this.windowResizedBound = this.windowResized.bind(this);
-        this.slotElementMap = new Map();
+        this.slotElementMap = new WeakMap();
     }
 
     private initDockspawn() {
@@ -45,6 +45,10 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         this.dockManager.config.dialogRootElement = dockSpawnDiv;
     }
 
+    public getElementInSlot(slot: HTMLSlotElement): HTMLElement {
+        return this.slotElementMap.get(slot);
+    }
+
     private cssLoaded() {
         setTimeout(() => {
             this.dockManager.initialize();
@@ -54,7 +58,6 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
                     let slot = dockNode.elementContent as any as HTMLSlotElement;
                     let element = this.slotElementMap.get(slot);
                     this.removeChild(element);
-                    this.slotElementMap.delete(slot);
                 }
             });
 
