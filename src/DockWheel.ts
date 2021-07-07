@@ -75,8 +75,10 @@ export class DockWheel {
         let containerHeight = element.clientHeight;
         let baseX = Math.floor(containerWidth / 2); // + element.offsetLeft;
         let baseY = Math.floor(containerHeight / 2); // + element.offsetTop;
-        this.elementMainWheel.style.left = baseX + 'px';
-        this.elementMainWheel.style.top = baseY + 'px';
+        let bcElement = element.getBoundingClientRect();
+        let bcdockManagerElement = this.dockManager.element.getBoundingClientRect()
+        this.elementMainWheel.style.left = (bcElement.left - bcdockManagerElement.left + baseX) + 'px';
+        this.elementMainWheel.style.top = (bcElement.top - bcdockManagerElement.top + baseY) + 'px';
 
         // The positioning of the main dock wheel buttons is done automatically through CSS
         // Dynamically calculate the positions of the buttons on the extreme sides of the dock manager
@@ -86,7 +88,7 @@ export class DockWheel {
 
         Utils.removeNode(this.elementMainWheel);
         Utils.removeNode(this.elementSideWheel);
-        element.appendChild(this.elementMainWheel);
+        this.dockManager.element.appendChild(this.elementMainWheel);
         this.dockManager.element.appendChild(this.elementSideWheel);
 
         this._setWheelButtonPosition(WheelTypes["left-s"], sideMargin, -dockManagerHeight / 2);
