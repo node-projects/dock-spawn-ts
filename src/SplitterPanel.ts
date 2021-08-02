@@ -188,9 +188,9 @@ export class SplitterPanel {
             totalChildPanelSize += size;
         });
 
+        const barRect = this.spiltterBars[0].barElement.getBoundingClientRect();
         // Get the thickness of the bar
-        let barSize = this.stackedVertical ?
-            this.spiltterBars[0].barElement.clientHeight : this.spiltterBars[0].barElement.clientWidth;
+        let barSize = this.stackedVertical ? barRect.height : barRect.width;
 
         // Find out how much space existing child containers will take after being resized (excluding the splitter bars)
         let targetTotalChildPanelSize = this.stackedVertical ? height : width;
