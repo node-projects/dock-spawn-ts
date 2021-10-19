@@ -21,11 +21,13 @@ export class Dialog {
     isHidden: boolean;
     keyPressHandler: EventHandler;
     focusHandler: EventHandler;
+    grayoutParent: PanelContainer;
 
-    constructor(panel: PanelContainer, dockManager: DockManager) {
+    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer) {
         this.panel = panel;
         this.dockManager = dockManager;
         this.eventListener = dockManager;
+        this.grayoutParent = grayoutParent;
         this._initialize();
         this.dockManager.context.model.dialogs.push(this);
         this.position = dockManager.defaultDialogPosition;
@@ -39,7 +41,7 @@ export class Dialog {
     }
 
     static fromElement(id: string, dockManager: DockManager) {
-        return new Dialog(new PanelContainer(<HTMLElement>document.getElementById(id), dockManager), dockManager);
+        return new Dialog(new PanelContainer(<HTMLElement>document.getElementById(id), dockManager), dockManager, null);
     }
 
     _initialize() {
@@ -59,6 +61,10 @@ export class Dialog {
         this.keyPressHandler = new EventHandler(this.elementDialog, 'keypress', this.dockManager.onKeyPressBound, true);
         this.resize(this.panel.elementPanel.clientWidth, this.panel.elementPanel.clientHeight);
         this.isHidden = false;
+
+        if (this.grayoutParent != null) {
+            this.grayoutParent.grayOut(true);
+        }
         this.bringToFront();
     }
 
@@ -79,7 +85,7 @@ export class Dialog {
             this.dockManager.activePanel = this.panel;
     }
 
-    onMouseDown() { 
+    onMouseDown() {
         this.bringToFront();
     }
 
@@ -105,6 +111,10 @@ export class Dialog {
         Utils.removeNode(this.panel.elementPanel);
         Utils.arrayRemove(this.dockManager.context.model.dialogs, this);
         delete this.panel.floatingDialog;
+        
+        if (this.grayoutParent) {
+            this.grayoutParent.grayOut(false);
+        }
     }
 
     resize(width: number, height: number) {
@@ -130,6 +140,9 @@ export class Dialog {
         if (!this.isHidden) {
             this.isHidden = true;
             this.dockManager.notifyOnHideDialog(this);
+        }
+        if (this.grayoutParent) {
+            this.grayoutParent.grayOut(false);
         }
     }
 

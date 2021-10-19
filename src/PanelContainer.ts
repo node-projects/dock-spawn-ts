@@ -46,6 +46,7 @@ export class PanelContainer implements IDockContainerWithSize {
     _cachedWidth: number;
     _cachedHeight: number;
     _hideCloseButton: boolean;
+    _grayOut: HTMLDivElement;
 
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
         if (!title)
@@ -128,6 +129,18 @@ export class PanelContainer implements IDockContainerWithSize {
 
     get containerElement() {
         return this.elementPanel;
+    }
+
+    grayOut(show: boolean) {
+        if (!show && this._grayOut) {
+            this.elementPanel.removeChild(this._grayOut);
+            this._grayOut = null;
+        }
+        else if (show && !this._grayOut) {
+            this._grayOut = document.createElement('div');
+            this._grayOut.className = 'panel-grayout';
+            this.elementPanel.appendChild(this._grayOut);
+        }
     }
 
     _initialize() {

@@ -45,6 +45,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     _cachedWidth: number;
     _cachedHeight: number;
     _hideCloseButton: boolean;
+    _grayOut: HTMLDivElement;
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean);
     canUndock(state: boolean): void;
     addListener(listener: any): void;
@@ -56,6 +57,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     loadState(state: IState): void;
     setActiveChild(): void;
     get containerElement(): HTMLDivElement;
+    grayOut(show: boolean): void;
     _initialize(): void;
     onMouseDown(): void;
     hideCloseButton(state: boolean): void;

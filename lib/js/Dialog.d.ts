@@ -21,7 +21,8 @@ export declare class Dialog {
     isHidden: boolean;
     keyPressHandler: EventHandler;
     focusHandler: EventHandler;
-    constructor(panel: PanelContainer, dockManager: DockManager);
+    grayoutParent: PanelContainer;
+    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer);
     saveState(x: number, y: number): void;
     static fromElement(id: string, dockManager: DockManager): Dialog;
     _initialize(): void;

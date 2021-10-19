@@ -104,13 +104,14 @@ window.onload = () => {
         }
     });
 
+    let properties;
     if (!lastState) {
         // Convert existing elements on the page into "Panels".
         // They can then be docked on to the dock manager
         // Panels get a titlebar and a close button, and can also be
         // converted to a floating dialog box which can be dragged / resized
         solution = new PanelContainer(document.getElementById("solution_window"), dockManager);
-        let properties = new PanelContainer(document.getElementById("properties_window"), dockManager);
+        properties = new PanelContainer(document.getElementById("properties_window"), dockManager);
         let toolbox = new PanelContainer(document.getElementById("toolbox_window"), dockManager);
         let outline = new PanelContainer(document.getElementById("outline_window"), dockManager);
         let state = new PanelContainer(document.getElementById("state_window"), dockManager);
@@ -133,6 +134,17 @@ window.onload = () => {
         dockManager.dockFill(documentNode, editor1);
         dockManager.dockFill(documentNode, editor2);
         dockManager.floatDialog(infovis, 50, 50);
+    }
+
+    document.getElementById("dlg").onclick = () => {
+        const el = document.createElement("div");
+        el.style.background = 'lightgreen';
+        el.style.width = "200px";
+        el.style.height = "200px";
+        el.innerHTML = "TestDialog";
+        const newPage = new PanelContainer(el, dockManager, 'Test Dlg', PanelType.document);
+        const dialog = dockManager.floatDialog(newPage, 200, 200, properties);
+        dialog.resize(200, 200);
     }
 
     var source_steering_h = "#pragma once\n#include \"entity\x2FGameEntity.h\"\n\n\nnamespace syntheticarc {\n\n\tclass SteeringBehaviours {\n\tpublic:\n\t\tSteeringBehaviours();\n\n\t\tvoid Update(float elapsedTime);\n\t\trespawn::math::Vector3 GetSteeringForce(const GameEntity\& host, const GameEntity\& target);\n\t\tvoid SetInitialDirection(const respawn::math::Vector3\& direction);\n\n\t\tbool IsSeekEnabled() const;\n\t\tvoid SetSeekEnabled(bool flag);\n\n\t\tbool IsBounceEnabled() const;\n\t\tvoid SetBounceEnabled(bool flag);\n\n\t\tvoid OnPhysicsContact(const respawn::physics::PhysicsContactPoint\& contactPoint);\n\n\tprivate:\n\t\trespawn::math::Vector3 Seek(const GameEntity\& host, const GameEntity\& target);\n\n\n\tprivate:\n\t\tbool seek;\n\t\tbool bounce;\n\n\t\trespawn::math::Vector3 direction;\t\t\t\x2F\x2F Used for bounce steering behavior\n\t\tfloat timeSinceLastBound;\n\n\t};\n}";

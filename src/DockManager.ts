@@ -355,7 +355,7 @@ export class DockManager {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine), false);
     }
 
-    floatDialog(container: PanelContainer, x: number, y: number) {
+    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent: PanelContainer) {
         let retdiag = undefined;
 
         //check the dialog do not already exist
@@ -377,7 +377,7 @@ export class DockManager {
         let panel = container;
         Utils.removeNode(panel.elementPanel);
         panel.isDialog = true;
-        let dialog = new Dialog(panel, this);
+        let dialog = new Dialog(panel, this, grayoutParent);
         dialog.setPosition(x, y);
         return dialog;
     }
@@ -463,7 +463,7 @@ export class DockManager {
         panelContainer.elementPanel.style.display = 'block';
 
         // Create a new dialog window for the undocked panel
-        let dialog = new Dialog(panelContainer, this);
+        let dialog = new Dialog(panelContainer, this, null);
 
         if (event !== undefined) {
             // Adjust the relative position
@@ -496,7 +496,7 @@ export class DockManager {
      */
     openInDialog(container: PanelContainer, event, dragOffset: Point) {
         // Create a new dialog window for the undocked panel
-        let dialog = new Dialog(container, this);
+        let dialog = new Dialog(container, this, null);
 
         if (event !== undefined) {
             // Adjust the relative position
