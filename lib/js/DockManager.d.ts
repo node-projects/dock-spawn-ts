@@ -84,7 +84,7 @@ export declare class DockManager {
     dockDown(referenceNode: DockNode, container: PanelContainer, ratio: number): DockNode;
     /** Dock the [container] as a tab inside the [referenceNode] node */
     dockFill(referenceNode: DockNode, container: PanelContainer): DockNode;
-    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent: PanelContainer): any;
+    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer): any;
     private _requestDockDialog;
     private _checkShowBackgroundContext;
     private _requestDockContainer;

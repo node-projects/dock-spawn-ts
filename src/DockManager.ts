@@ -355,7 +355,7 @@ export class DockManager {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine), false);
     }
 
-    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent: PanelContainer) {
+    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer) {
         let retdiag = undefined;
 
         //check the dialog do not already exist
