@@ -626,15 +626,15 @@ export class DockManager {
 
     notifyOnClosePanel(panel: PanelContainer) {
         this._checkShowBackgroundContext();
+        if (this.activePanel == panel)
+            this.activePanel = null;
+        if (this._activeDocument == panel)
+            this._activeDocument = null;
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onClosePanel) {
                 listener.onClosePanel(this, panel);
             }
         });
-        if (this.activePanel == panel)
-            this.activePanel = null;
-        if (this._activeDocument == panel)
-            this._activeDocument = null;
     }
 
     notifyOnCreateDialog(dialog: Dialog) {
