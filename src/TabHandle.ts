@@ -50,7 +50,7 @@ export class TabHandle {
         this.elementBase.appendChild(this.elementText);
         if (this.parent.host.displayCloseButton)
             this.elementBase.appendChild(this.elementCloseButton);
-        if ((<PanelContainer>this.parent.container)._hideCloseButton)
+        if ((<PanelContainer>this.parent.container)._hideCloseButton || (<PanelContainer>this.parent.container)._grayOut)
             this.elementCloseButton.style.display = 'none';
         this.parent.host.tabListElement.appendChild(this.elementBase);
 

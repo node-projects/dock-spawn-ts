@@ -25,6 +25,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
         resizeHandler?: any;
         _dockSpawnPanelContainer: PanelContainer;
     };
+    elementContentWrapper: HTMLElement;
     dockManager: DockManager;
     title: string;
     containerType: ContainerType;

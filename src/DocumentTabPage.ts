@@ -19,7 +19,7 @@ export class DocumentTabPage extends TabPage {
         // If the container is a panel, extract the content element and set it as the tab's content
         if (this.container.containerType === 'panel') {
             this.panel = container as PanelContainer;
-            this.containerElement = this.panel.elementContent;
+            this.containerElement = this.panel.elementContentWrapper;
 
             // detach the container element from the panel's frame.
             // It will be reattached when this tab page is destroyed

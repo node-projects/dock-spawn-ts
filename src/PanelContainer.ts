@@ -25,6 +25,7 @@ export class PanelContainer implements IDockContainerWithSize {
     name: string;
     state: ISize;
     elementContent: HTMLElement & { resizeHandler?: any, _dockSpawnPanelContainer: PanelContainer };
+    elementContentWrapper: HTMLElement;
     dockManager: DockManager;
     title: string;
     containerType: ContainerType;
@@ -54,6 +55,7 @@ export class PanelContainer implements IDockContainerWithSize {
         if (!panelType)
             panelType = PanelType.panel;
         this.panelType = panelType;
+
         this.elementContent = Object.assign(elementContent, { _dockSpawnPanelContainer: this });
         this.dockManager = dockManager;
         this.title = title;
@@ -133,13 +135,26 @@ export class PanelContainer implements IDockContainerWithSize {
 
     grayOut(show: boolean) {
         if (!show && this._grayOut) {
-            this.elementPanel.removeChild(this._grayOut);
+            this.elementContentWrapper.removeChild(this._grayOut);
+            this.elementButtonClose.style.display = this._hideCloseButton ? 'none' : 'block';
             this._grayOut = null;
+            if (!this._hideCloseButton)
+                this.eventListeners.forEach((listener) => {
+                    if (listener.onHideCloseButton) {
+                        listener.onHideCloseButton({ self: this, state: this._hideCloseButton });
+                    }
+                });
         }
         else if (show && !this._grayOut) {
             this._grayOut = document.createElement('div');
             this._grayOut.className = 'panel-grayout';
-            this.elementPanel.appendChild(this._grayOut);
+            this.elementButtonClose.style.display = 'none';
+            this.elementContentWrapper.appendChild(this._grayOut);
+            this.eventListeners.forEach((listener) => {
+                if (listener.onHideCloseButton) {
+                    listener.onHideCloseButton({ self: this, state: true });
+                }
+            });
         }
     }
 
@@ -179,8 +194,12 @@ export class PanelContainer implements IDockContainerWithSize {
                 new EventHandler(this.elementButtonClose, 'touchstart', this.onCloseButtonClicked.bind(this));
         }
 
-        Utils.removeNode(this.elementContent);
-        this.elementContentHost.appendChild(this.elementContent);
+        this.elementContentWrapper = document.createElement("div");
+        this.elementContentWrapper.classList.add('panel-content-wrapper');
+        this.elementContentWrapper.appendChild(this.elementContent);
+
+        Utils.removeNode(this.elementContentWrapper);
+        this.elementContentHost.appendChild(this.elementContentWrapper);
 
         // Extract the title from the content element's attribute
         let contentTitle = this.elementContent.dataset.panelCaption;
@@ -239,7 +258,7 @@ export class PanelContainer implements IDockContainerWithSize {
     performUndockToDialog(e, dragOffset: Point) {
         this.isDialog = true;
         this.undockInitiator.enabled = false;
-        this.elementContent.style.display = "block";
+        this.elementContentWrapper.style.display = "block";
         this.elementPanel.style.position = "";
         return this.dockManager.requestUndockToDialog(this, e, dragOffset);
     }
@@ -250,7 +269,7 @@ export class PanelContainer implements IDockContainerWithSize {
     performClose() {
         this.isDialog = true;
         this.undockInitiator.enabled = false;
-        this.elementContent.style.display = "block";
+        this.elementContentWrapper.style.display = "block";
         this.elementPanel.style.position = "";
         this.dockManager.requestClose(this);
     }
