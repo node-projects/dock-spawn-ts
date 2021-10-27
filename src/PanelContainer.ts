@@ -17,7 +17,7 @@ import { TabPage } from './TabPage.js';
  */
 export class PanelContainer implements IDockContainerWithSize {
 
-    onTitleChanged: any;
+    onTitleChanged: (panelContainer: PanelContainer, title: string) => void;
     elementPanel: HTMLDivElement;
     elementTitle: HTMLDivElement;
     elementTitleText: HTMLDivElement;
@@ -30,6 +30,7 @@ export class PanelContainer implements IDockContainerWithSize {
     title: string;
     containerType: ContainerType;
     icon: string;
+    hasChanges: boolean;
     minimumAllowedChildNodes: number;
     isDialog: boolean;
     eventListeners: any[];
@@ -348,6 +349,18 @@ export class PanelContainer implements IDockContainerWithSize {
     setTitleIcon(icon: string) {
         this.icon = icon;
         this._updateTitle();
+        if (this.onTitleChanged)
+            this.onTitleChanged(this, this.title);
+    }
+
+    setHasChanges(changes: boolean) {
+        this.hasChanges = changes;
+        this._updateTitle();
+        if (changes) {
+            this.elementTitleText.classList.add('panel-has-changes')
+        } else {
+            this.elementTitleText.classList.remove('panel-has-changes')
+        }
         if (this.onTitleChanged)
             this.onTitleChanged(this, this.title);
     }

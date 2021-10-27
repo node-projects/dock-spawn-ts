@@ -81,6 +81,14 @@
 	background: rgb(0 0 0 / 50%);
 }
 
+.panel-has-changes {
+    font-style: italic;
+}
+
+.panel-has-changes::before {
+    content: '* ';
+}
+
 /***************** Floating dialog box ****************/
 
 .dialog-floating {
