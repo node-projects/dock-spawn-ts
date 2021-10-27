@@ -486,8 +486,11 @@ export class DockManager {
         this.layoutEngine.close(node);
         if (this.activePanel == container)
             this.activePanel = null;
-        if (this._activeDocument == container)
+        if (this._activeDocument == container) {
+            const last = this._activeDocument;
             this._activeDocument = null;
+            this.notifyOnActiveDocumentChange(null, last);
+        }
     }
 
     /**
@@ -628,8 +631,11 @@ export class DockManager {
         this._checkShowBackgroundContext();
         if (this.activePanel == panel)
             this.activePanel = null;
-        if (this._activeDocument == panel)
+        if (this._activeDocument == panel) {
+            const last = this._activeDocument;
             this._activeDocument = null;
+            this.notifyOnActiveDocumentChange(null, last);
+        }
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onClosePanel) {
                 listener.onClosePanel(this, panel);
@@ -690,6 +696,14 @@ export class DockManager {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onActivePanelChange) {
                 listener.onActivePanelChange(this, panel, oldActive);
+            }
+        });
+    }
+
+    notifyOnActiveDocumentChange(panel: PanelContainer, oldActive: PanelContainer) {
+        this.layoutEventListeners.forEach((listener) => {
+            if (listener.onActiveDocumentChange) {
+                listener.onActiveDocumentChange(this, panel, oldActive);
             }
         });
     }
@@ -805,6 +819,7 @@ export class DockManager {
                 }
             }
             this._activePanel = value;
+            let lastActiveDocument = this._activeDocument;
             if (value && value.panelType == PanelType.document) {
                 this._activeDocument = value;
             }
@@ -815,6 +830,9 @@ export class DockManager {
             }
 
             this.notifyOnActivePanelChange(value, oldActive);
+            if (lastActiveDocument != this._activeDocument) {
+                this.notifyOnActiveDocumentChange(this._activeDocument, lastActiveDocument);
+            }
             if (value) {
                 value.elementTitle.classList.add("dockspan-panel-active");
                 value.elementTitleText.classList.add("dockspan-panel-titlebar-text-active");

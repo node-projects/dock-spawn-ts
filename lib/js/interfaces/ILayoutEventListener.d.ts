@@ -16,6 +16,7 @@ export interface ILayoutEventListener {
     onContainerResized?(dockManager: DockManager, dockContainer: IDockContainer): void;
     onTabChanged?(dockManager: DockManager, tabpage: TabPage): void;
     onActivePanelChange?(dockManager: DockManager, panel?: PanelContainer, previousPanel?: PanelContainer): void;
+    onActiveDocumentChange?(dockManager: DockManager, panel?: PanelContainer, previousPanel?: PanelContainer): void;
     /**
     * The Dock Manager notifies the listeners of layout changes so client containers that have
     * costly layout structures can detach and reattach themself to avoid reflow
