@@ -91,6 +91,6 @@ export declare class PanelContainer implements IDockContainerWithSize {
     _updateTitle(): void;
     getRawTitle(): string;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean): void;
-    onCloseButtonClicked(): void;
+    onCloseButtonClicked(e: Event): void;
     close(): void;
 }

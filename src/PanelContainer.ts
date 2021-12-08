@@ -190,7 +190,7 @@ export class PanelContainer implements IDockContainerWithSize {
 
         if (!this._hideCloseButton) {
             this.closeButtonClickedHandler =
-                new EventHandler(this.elementButtonClose, 'click', this.onCloseButtonClicked.bind(this));
+                new EventHandler(this.elementButtonClose, 'mousedown', this.onCloseButtonClicked.bind(this));
             this.closeButtonTouchedHandler =
                 new EventHandler(this.elementButtonClose, 'touchstart', this.onCloseButtonClicked.bind(this));
         }
@@ -384,7 +384,8 @@ export class PanelContainer implements IDockContainerWithSize {
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean) {
     }
 
-    onCloseButtonClicked() {
+    onCloseButtonClicked(e: Event) {
+        e.preventDefault();
         this.close();
     }
 
