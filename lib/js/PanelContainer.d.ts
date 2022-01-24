@@ -14,6 +14,7 @@ import { TabPage } from './TabPage.js';
  * This dock container wraps the specified element on a panel frame with a title bar and close button
  */
 export declare class PanelContainer implements IDockContainerWithSize {
+    closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
     onTitleChanged: (panelContainer: PanelContainer, title: string) => void;
     elementPanel: HTMLDivElement;
     elementTitle: HTMLDivElement;
@@ -92,5 +93,5 @@ export declare class PanelContainer implements IDockContainerWithSize {
     getRawTitle(): string;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean): void;
     onCloseButtonClicked(e: Event): void;
-    close(): void;
+    close(): Promise<void>;
 }

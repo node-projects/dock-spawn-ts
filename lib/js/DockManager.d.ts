@@ -24,6 +24,7 @@ export declare class DockManager {
     mouseMoveHandler: EventHandler;
     touchMoveHandler: EventHandler;
     layoutEventListeners: ILayoutEventListener[];
+    closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
     defaultDialogPosition: Point;
     backgroundContext: HTMLElement;
     zIndexCounter: number;

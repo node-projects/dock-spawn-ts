@@ -17,6 +17,8 @@ import { TabPage } from './TabPage.js';
  */
 export class PanelContainer implements IDockContainerWithSize {
 
+    public closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
+    
     onTitleChanged: (panelContainer: PanelContainer, title: string) => void;
     elementPanel: HTMLDivElement;
     elementTitle: HTMLDivElement;
@@ -386,19 +388,29 @@ export class PanelContainer implements IDockContainerWithSize {
 
     onCloseButtonClicked(e: Event) {
         e.preventDefault();
+        e.stopPropagation();
         this.close();
     }
 
-    close() {
-        if (this.isDialog) {
-            if (this.floatingDialog) {
-                //this.floatingDialog.hide();
-                this.floatingDialog.close(); // fires onClose notification
+    async close() {
+        let close = true;
+
+        if (this.closePanelContainerCallback)
+            close = await this.closePanelContainerCallback(this);
+        else if (this.dockManager.closePanelContainerCallback)
+            close = await this.dockManager.closePanelContainerCallback(this);
+            
+        if (close) {
+            if (this.isDialog) {
+                if (this.floatingDialog) {
+                    //this.floatingDialog.hide();
+                    this.floatingDialog.close(); // fires onClose notification
+                }
             }
-        }
-        else {
-            this.performClose();
-            this.dockManager.notifyOnClosePanel(this);
+            else {
+                this.performClose();
+                this.dockManager.notifyOnClosePanel(this);
+            }
         }
     }
 }

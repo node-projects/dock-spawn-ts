@@ -46,7 +46,12 @@ window.onload = () => {
     };
     window.onresize(null);
 
-
+    dockManager.closePanelContainerCallback = async (panel) => {
+        let p = prompt("close?", " ")
+        if (p)
+            return true;
+        return false;
+    }
 
     dockManager.addLayoutListener({
         onDock: (dockManager, dockNode) => {

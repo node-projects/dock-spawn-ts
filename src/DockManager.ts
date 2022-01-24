@@ -33,6 +33,7 @@ export class DockManager {
     public mouseMoveHandler: EventHandler;
     public touchMoveHandler: EventHandler;
     public layoutEventListeners: ILayoutEventListener[];
+    public closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
     public defaultDialogPosition: Point;
     public backgroundContext: HTMLElement;
     public zIndexCounter: number;
