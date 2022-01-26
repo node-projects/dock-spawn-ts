@@ -18,7 +18,7 @@ import { TabPage } from './TabPage.js';
 export class PanelContainer implements IDockContainerWithSize {
 
     public closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
-    
+
     onTitleChanged: (panelContainer: PanelContainer, title: string) => void;
     elementPanel: HTMLDivElement;
     elementTitle: HTMLDivElement;
@@ -44,6 +44,8 @@ export class PanelContainer implements IDockContainerWithSize {
     touchDownHandler: EventHandler;
     panelType: PanelType;
     tabPage?: TabPage;
+
+    lastDialogSize?: ISize;
 
     _floatingDialog?: Dialog;
     _canUndock: boolean;
@@ -399,7 +401,7 @@ export class PanelContainer implements IDockContainerWithSize {
             close = await this.closePanelContainerCallback(this);
         else if (this.dockManager.closePanelContainerCallback)
             close = await this.dockManager.closePanelContainerCallback(this);
-            
+
         if (close) {
             if (this.isDialog) {
                 if (this.floatingDialog) {

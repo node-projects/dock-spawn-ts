@@ -43,6 +43,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     touchDownHandler: EventHandler;
     panelType: PanelType;
     tabPage?: TabPage;
+    lastDialogSize?: ISize;
     _floatingDialog?: Dialog;
     _canUndock: boolean;
     _cachedWidth: number;

@@ -90,6 +90,8 @@ export class Dialog {
     }
 
     destroy() {
+        this.panel.lastDialogSize = { width: this.resizable.width, height: this.resizable.height };
+        
         if (this.focusHandler) {
             this.focusHandler.cancel();
             delete this.focusHandler;
@@ -111,7 +113,7 @@ export class Dialog {
         Utils.removeNode(this.panel.elementPanel);
         Utils.arrayRemove(this.dockManager.context.model.dialogs, this);
         delete this.panel.floatingDialog;
-        
+
         if (this.grayoutParent) {
             this.grayoutParent.grayOut(false);
         }

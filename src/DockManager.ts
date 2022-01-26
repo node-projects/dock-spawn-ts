@@ -466,6 +466,9 @@ export class DockManager {
         // Create a new dialog window for the undocked panel
         let dialog = new Dialog(panelContainer, this, null);
 
+        if (panelContainer.lastDialogSize)
+            dialog.resize(panelContainer.lastDialogSize.width, panelContainer.lastDialogSize.height);
+
         if (event !== undefined) {
             // Adjust the relative position
             let dialogWidth = dialog.elementDialog.clientWidth;
