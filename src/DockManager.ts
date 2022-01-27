@@ -427,7 +427,9 @@ export class DockManager {
             let splitter = newNode.parent.container as SplitterDockContainer;
             if (ratios && oldSplitter == splitter) {
                 if (dockedToPrevious) {
-                    ratios[ratios.length - 1] = ratios[ratios.length - 1] - ratio;
+                    for (let i = 0; i < ratios.length; i++) {
+                        ratios[i] = ratios[i] - ratios[i] * ratio;
+                    }
                     ratios.push(ratio);
                 } else {
                     ratios[0] = ratios[0] - ratio;
