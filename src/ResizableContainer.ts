@@ -35,8 +35,8 @@ export class ResizableContainer implements IDockContainer {
         this.dockManager = delegate.dockManager;
         this.topLevelElement = topLevelElement;
         this.containerType = delegate.containerType;
-        this.topLevelElement.style.marginLeft = this.topLevelElement.offsetLeft + 'px';
-        this.topLevelElement.style.marginTop = this.topLevelElement.offsetTop + 'px';
+        this.topLevelElement.style.left = this.topLevelElement.offsetLeft + 'px';
+        this.topLevelElement.style.top = this.topLevelElement.offsetTop + 'px';
         this.minimumAllowedChildNodes = delegate.minimumAllowedChildNodes;
         this._buildResizeHandles();
         this.readyToProcessNextResize = true;
@@ -243,8 +243,8 @@ export class ResizableContainer implements IDockContainer {
 
     _performDrag(handle, dx: number, dy: number) {
         let bounds: IThickness = {};
-        bounds.left = Utils.getPixels(this.topLevelElement.style.marginLeft);
-        bounds.top = Utils.getPixels(this.topLevelElement.style.marginTop);
+        bounds.left = Utils.getPixels(this.topLevelElement.style.left);
+        bounds.top = Utils.getPixels(this.topLevelElement.style.top);
         bounds.width = this.topLevelElement.clientWidth;
         bounds.height = this.topLevelElement.clientHeight;
 
@@ -281,8 +281,8 @@ export class ResizableContainer implements IDockContainer {
         bounds.width = Math.max(bounds.width, minWidth);
         bounds.height = Math.max(bounds.height, minHeight);
 
-        this.topLevelElement.style.marginLeft = bounds.left + 'px';
-        this.topLevelElement.style.marginTop = bounds.top + 'px';
+        this.topLevelElement.style.left = bounds.left + 'px';
+        this.topLevelElement.style.top = bounds.top + 'px';
 
         this.resize(bounds.width, bounds.height);
     }
