@@ -54,6 +54,12 @@ export class PanelContainer implements IDockContainerWithSize {
     _hideCloseButton: boolean;
     _grayOut: HTMLDivElement;
 
+    setPosition(x: number, y: number) {
+        this.elementContent.style.left = x + 'px';
+        //todo, 25px if it is a dialog, is it always 25px? where do we know...
+        this.elementContent.style.top = (y + 25) + 'px';
+    }
+
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
         if (!title)
             title = 'Panel';
@@ -62,6 +68,11 @@ export class PanelContainer implements IDockContainerWithSize {
         this.panelType = panelType;
 
         this.elementContent = Object.assign(elementContent, { _dockSpawnPanelContainer: this });
+        this.elementContent.style.position = 'absolute';
+        //this.elementContent.style.left='0px';
+        //this.elementContent.style.top='0px';
+        dockManager.config.dialogRootElement.appendChild(this.elementContent);
+
         this.dockManager = dockManager;
         this.title = title;
         this.containerType = ContainerType.panel;
@@ -201,7 +212,7 @@ export class PanelContainer implements IDockContainerWithSize {
 
         this.elementContentWrapper = document.createElement("div");
         this.elementContentWrapper.classList.add('panel-content-wrapper');
-        this.elementContentWrapper.appendChild(this.elementContent);
+        //this.elementContentWrapper.appendChild(this.elementContent);
 
         Utils.removeNode(this.elementContentWrapper);
         this.elementContentHost.appendChild(this.elementContentWrapper);

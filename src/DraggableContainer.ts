@@ -223,5 +223,7 @@ export class DraggableContainer implements IDockContainer {
         let top = dy + Utils.getPixels(this.topLevelElement.style.top);
         this.topLevelElement.style.left = left + 'px';
         this.topLevelElement.style.top = top + 'px';
+
+        this.dialog.panel.setPosition(left,top);
     }
 }
