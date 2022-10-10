@@ -345,6 +345,8 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContent.style.height = contentHeight + 'px';
         this.elementPanel.style.height = height + 'px';
 
+        if (this.elementContent.parentElement != this.dockManager.config.dialogRootElement)
+            this.dockManager.config.dialogRootElement.appendChild(this.elementContent);
         const rect = this.elementContentWrapper.getBoundingClientRect();
         this.elementContent.style.left = rect.x + 'px';
         this.elementContent.style.top = rect.y + 'px';
@@ -358,8 +360,8 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContent.style.top = (y + this.elementTitle.clientHeight) + 'px';
     }
 
-    setVisible(isVisible : boolean) {
-        this.elementContent.style.display = isVisible ? 'block': 'none';
+    setVisible(isVisible: boolean) {
+        this.elementContent.style.display = isVisible ? 'block' : 'none';
     }
 
     setTitle(title: string) {
