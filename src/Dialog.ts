@@ -73,7 +73,7 @@ export class Dialog {
         this.position = new Point(x - rect.left, y - rect.top);
         this.elementDialog.style.left = (x - rect.left) + 'px';
         this.elementDialog.style.top = (y - rect.top) + 'px';
-        this.panel.setPosition(x, y);
+        this.panel.setDialogPosition(x, y);
         this.dockManager.notifyOnChangeDialogPosition(this, x, y);
     }
 

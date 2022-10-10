@@ -78,6 +78,7 @@ export class TabPage {
         this._initContent = true;
         if (this.selected) {
             this.containerElement.style.display = 'block';
+            this.panel.setVisible(true);
             // force a resize again
             let width = this.host.contentElement.clientWidth;
             let height = this.host.contentElement.clientHeight;
@@ -86,6 +87,7 @@ export class TabPage {
         }
         else {
             this.containerElement.style.display = 'none';
+            this.panel.setVisible(false);
         }
     }
 

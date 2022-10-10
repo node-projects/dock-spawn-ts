@@ -54,12 +54,6 @@ export class PanelContainer implements IDockContainerWithSize {
     _hideCloseButton: boolean;
     _grayOut: HTMLDivElement;
 
-    setPosition(x: number, y: number) {
-        this.elementContent.style.left = x + 'px';
-        //todo, 25px if it is a dialog, is it always 25px? where do we know...
-        this.elementContent.style.top = (y + 25) + 'px';
-    }
-
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
         if (!title)
             title = 'Panel';
@@ -69,8 +63,6 @@ export class PanelContainer implements IDockContainerWithSize {
 
         this.elementContent = Object.assign(elementContent, { _dockSpawnPanelContainer: this });
         this.elementContent.style.position = 'absolute';
-        //this.elementContent.style.left='0px';
-        //this.elementContent.style.top='0px';
         dockManager.config.dialogRootElement.appendChild(this.elementContent);
 
         this.dockManager = dockManager;
@@ -201,6 +193,10 @@ export class PanelContainer implements IDockContainerWithSize {
         let panelWidth = this.elementContent.clientWidth;
         let panelHeight = this.elementContent.clientHeight;
         let titleHeight = this.elementTitle.clientHeight;
+
+        this.elementContentWrapper = document.createElement("div");
+        this.elementContentWrapper.classList.add('panel-content-wrapper');
+
         this._setPanelDimensions(panelWidth, panelHeight + titleHeight);
 
         if (!this._hideCloseButton) {
@@ -209,10 +205,6 @@ export class PanelContainer implements IDockContainerWithSize {
             this.closeButtonTouchedHandler =
                 new EventHandler(this.elementButtonClose, 'touchstart', this.onCloseButtonClicked.bind(this));
         }
-
-        this.elementContentWrapper = document.createElement("div");
-        this.elementContentWrapper.classList.add('panel-content-wrapper');
-        //this.elementContentWrapper.appendChild(this.elementContent);
 
         Utils.removeNode(this.elementContentWrapper);
         this.elementContentHost.appendChild(this.elementContentWrapper);
@@ -352,6 +344,22 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContentHost.style.height = contentHeight + 'px';
         this.elementContent.style.height = contentHeight + 'px';
         this.elementPanel.style.height = height + 'px';
+
+        const rect = this.elementContentWrapper.getBoundingClientRect();
+        this.elementContent.style.left = rect.x + 'px';
+        this.elementContent.style.top = rect.y + 'px';
+        this.elementContent.style.width = rect.width + 'px';
+        this.elementContent.style.height = rect.height + 'px';
+    }
+
+    setDialogPosition(x: number, y: number) {
+        this.elementContent.style.left = x + 'px';
+        //todo, 25px if it is a dialog, is it always 25px? where do we know...
+        this.elementContent.style.top = (y + this.elementTitle.clientHeight) + 'px';
+    }
+
+    setVisible(isVisible : boolean) {
+        this.elementContent.style.display = isVisible ? 'block': 'none';
     }
 
     setTitle(title: string) {
@@ -407,6 +415,8 @@ export class PanelContainer implements IDockContainerWithSize {
 
     async close() {
         let close = true;
+
+        this.dockManager.config.dialogRootElement.removeChild(this.elementContent);
 
         if (this.closePanelContainerCallback)
             close = await this.closePanelContainerCallback(this);
