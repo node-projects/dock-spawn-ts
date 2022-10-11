@@ -7,11 +7,12 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
 import { IState } from "./interfaces/IState.js";
 import { DockWheelItem } from "./DockWheelItem.js";
+import { PanelContainer } from "./PanelContainer.js";
 
 export class DraggableContainer implements IDockContainer {
 
     dialog: Dialog;
-    delegate: IDockContainer;
+    delegate: PanelContainer;
     containerElement: HTMLElement;
     dockManager: DockManager;
     topLevelElement: HTMLElement;
@@ -26,7 +27,7 @@ export class DraggableContainer implements IDockContainer {
     touchUpHandler: EventHandler;
     private iframeEventHandlers: EventHandler[];
 
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, dragHandle: HTMLElement) {
+    constructor(dialog: Dialog, delegate: PanelContainer, topLevelElement: HTMLElement, dragHandle: HTMLElement) {
         this.dialog = dialog;
         this.delegate = delegate;
         this.containerElement = delegate.containerElement;
@@ -158,6 +159,7 @@ export class DraggableContainer implements IDockContainer {
 
     _startDragging(event: { clientX: number, clientY: number }) {
         this.containerElement.classList.add("draggable-dragging-active");
+        this.delegate.elementContentContainer.classList.add("draggable-dragging-active");
         if (this.dialog.eventListener)
             this.dialog.eventListener._onDialogDragStarted(this.dialog, event);
         Utils.disableGlobalTextSelection(this.dockManager.config.dialogRootElement);
@@ -165,6 +167,7 @@ export class DraggableContainer implements IDockContainer {
 
     _stopDragging(event) {
         this.containerElement.classList.remove("draggable-dragging-active");
+        this.delegate.elementContentContainer.classList.remove("draggable-dragging-active");
         if (this.dialog.eventListener)
             this.dialog.eventListener._onDialogDragEnded(this.dialog, event);
         Utils.enableGlobalTextSelection(this.dockManager.config.dialogRootElement);

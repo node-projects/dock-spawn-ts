@@ -134,13 +134,13 @@ export class Dialog {
 
     bringToFront() {
         this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
-        this.panel.elementContent.style.zIndex = this.elementDialog.style.zIndex;
+        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex;
         this.dockManager.activePanel = this.panel;
     }
 
     hide() {
         this.elementDialog.style.zIndex = '0';
-        this.panel.elementContent.style.zIndex = this.elementDialog.style.zIndex;
+        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex;
         this.elementDialog.style.display = 'none';
         if (!this.isHidden) {
             this.isHidden = true;
@@ -164,7 +164,7 @@ export class Dialog {
 
     show() {
         this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
-        this.panel.elementContent.style.zIndex = this.elementDialog.style.zIndex;
+        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex;
         this.elementDialog.style.display = 'block';
         if (this.isHidden) {
             this.isHidden = false;
