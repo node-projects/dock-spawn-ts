@@ -27,6 +27,11 @@
 .panel-content * {
 }
 
+
+.panel-element-content-container {
+	z-index: 1;
+	background-color: white;
+}
 /***************** Floating dialog box ****************/
 .dialog-floating {
 	box-shadow: 5px 5px 20px #000;
