@@ -17,8 +17,8 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
     _cachedHeight: number;
     state: ISize;
     containerType: ContainerType;
-    
-    constructor(name: string, dockManager: DockManager, childContainers: IDockContainer[], stackedVertical : boolean) {
+
+    constructor(name: string, dockManager: DockManager, childContainers: IDockContainer[], stackedVertical: boolean) {
         // for prototype inheritance purposes only
         if (arguments.length === 0) {
             return;
@@ -32,7 +32,7 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
         this.minimumAllowedChildNodes = 2;
     }
 
-    resize(width:number, height:number) {
+    resize(width: number, height: number) {
         //    if (_cachedWidth === _cachedWidth && _cachedHeight === _height) {
         //      // No need to resize
         //      return;
@@ -42,7 +42,7 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
         this._cachedHeight = height;
     }
 
-    performLayout(childContainers: IDockContainer[], relayoutEvenIfEqual : boolean = false) {
+    performLayout(childContainers: IDockContainer[], relayoutEvenIfEqual: boolean = false) {
         this.splitterPanel.performLayout(childContainers, relayoutEvenIfEqual);
     }
 
@@ -62,7 +62,7 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
         this.resize(this.width, this.height);
     }
 
-    getRatios() : number[] {
+    getRatios(): number[] {
         return this.splitterPanel.getRatios();
     }
 

@@ -88,8 +88,9 @@ export class TabHost {
         } else {
             this.separatorElement.classList.remove('dockspan-tab-handle-content-seperator-active');
         }
-        if (this.activeTab)
+        if (this.activeTab) {
             this.activeTab.handle.setActive(isActive);
+        }
     }
 
     onMousedown() {
