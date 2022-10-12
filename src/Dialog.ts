@@ -140,7 +140,7 @@ export class Dialog {
 
     hide() {
         this.elementDialog.style.zIndex = '0';
-        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex;
+        this.panel.elementContentContainer.style.zIndex = '';
         this.elementDialog.style.display = 'none';
         if (!this.isHidden) {
             this.isHidden = true;
