@@ -73,6 +73,7 @@ export class Dialog {
         this.position = new Point(x - rect.left, y - rect.top);
         this.elementDialog.style.left = (x - rect.left) + 'px';
         this.elementDialog.style.top = (y - rect.top) + 'px';
+        this.panel.setDialogPosition(x, y);
         this.dockManager.notifyOnChangeDialogPosition(this, x, y);
     }
 
@@ -91,7 +92,7 @@ export class Dialog {
 
     destroy() {
         this.panel.lastDialogSize = { width: this.resizable.width, height: this.resizable.height };
-        
+
         if (this.focusHandler) {
             this.focusHandler.cancel();
             delete this.focusHandler;
@@ -132,12 +133,15 @@ export class Dialog {
     }
 
     bringToFront() {
-        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
+        this._increaseZIndex();
+        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter;
+        this.panel.elementContentContainer.style.zIndex = (parseInt(this.elementDialog.style.zIndex) + 1).toString();
         this.dockManager.activePanel = this.panel;
     }
 
     hide() {
         this.elementDialog.style.zIndex = '0';
+        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex;
         this.elementDialog.style.display = 'none';
         if (!this.isHidden) {
             this.isHidden = true;
@@ -160,11 +164,18 @@ export class Dialog {
     }
 
     show() {
-        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
+        this._increaseZIndex();
+        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter;
+        this.panel.elementContentContainer.style.zIndex = (parseInt(this.elementDialog.style.zIndex) + 1).toString();
         this.elementDialog.style.display = 'block';
         if (this.isHidden) {
             this.isHidden = false;
             this.dockManager.notifyOnShowDialog(this);
         }
+    }
+
+    private _increaseZIndex(){
+        // Increase by two, so the content can lay on top of the dialog
+        this.dockManager.zIndexDialogCounter += 2;
     }
 }

@@ -399,6 +399,7 @@ export class DockManager {
         let panel = dialog.panel;
         let newNode = new DockNode(panel);
         panel.prepareForDocking();
+        panel.elementContentContainer.style.zIndex = '';
         dialog.destroy();
         layoutDockFunction(referenceNode, newNode);
         // this.invalidate();
@@ -623,6 +624,7 @@ export class DockManager {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onDock) {
                 listener.onDock(this, dockNode);
+                dockNode.container.resize(dockNode.container.width, dockNode.container.height);
             }
         });
     }

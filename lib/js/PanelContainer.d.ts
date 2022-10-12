@@ -26,6 +26,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
         resizeHandler?: any;
         _dockSpawnPanelContainer: PanelContainer;
     };
+    elementContentContainer: HTMLElement;
     elementContentWrapper: HTMLElement;
     dockManager: DockManager;
     title: string;
@@ -86,6 +87,8 @@ export declare class PanelContainer implements IDockContainerWithSize {
     set height(value: number);
     resize(width: number, height: number): void;
     _setPanelDimensions(width: number, height: number): void;
+    setDialogPosition(x: number, y: number): void;
+    setVisible(isVisible: boolean): void;
     setTitle(title: string): void;
     setTitleIcon(icon: string): void;
     setHasChanges(changes: boolean): void;
