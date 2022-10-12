@@ -80,6 +80,7 @@ export class PanelContainer implements IDockContainerWithSize {
                 if (this.tabPage)
                     this.tabPage.setSelected(true);
             }
+            this.dockManager.activePanel = this;
         });
         this.elementContentContainer.appendChild(elementContent);
         dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);

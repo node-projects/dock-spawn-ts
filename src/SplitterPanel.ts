@@ -159,6 +159,9 @@ export class SplitterPanel {
         if (this.childContainers.length <= 1)
             return;
 
+        this.panelElement.style.width = width + 'px';
+        this.panelElement.style.height = height + 'px';
+
         let i;
 
         // Adjust the fixed dimension that is common to all (i.e. width, if stacked vertical; height, if stacked horizontally)
@@ -221,8 +224,5 @@ export class SplitterPanel {
             else
                 child.resize(newSize, child.height);
         }
-
-        this.panelElement.style.width = width + 'px';
-        this.panelElement.style.height = height + 'px';
     }
 }
