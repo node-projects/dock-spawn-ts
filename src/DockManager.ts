@@ -203,9 +203,9 @@ export class DockManager {
         this.context.model.rootNode.container.resize(width, height);
 
         let offsetX = 0, offsetY = 0;
-        for (let dialog of this.context.model.dialogs){
-            if(dialog.position.x > this.element.clientWidth || dialog.position.y > this.element.clientHeight){
-                if(offsetX > this.element.clientWidth || offsetY > this.element.clientHeight)
+        for (let dialog of this.context.model.dialogs) {
+            if (dialog.position.x > this.element.clientWidth || dialog.position.y > this.element.clientHeight) {
+                if (offsetX > this.element.clientWidth || offsetY > this.element.clientHeight)
                     offsetX = 0, offsetY = 0;
                 dialog.setPosition(100 + offsetX, 100 + offsetY);
                 offsetX += 100;

@@ -74,7 +74,12 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContentContainer.className = 'panel-element-content-container';
         this.elementContentContainer.style.position = 'absolute';
         this.elementContentContainer.addEventListener('pointerdown', () => {
-            if(this.isDialog) this._floatingDialog.bringToFront();
+            if (this.isDialog) {
+                this._floatingDialog.bringToFront();
+            } else {
+                if (this.tabPage)
+                    this.tabPage.setSelected(true);
+            }
         });
         this.elementContentContainer.appendChild(elementContent);
         dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
@@ -336,6 +341,7 @@ export class PanelContainer implements IDockContainerWithSize {
         //     // Already in the desired size
         //     return;
         // }
+        this.setVisible(true);
         this._setPanelDimensions(width, height);
         this._cachedWidth = width;
         this._cachedHeight = height;
