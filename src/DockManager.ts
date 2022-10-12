@@ -623,6 +623,7 @@ export class DockManager {
         this.layoutEventListeners.forEach((listener) => {
             if (listener.onDock) {
                 listener.onDock(this, dockNode);
+                dockNode.container.resize(dockNode.container.width, dockNode.container.height);
             }
         });
     }

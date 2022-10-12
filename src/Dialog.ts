@@ -133,8 +133,9 @@ export class Dialog {
     }
 
     bringToFront() {
-        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
-        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex;
+        this._increaseZIndex();
+        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter;
+        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex + 1;
         this.dockManager.activePanel = this.panel;
     }
 
@@ -163,12 +164,18 @@ export class Dialog {
     }
 
     show() {
-        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
-        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex;
+        this._increaseZIndex();
+        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter;
+        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex + 1;
         this.elementDialog.style.display = 'block';
         if (this.isHidden) {
             this.isHidden = false;
             this.dockManager.notifyOnShowDialog(this);
         }
+    }
+
+    private _increaseZIndex(){
+        // Increase by two, so the content can lay on top of the dialog
+        this.dockManager.zIndexDialogCounter += 2;
     }
 }
