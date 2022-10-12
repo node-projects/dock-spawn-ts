@@ -399,6 +399,7 @@ export class DockManager {
         let panel = dialog.panel;
         let newNode = new DockNode(panel);
         panel.prepareForDocking();
+        panel.elementContentContainer.style.zIndex = '';
         dialog.destroy();
         layoutDockFunction(referenceNode, newNode);
         // this.invalidate();

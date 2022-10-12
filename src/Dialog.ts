@@ -135,7 +135,7 @@ export class Dialog {
     bringToFront() {
         this._increaseZIndex();
         this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter;
-        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex + 1;
+        this.panel.elementContentContainer.style.zIndex = (parseInt(this.elementDialog.style.zIndex) + 1).toString();
         this.dockManager.activePanel = this.panel;
     }
 
@@ -166,7 +166,7 @@ export class Dialog {
     show() {
         this._increaseZIndex();
         this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter;
-        this.panel.elementContentContainer.style.zIndex = this.elementDialog.style.zIndex + 1;
+        this.panel.elementContentContainer.style.zIndex = (parseInt(this.elementDialog.style.zIndex) + 1).toString();
         this.elementDialog.style.display = 'block';
         if (this.isHidden) {
             this.isHidden = false;

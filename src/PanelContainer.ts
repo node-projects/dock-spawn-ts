@@ -73,6 +73,9 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContentContainer = document.createElement('div');
         this.elementContentContainer.className = 'panel-element-content-container';
         this.elementContentContainer.style.position = 'absolute';
+        this.elementContentContainer.onclick = () => {
+            if(this.isDialog) this._floatingDialog.bringToFront();
+        }
         this.elementContentContainer.appendChild(elementContent);
         dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
 
