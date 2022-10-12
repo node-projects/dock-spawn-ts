@@ -39,4 +39,5 @@ export declare class Dialog {
     close(): void;
     remove(): void;
     show(): void;
+    private _increaseZIndex;
 }

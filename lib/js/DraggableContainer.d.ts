@@ -4,9 +4,10 @@ import { EventHandler } from "./EventHandler.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
 import { IState } from "./interfaces/IState.js";
+import { PanelContainer } from "./PanelContainer.js";
 export declare class DraggableContainer implements IDockContainer {
     dialog: Dialog;
-    delegate: IDockContainer;
+    delegate: PanelContainer;
     containerElement: HTMLElement;
     dockManager: DockManager;
     topLevelElement: HTMLElement;
@@ -23,7 +24,7 @@ export declare class DraggableContainer implements IDockContainer {
     mouseUpHandler: EventHandler;
     touchUpHandler: EventHandler;
     private iframeEventHandlers;
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, dragHandle: HTMLElement);
+    constructor(dialog: Dialog, delegate: PanelContainer, topLevelElement: HTMLElement, dragHandle: HTMLElement);
     destroy(): void;
     saveState(state: IState): void;
     loadState(state: IState): void;
