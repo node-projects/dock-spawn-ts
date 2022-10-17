@@ -73,6 +73,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContentContainer = document.createElement('div');
         this.elementContentContainer.className = 'panel-element-content-container';
         this.elementContentContainer.style.position = 'absolute';
+        (<any>this.elementContentContainer)._panel = this;
         this.elementContentContainer.addEventListener('pointerdown', () => {
             if (this.isDialog) {
                 this._floatingDialog.bringToFront();
