@@ -21,7 +21,6 @@ export class TabHandle {
     closeButtonTouchHandler: EventHandler;
     auxClickHandler: EventHandler;
     contextMenuHandler: EventHandler;
-    zIndexCounter: number;
     mouseMoveHandler: EventHandler;
     touchMoveHandler: EventHandler;
     mouseUpHandler: EventHandler;
@@ -66,7 +65,7 @@ export class TabHandle {
         this.elementText.innerHTML = title;
         this.elementText.title = this.elementText.innerText;
 
-        this._bringToFront(this.elementBase);
+        //this._bringToFront(this.elementBase);
 
         this.undockInitiator = new UndockInitiator(this.elementBase, undockHandler);
         this.undockInitiator.enabled = true;
@@ -77,7 +76,7 @@ export class TabHandle {
         this.auxClickHandler = new EventHandler(this.elementBase, 'auxclick', this.onCloseButtonClicked.bind(this));
         this.contextMenuHandler = new EventHandler(this.elementBase, 'contextmenu', this.oncontextMenuClicked.bind(this));
 
-        this.zIndexCounter = parent.host.dockManager.zIndexTabHandle;
+        //this.zIndexCounter = parent.host.dockManager.zIndexTabHandle;
     }
 
     addListener(listener) {
@@ -316,14 +315,5 @@ export class TabHandle {
             else
                 this.elementBase.classList.remove('dockspan-tab-handle-active');
         }
-    }
-
-    setZIndex(zIndex: number) {
-        this.elementBase.style.zIndex = <string><any>zIndex;
-    }
-
-    _bringToFront(element: HTMLElement) {
-        element.style.zIndex = <string><any>this.zIndexCounter;
-        this.zIndexCounter++;
     }
 }
