@@ -17,7 +17,6 @@ export declare class TabHandle {
     closeButtonTouchHandler: EventHandler;
     auxClickHandler: EventHandler;
     contextMenuHandler: EventHandler;
-    zIndexCounter: number;
     mouseMoveHandler: EventHandler;
     touchMoveHandler: EventHandler;
     mouseUpHandler: EventHandler;
@@ -53,6 +52,4 @@ export declare class TabHandle {
     onCloseButtonClicked(e: any): void;
     setSelected(isSelected: boolean): void;
     setActive(isActive: boolean): void;
-    setZIndex(zIndex: number): void;
-    _bringToFront(element: HTMLElement): void;
 }
