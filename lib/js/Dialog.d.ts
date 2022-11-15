@@ -14,6 +14,7 @@ export declare class Dialog {
     eventListener: DockManager;
     position: Point;
     resizable: ResizableContainer;
+    disableResize: boolean;
     mouseDownHandler: any;
     touchDownHandler: any;
     onKeyPressBound: any;
@@ -22,7 +23,7 @@ export declare class Dialog {
     keyPressHandler: EventHandler;
     focusHandler: EventHandler;
     grayoutParent: PanelContainer;
-    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer);
+    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, disableResize?: boolean);
     saveState(x: number, y: number): void;
     static fromElement(id: string, dockManager: DockManager): Dialog;
     _initialize(): void;

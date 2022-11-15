@@ -14,6 +14,7 @@ export class Dialog {
     eventListener: DockManager;
     position: Point;
     resizable: ResizableContainer;
+    disableResize: boolean;
     mouseDownHandler: any;
     touchDownHandler: any;
     onKeyPressBound: any;
@@ -23,11 +24,12 @@ export class Dialog {
     focusHandler: EventHandler;
     grayoutParent: PanelContainer;
 
-    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer) {
+    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, disableResize?: boolean) {
         this.panel = panel;
         this.dockManager = dockManager;
         this.eventListener = dockManager;
         this.grayoutParent = grayoutParent;
+        this.disableResize = disableResize;
         this._initialize();
         this.dockManager.context.model.dialogs.push(this);
         this.position = dockManager.defaultDialogPosition;
@@ -50,7 +52,7 @@ export class Dialog {
         this.elementDialog.tabIndex = 0;
         this.elementDialog.appendChild(this.panel.elementPanel);
         this.draggable = new DraggableContainer(this, this.panel, this.elementDialog, this.panel.elementTitle);
-        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement);
+        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement, this.disableResize);
 
         this.dockManager.config.dialogRootElement.appendChild(this.elementDialog);
         this.elementDialog.classList.add('dialog-floating');
