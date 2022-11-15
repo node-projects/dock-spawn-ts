@@ -27,9 +27,11 @@ export class ResizableContainer implements IDockContainer {
     resizeHandles: ResizeHandle[];
     previousMousePosition: Point;
     private iframeEventHandlers: EventHandler[];
+    private disableResize: boolean;
 
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement) {
+    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, disableResize: boolean = false) {
         this.dialog = dialog;
+        this.disableResize = disableResize;
         this.delegate = delegate;
         this.containerElement = delegate.containerElement;
         this.dockManager = delegate.dockManager;
@@ -50,14 +52,16 @@ export class ResizableContainer implements IDockContainer {
     _buildResizeHandles() {
         this.resizeHandles = [];
         //    this._buildResizeHandle(true, false, true, false); // Dont need the corner resizer near the close button
-        this._buildResizeHandle(false, true, true, false);
-        this._buildResizeHandle(true, false, false, true);
-        this._buildResizeHandle(false, true, false, true);
+        if (!this.disableResize) {
+            this._buildResizeHandle(false, true, true, false);
+            this._buildResizeHandle(true, false, false, true);
+            this._buildResizeHandle(false, true, false, true);
 
-        this._buildResizeHandle(true, false, false, false);
-        this._buildResizeHandle(false, true, false, false);
-        this._buildResizeHandle(false, false, true, false);
-        this._buildResizeHandle(false, false, false, true);
+            this._buildResizeHandle(true, false, false, false);
+            this._buildResizeHandle(false, true, false, false);
+            this._buildResizeHandle(false, false, true, false);
+            this._buildResizeHandle(false, false, false, true);
+        }
     }
 
     _buildResizeHandle(east: boolean, west: boolean, north: boolean, south: boolean) {

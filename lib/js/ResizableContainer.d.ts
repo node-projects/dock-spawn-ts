@@ -23,7 +23,8 @@ export declare class ResizableContainer implements IDockContainer {
     resizeHandles: ResizeHandle[];
     previousMousePosition: Point;
     private iframeEventHandlers;
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement);
+    private disableResize;
+    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, disableResize?: boolean);
     setActiveChild(): void;
     _buildResizeHandles(): void;
     _buildResizeHandle(east: boolean, west: boolean, north: boolean, south: boolean): void;

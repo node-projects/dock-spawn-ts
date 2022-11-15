@@ -138,7 +138,7 @@ window.onload = () => {
         dockManager.dockRight(documentNode, toolbox, 0.20);
         dockManager.dockFill(documentNode, editor1);
         dockManager.dockFill(documentNode, editor2);
-        dockManager.floatDialog(infovis, 50, 50);
+        dockManager.floatDialog(infovis, 50, 50, null, true);
     }
 
     document.getElementById("dlg").onclick = () => {
