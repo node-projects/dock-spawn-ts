@@ -181,8 +181,10 @@ export class TabHost {
         let tabListWidth = 0;
         this.pages.forEach((page) => {
             let handle = page.handle;
-            handle.elementBase.style.width = ''; //clear
-            tabListWidth += handle.elementBase.clientWidth;
+            if (handle.elementBase != null){
+                handle.elementBase.style.width = ''; //clear
+                tabListWidth += handle.elementBase.clientWidth;
+            }
         });
         let scaleMultiplier = width / tabListWidth;
         if (scaleMultiplier > 1.2) return; //with a reserve

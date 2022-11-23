@@ -271,10 +271,15 @@ export class TabHandle {
             this.contextMenuHandler.cancel();
         }
 
-        Utils.removeNode(this.elementBase);
-        Utils.removeNode(this.elementCloseButton);
-        delete this.elementBase;
-        delete this.elementCloseButton;
+        if(this.elementBase){
+            Utils.removeNode(this.elementBase);
+            delete this.elementBase;
+        }
+        
+        if(this.elementCloseButton){
+            Utils.removeNode(this.elementCloseButton);
+            delete this.elementCloseButton;
+        }
     }
 
     _performUndock(e, dragOffset) {
