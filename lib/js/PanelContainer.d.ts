@@ -57,7 +57,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     removeListener(listener: any): void;
     get floatingDialog(): Dialog;
     set floatingDialog(value: Dialog);
-    static loadFromState(state: IState, dockManager: DockManager): PanelContainer;
+    static loadFromState(state: IState, dockManager: DockManager): Promise<PanelContainer>;
     saveState(state: IState): void;
     loadState(state: IState): void;
     setActiveChild(): void;
