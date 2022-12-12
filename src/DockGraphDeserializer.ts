@@ -24,27 +24,27 @@ export class DockGraphDeserializer {
         this.dockManager = dockManager;
     }
 
-    deserialize(_json: string): DockModel {
+    async deserialize(_json: string): Promise<DockModel> {
         let info = JSON.parse(_json);
         let model = new DockModel();
-        model.rootNode = this._buildGraph(info.graphInfo);
-        model.dialogs = this._buildDialogs(info.dialogsInfo);
+        model.rootNode = await this._buildGraph(info.graphInfo);
+        model.dialogs = await this._buildDialogs(info.dialogsInfo);
         model.documentManagerNode = this.documentManagerNode;
         return model;
     }
 
-    _buildGraph(nodeInfo: INodeInfo) {
+    async _buildGraph(nodeInfo: INodeInfo) {
         let childrenInfo = nodeInfo.children;
         let children: DockNode[] = [];
-        childrenInfo.forEach((childInfo) => {
-            let childNode = this._buildGraph(childInfo);
+        for (let childInfo of childrenInfo) {
+            let childNode = await this._buildGraph(childInfo);
             if (childNode !== null) {
                 children.push(childNode);
             }
-        });
+        };
 
         // Build the container owned by this node
-        let container = this._createContainer(nodeInfo, children);
+        let container = await this._createContainer(nodeInfo, children);
         if (container === null) {
             return null;
         }
@@ -53,25 +53,26 @@ export class DockGraphDeserializer {
         if (container instanceof DocumentManagerContainer)
             this.documentManagerNode = node;
         node.children = children;
-        node.children.reverse().forEach((childNode) => {
+        for (let childNode of node.children.reverse()) {
             childNode.parent = node;
-        });
+        };
         node.children.reverse();
         // node.container.setActiveChild(node.container);
         return node;
     }
 
-    _createContainer(nodeInfo: INodeInfo, children: DockNode[]) {
+    async _createContainer(nodeInfo: INodeInfo, children: DockNode[]) {
         let containerType = nodeInfo.containerType;
         let containerState = nodeInfo.state;
         let container;
 
         let childContainers: IDockContainer[] = [];
-        children.forEach((childNode) => { childContainers.push(childNode.container); });
-
+        for (let childNode of children) {
+            childContainers.push(childNode.container);
+        }
 
         if (containerType === 'panel') {
-            container = PanelContainer.loadFromState(containerState, this.dockManager);
+            container = await PanelContainer.loadFromState(containerState, this.dockManager);
             if (!container.prepareForDocking)
                 return null;
             container.prepareForDocking();
@@ -102,14 +103,14 @@ export class DockGraphDeserializer {
         return container;
     }
 
-    _buildDialogs(dialogsInfo: IPanelInfo[]) {
+    async _buildDialogs(dialogsInfo: IPanelInfo[]) {
         let dialogs: Dialog[] = [];
-        dialogsInfo.forEach((dialogInfo) => {
+        for (let dialogInfo of dialogsInfo) {
             let containerType = dialogInfo.containerType;
             let containerState = dialogInfo.state;
             let container;
             if (containerType === 'panel') {
-                container = PanelContainer.loadFromState(containerState, this.dockManager);
+                container = await PanelContainer.loadFromState(containerState, this.dockManager);
                 if (container.prepareForDocking) {
                     Utils.removeNode(container.elementPanel);
                     container.isDialog = true;
@@ -127,7 +128,7 @@ export class DockGraphDeserializer {
                 }
             }
 
-        });
+        }
         return dialogs;
     }
 }

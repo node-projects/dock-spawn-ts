@@ -126,13 +126,22 @@ export class PanelContainer implements IDockContainerWithSize {
         this.undockInitiator.enabled = canUndock;
     }
 
-    static loadFromState(state: IState, dockManager: DockManager) {
-        let elementName = state.element;
-        let elementContent = document.getElementById(elementName);
+    static async loadFromState(state: IState, dockManager: DockManager) {
+        let elementContent: HTMLElement;
+        let title: string;
+        if (!dockManager.getElementCallback) {
+            let elementName = state.element;
+            elementContent = document.getElementById(elementName);
+        } else {
+            let res= await dockManager.getElementCallback(state);
+            elementContent = res.element;
+            title = res.title;
+        }
+
         if (elementContent === null) {
             return null;
         }
-        let ret = new PanelContainer(elementContent, dockManager);
+        let ret = new PanelContainer(elementContent, dockManager, title);
         ret.loadState(state);
         return ret;
     }

@@ -11,6 +11,7 @@ import { PanelContainer } from "./PanelContainer.js";
 import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { DockModel } from "./DockModel.js";
 import { DockConfig } from "./DockConfig.js";
+import { IState } from "./interfaces/IState.js";
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.
  * It owns a Html Div element inside which all panels are docked
@@ -34,6 +35,10 @@ export declare class DockManager {
     onKeyPressBound: any;
     iframes: HTMLIFrameElement[];
     _undockEnabled: boolean;
+    getElementCallback: (state: IState) => Promise<{
+        element: HTMLElement;
+        title: string;
+    }>;
     private _config;
     private _activePanel;
     private _lastPanelNotADialog;
@@ -134,7 +139,7 @@ export declare class DockManager {
     notifyOnActivePanelChange(panel: PanelContainer, oldActive: PanelContainer): void;
     notifyOnActiveDocumentChange(panel: PanelContainer, oldActive: PanelContainer): void;
     saveState(): string;
-    loadState(json: string): void;
+    loadState(json: string): Promise<void>;
     getPanels(): PanelContainer[];
     undockEnabled(state: boolean): void;
     lockDockState(state: boolean): void;
