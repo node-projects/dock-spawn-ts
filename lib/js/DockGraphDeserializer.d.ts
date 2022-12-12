@@ -11,8 +11,8 @@ export declare class DockGraphDeserializer {
     dockManager: DockManager;
     documentManagerNode: DockNode;
     constructor(dockManager: DockManager);
-    deserialize(_json: string): DockModel;
-    _buildGraph(nodeInfo: INodeInfo): DockNode;
-    _createContainer(nodeInfo: INodeInfo, children: DockNode[]): any;
-    _buildDialogs(dialogsInfo: IPanelInfo[]): Dialog[];
+    deserialize(_json: string): Promise<DockModel>;
+    _buildGraph(nodeInfo: INodeInfo): Promise<DockNode>;
+    _createContainer(nodeInfo: INodeInfo, children: DockNode[]): Promise<any>;
+    _buildDialogs(dialogsInfo: IPanelInfo[]): Promise<Dialog[]>;
 }

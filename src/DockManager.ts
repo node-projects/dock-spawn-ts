@@ -18,6 +18,7 @@ import { DockModel } from "./DockModel.js";
 import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
 import { DockConfig } from "./DockConfig.js";
 import { PanelType } from "./enums/PanelType.js";
+import { IState } from "./interfaces/IState.js";
 
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.
@@ -43,6 +44,7 @@ export class DockManager {
     public onKeyPressBound: any;
     public iframes: HTMLIFrameElement[];
     public _undockEnabled: boolean;
+    public getElementCallback: (state: IState) => Promise<{element: HTMLElement, title: string }>;
 
     private _config: DockConfig;
     private _activePanel: PanelContainer;
@@ -732,9 +734,9 @@ export class DockManager {
         return serializer.serialize(this.context.model);
     }
 
-    loadState(json: string) {
+    async loadState(json: string) {
         let deserializer = new DockGraphDeserializer(this);
-        this.context.model = deserializer.deserialize(json);
+        this.context.model = await deserializer.deserialize(json);
         this.setModel(this.context.model);
     }
 
