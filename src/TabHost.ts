@@ -181,8 +181,10 @@ export class TabHost {
         let tabListWidth = 0;
         this.pages.forEach((page) => {
             let handle = page.handle;
-            handle.elementBase.style.width = ''; //clear
-            tabListWidth += handle.elementBase.clientWidth;
+            if (handle.elementBase != null){
+                handle.elementBase.style.width = ''; //clear
+                tabListWidth += handle.elementBase.clientWidth;
+            }
         });
         let scaleMultiplier = width / tabListWidth;
         if (scaleMultiplier > 1.2) return; //with a reserve
@@ -260,17 +262,6 @@ export class TabHost {
         this.pages.forEach((tabPage) => {
             let selected = (tabPage === page);
             tabPage.setSelected(selected);
-        });
-
-        // adjust the zIndex of the tabs to have proper shadow/depth effect
-        let zIndexDelta = 1;
-        let zIndex = this.dockManager.zIndexTabHost;
-        this.pages.forEach((tabPage) => {
-            tabPage.handle.setZIndex(zIndex);
-            let selected = (tabPage === page);
-            if (selected)
-                zIndexDelta = -1;
-            zIndex += zIndexDelta;
         });
     }
 }

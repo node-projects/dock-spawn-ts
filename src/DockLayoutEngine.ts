@@ -96,7 +96,7 @@ export class DockLayoutEngine {
     }
 
     close(node: DockNode) {
-        let parentNode = node.parent;
+        let parentNode = node?.parent;
         if (!parentNode)
             throw new Error('Cannot undock.  panel is not a leaf node');
 

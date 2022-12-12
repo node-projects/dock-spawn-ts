@@ -304,10 +304,11 @@ export class PanelContainer implements IDockContainerWithSize {
     /**
     * Closes the panel
     */
-    performClose() {
+    private performClose() {
         this.isDialog = true;
         this.undockInitiator.enabled = false;
         this.elementContentWrapper.style.display = "block";
+        this.elementContentContainer.style.display = 'none';
         this.elementPanel.style.position = "";
         this.dockManager.requestClose(this);
     }
@@ -324,6 +325,8 @@ export class PanelContainer implements IDockContainerWithSize {
     prepareForDocking() {
         this.isDialog = false;
         this.undockInitiator.enabled = this._canUndock;
+        if (this.elementContentContainer.parentElement != this.dockManager.config.dialogRootElement)
+            this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
     }
 
     get width(): number {
@@ -376,11 +379,11 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContentContainer.style.height = contentHeight + 'px';
         this.elementPanel.style.height = height + 'px';
 
-        if (this.elementContentContainer.parentElement != this.dockManager.config.dialogRootElement)
-            this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
+        //if (this.elementContentContainer.parentElement != this.dockManager.config.dialogRootElement)
+        //    this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
         const rect = this.elementContentWrapper.getBoundingClientRect();
         const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
-        this.elementContentContainer.style.left = (rect.x - rootRect.x) + 'px';
+        this.elementContentContainer.style.left = (rect.x /*- rootRect.x*/) + 'px';
         this.elementContentContainer.style.top = (rect.y - rootRect.y) + 'px';
         this.elementContentContainer.style.width = rect.width + 'px';
         this.elementContentContainer.style.height = rect.height + 'px';
@@ -390,7 +393,7 @@ export class PanelContainer implements IDockContainerWithSize {
         const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
         this.elementContentContainer.style.left = (x - rootRect.x) + 'px';
         //todo, 25px if it is a dialog, is it always 25px? where do we know...
-        this.elementContentContainer.style.top = (y + this.elementTitle.clientHeight - rootRect.y) + 'px';
+        this.elementContentContainer.style.top = (y + this.elementTitle.clientHeight /*- rootRect.y*/) + 'px';
     }
 
     setVisible(isVisible: boolean) {
@@ -451,23 +454,25 @@ export class PanelContainer implements IDockContainerWithSize {
     async close() {
         let close = true;
 
-        this.dockManager.config.dialogRootElement.removeChild(this.elementContentContainer);
+        if (this.elementContentContainer.parentElement === this.dockManager.config.dialogRootElement) {
+            this.dockManager.config.dialogRootElement.removeChild(this.elementContentContainer);
 
-        if (this.closePanelContainerCallback)
-            close = await this.closePanelContainerCallback(this);
-        else if (this.dockManager.closePanelContainerCallback)
-            close = await this.dockManager.closePanelContainerCallback(this);
+            if (this.closePanelContainerCallback)
+                close = await this.closePanelContainerCallback(this);
+            else if (this.dockManager.closePanelContainerCallback)
+                close = await this.dockManager.closePanelContainerCallback(this);
 
-        if (close) {
-            if (this.isDialog) {
-                if (this.floatingDialog) {
-                    //this.floatingDialog.hide();
-                    this.floatingDialog.close(); // fires onClose notification
+            if (close) {
+                if (this.isDialog) {
+                    if (this.floatingDialog) {
+                        //this.floatingDialog.hide();
+                        this.floatingDialog.close(); // fires onClose notification
+                    }
                 }
-            }
-            else {
-                this.performClose();
-                this.dockManager.notifyOnClosePanel(this);
+                else {
+                    this.performClose();
+                    this.dockManager.notifyOnClosePanel(this);
+                }
             }
         }
     }

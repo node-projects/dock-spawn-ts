@@ -74,7 +74,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     /**
     * Closes the panel
     */
-    performClose(): void;
+    private performClose;
     /**
      * Undocks the container and from the layout hierarchy
      * The container would be removed from the DOM
