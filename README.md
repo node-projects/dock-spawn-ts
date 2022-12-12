@@ -119,4 +119,5 @@ Usage Example is in page/demo/demo_simple_es5.html
 | http://www.htmldockfloat.com                   | Commerical/free | No            | Yes     | No                            |
 | http://phosphorjs.github.io/                   | BSD 3           | ?             | ?       | No                            |
 | https://github.com/tupilabs/vue-lumino         | Apache2         | ?             | No      | No                            |
+| https://github.com/mathuo/dockview             | MIT             | ?             | No      | No                            |
    
