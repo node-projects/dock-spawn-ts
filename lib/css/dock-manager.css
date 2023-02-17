@@ -1,5 +1,7 @@
 /************* Panel with title bar ************/
-.panel-base {}
+.panel-base {
+	pointer-events: none;
+}
 
 .panel-base:focus {
 	outline: 0;
@@ -9,6 +11,7 @@
 	width: 100%;
 	overflow: hidden;
 	height: 25px;
+	pointer-events: auto;
 }
 
 .panel-titlebar-icon {
@@ -248,10 +251,12 @@
 .splitter-container-horizontal {
 	float: left;
 	position: relative;
+	pointer-events: none;
 }
 
 .splitter-container-vertical {
 	position: relative;
+	pointer-events: none;
 }
 
 .splitbar-horizontal {
@@ -259,6 +264,7 @@
 	height: 5px;
 	cursor: n-resize;
 	position: relative;
+	pointer-events: auto;
 }
 
 .splitbar-vertical {
@@ -267,6 +273,7 @@
 	float: left;
 	cursor: e-resize;
 	position: relative;
+	pointer-events: auto;
 }
 
 .splitbar-horizontal-ghoust {
@@ -355,6 +362,7 @@
 	height: 22px;
 	overflow: hidden;
 	display: none;
+	pointer-events: auto;
 }
 
 .dockspan-tab-handle-list-container-visible {
