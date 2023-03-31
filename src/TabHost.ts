@@ -119,7 +119,7 @@ export class TabHost {
         }
 
         if (this.activeTab)
-            this.onTabPageSelected(this.activeTab);
+            this.onTabPageSelected(this.activeTab, false);
     }
 
     getActiveTab() {
@@ -154,7 +154,7 @@ export class TabHost {
             }
         });
         if (this.pages.length > 0 && currentPage) {
-            this.onTabPageSelected(currentPage);
+            this.onTabPageSelected(currentPage, true);
             this.dockManager.activePanel = container as PanelContainer;
         }
     }
@@ -244,7 +244,7 @@ export class TabHost {
             this._setTabHandlesVisible(false);
 
         if (this.activeTab)
-            this.onTabPageSelected(this.activeTab);
+            this.onTabPageSelected(this.activeTab, false);
     }
 
     _setTabHandlesVisible(visible: boolean) {
@@ -257,11 +257,11 @@ export class TabHost {
         }
     }
 
-    onTabPageSelected(page: TabPage) {
+    onTabPageSelected(page: TabPage, active: boolean) {
         this.activeTab = page;
         this.pages.forEach((tabPage) => {
             let selected = (tabPage === page);
-            tabPage.setSelected(selected);
+            tabPage.setSelected(selected, active);
         });
     }
 }

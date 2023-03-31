@@ -62,14 +62,14 @@ export class TabPage {
     }
 
     onSelected() {
-        this.host.onTabPageSelected(this);
+        this.host.onTabPageSelected(this, true);
         if (this.container instanceof PanelContainer) {
             let panel = this.container;
             panel.dockManager.notifyOnTabChange(this);
         }
     }
 
-    setSelected(flag: boolean) {
+    setSelected(flag: boolean, isActive: boolean) {
         this.selected = flag;
         this.handle.setSelected(flag);
 
@@ -83,7 +83,8 @@ export class TabPage {
             let width = this.host.contentElement.clientWidth;
             let height = this.host.contentElement.clientHeight;
             this.container.resize(width, height);
-            this.host.dockManager.activePanel = this.container as PanelContainer;
+            if (isActive)
+                this.host.dockManager.activePanel = this.container as PanelContainer;
         }
         else {
             this.containerElement.style.display = 'none';

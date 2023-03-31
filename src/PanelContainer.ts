@@ -79,7 +79,7 @@ export class PanelContainer implements IDockContainerWithSize {
                 this._floatingDialog.bringToFront();
             } else {
                 if (this.tabPage)
-                    this.tabPage.setSelected(true);
+                    this.tabPage.setSelected(true, true);
             }
             this.dockManager.activePanel = this;
         });
