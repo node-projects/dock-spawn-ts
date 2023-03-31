@@ -42,5 +42,5 @@ export declare class TabHost {
     resizeTabListElement(width: number, height?: number): void;
     performLayout(children: IDockContainer[]): void;
     _setTabHandlesVisible(visible: boolean): void;
-    onTabPageSelected(page: TabPage): void;
+    onTabPageSelected(page: TabPage, active: boolean): void;
 }

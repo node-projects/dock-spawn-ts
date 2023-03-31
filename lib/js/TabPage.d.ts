@@ -14,6 +14,6 @@ export declare class TabPage {
     onTitleChanged(): void;
     destroy(): void;
     onSelected(): void;
-    setSelected(flag: boolean): void;
+    setSelected(flag: boolean, isActive: boolean): void;
     resize(width: number, height: number): void;
 }
