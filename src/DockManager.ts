@@ -113,17 +113,17 @@ export class DockManager {
         let rect = this.element.getBoundingClientRect();
         let dx = Math.floor(currentMousePosition.x - previousMousePosition.x);
         let leftBounds = container.offsetLeft + container.offsetWidth + dx + rect.left < 40; // || (container.offsetLeft + container.offsetWidth + dx - 40 ) < 0;
-        let rightBounds = container.offsetLeft + dx > (window.innerWidth - 40);
+        let rightBounds = container.offsetLeft + dx + rect.left > (window.innerWidth - 40);
         if (leftBounds) {
             previousMousePosition.x = currentMousePosition.x;
             dx = 0;
-            let d = 40 - (container.offsetWidth + container.offsetLeft);
+            let d = 40 - (container.offsetWidth + container.offsetLeft + rect.left);
             if (d > 0)
                 dx = d;
         } else if (rightBounds) {
             previousMousePosition.x = currentMousePosition.x;
             dx = 0;
-            let d = (window.innerWidth - 40) - container.offsetLeft;
+            let d = (window.innerWidth - 40) - container.offsetLeft - rect.left;
             if (d > 0)
                 dx = d;
         }
@@ -164,7 +164,7 @@ export class DockManager {
         } else if (bottomBounds) {
             previousMousePosition.y = currentMousePosition.y;
             dy = 0;
-            let d = (window.innerHeight - 25) - container.offsetTop;
+            let d = (window.innerHeight - 16) - container.offsetTop - rect.top;
             if (d > 0)
                 dy = d;
         }
