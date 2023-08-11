@@ -110,8 +110,9 @@ export class DockManager {
         if (this._config.moveOnlyWithinDockConatiner)
             return this.checkXBoundsWithinDockContainer(container, currentMousePosition, previousMousePosition, resizeWest, resizeEast);
 
+        let rect = this.element.getBoundingClientRect();
         let dx = Math.floor(currentMousePosition.x - previousMousePosition.x);
-        let leftBounds = container.offsetLeft + container.offsetWidth + dx < 40; // || (container.offsetLeft + container.offsetWidth + dx - 40 ) < 0;
+        let leftBounds = container.offsetLeft + container.offsetWidth + dx + rect.left < 40; // || (container.offsetLeft + container.offsetWidth + dx - 40 ) < 0;
         let rightBounds = container.offsetLeft + dx > (window.innerWidth - 40);
         if (leftBounds) {
             previousMousePosition.x = currentMousePosition.x;
@@ -153,8 +154,9 @@ export class DockManager {
         if (this._config.moveOnlyWithinDockConatiner)
             return this.checkYBoundsWithinDockContainer(container, currentMousePosition, previousMousePosition, resizeNorth, resizeSouth);
 
+        let rect = this.element.getBoundingClientRect();
         let dy = Math.floor(currentMousePosition.y - previousMousePosition.y);
-        let topBounds = container.offsetTop + dy < 0;
+        let topBounds = container.offsetTop + dy + rect.top < 0;
         let bottomBounds = container.offsetTop + dy > (window.innerHeight - 16);
         if (topBounds) {
             previousMousePosition.y = currentMousePosition.y;
@@ -521,7 +523,7 @@ export class DockManager {
         // Create a new dialog window for the undocked panel
         let dialog = new Dialog(container, this, null, disableResize);
 
-        if (event !== undefined) {
+        if (event != null) {
             // Adjust the relative position
             let dialogWidth = dialog.elementDialog.clientWidth;
             if (dragOffset.x > dialogWidth)

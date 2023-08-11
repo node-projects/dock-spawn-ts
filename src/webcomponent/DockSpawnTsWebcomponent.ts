@@ -185,6 +185,12 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType);
         this.dockManager.dockDown(dockNode != null ? dockNode : this.dockManager.context.model.documentManagerNode, container, ratio);
     }
+
+    floatDialog(element: HTMLElement, x: number, y: number, width: number, height: number, panelType?: PanelType, title?: string) {
+        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType);
+        let dlg = this.dockManager.floatDialog(container, x, y, null);
+        dlg.resize(width, height);
+    }
 }
 
 window.customElements.define('dock-spawn-ts', DockSpawnTsWebcomponent);
