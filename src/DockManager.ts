@@ -157,7 +157,7 @@ export class DockManager {
         let rect = this.element.getBoundingClientRect();
         let dy = Math.floor(currentMousePosition.y - previousMousePosition.y);
         let topBounds = container.offsetTop + dy + rect.top < 0;
-        let bottomBounds = container.offsetTop + dy > (window.innerHeight - 16);
+        let bottomBounds = container.offsetTop + dy + rect.top > (window.innerHeight - 16);
         if (topBounds) {
             previousMousePosition.y = currentMousePosition.y;
             dy = 0;
