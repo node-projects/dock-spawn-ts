@@ -133,7 +133,7 @@ export class PanelContainer implements IDockContainerWithSize {
             let elementName = state.element;
             elementContent = document.getElementById(elementName);
         } else {
-            let res= await dockManager.getElementCallback(state);
+            let res = await dockManager.getElementCallback(state);
             elementContent = res.element;
             title = res.title;
         }
@@ -470,8 +470,12 @@ export class PanelContainer implements IDockContainerWithSize {
                     }
                 }
                 else {
+                    try {
+                        this.dockManager.notifyOnClosePanel(this);
+                    } catch (err) {
+                        console.error(err);
+                    }
                     this.performClose();
-                    this.dockManager.notifyOnClosePanel(this);
                 }
             }
         }
