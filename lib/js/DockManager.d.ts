@@ -119,6 +119,7 @@ export declare class DockManager {
      */
     requestRemove(container: PanelContainer): DockNode;
     getNodeByElementId(id: string): DockNode;
+    getNodeByElement(element: Element): DockNode;
     /** Finds the node that owns the specified [container] */
     private _findNodeFromContainer;
     findNodeFromContainerElement(containerElement: HTMLElement): DockNode;

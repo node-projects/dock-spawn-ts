@@ -44,7 +44,7 @@ export class DockManager {
     public onKeyPressBound: any;
     public iframes: HTMLIFrameElement[];
     public _undockEnabled: boolean;
-    public getElementCallback: (state: IState) => Promise<{element: HTMLElement, title: string }>;
+    public getElementCallback: (state: IState) => Promise<{ element: HTMLElement, title: string }>;
 
     private _config: DockConfig;
     private _activePanel: PanelContainer;
@@ -564,8 +564,37 @@ export class DockManager {
         while (stack.length > 0) {
             let topNode = stack.pop();
 
-            if (topNode.container instanceof PanelContainer && topNode.container.elementContent.id === id)
-                return topNode;
+            if (topNode.container instanceof PanelContainer) {
+                if (topNode.container.elementContent.id === id)
+                    return topNode;
+                if (topNode.container.elementContent instanceof HTMLSlotElement) {
+                    if ((<HTMLSlotElement>topNode.container.elementContent).assignedElements()?.[0]?.id === id)
+                        return topNode;
+                }
+            }
+
+            [].push.apply(stack, topNode.children);
+        }
+
+        return null;
+    }
+
+    getNodeByElement(element: Element): DockNode {
+        let stack = [];
+        stack.push(this.context.model.rootNode);
+
+        while (stack.length > 0) {
+            let topNode = stack.pop();
+
+            if (topNode.container instanceof PanelContainer) {
+                if (topNode.container.elementContent === element)
+                    return topNode;
+                if (topNode.container.elementContent instanceof HTMLSlotElement) {
+                    if ((<HTMLSlotElement>topNode.container.elementContent).assignedElements()?.[0] === element)
+                        return topNode;
+                }
+            }
+
             [].push.apply(stack, topNode.children);
         }
 
