@@ -69,8 +69,7 @@ export class DockLayoutEngine {
 
                     otherChild.container.resize(width, height);
                     grandParent.performLayout(false);
-                }
-                else {
+                } else {
                     // Parent is a root node.
                     // Make the other child the root node
                     parentNode.detachFromParent();
