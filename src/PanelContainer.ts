@@ -250,7 +250,7 @@ export class PanelContainer implements IDockContainerWithSize {
         delete this.floatingDialog;
 
         this.mouseDownHandler = new EventHandler(this.elementPanel, 'mousedown', this.onMouseDown.bind(this));
-        this.touchDownHandler = new EventHandler(this.elementPanel, 'touchstart', this.onMouseDown.bind(this));
+        this.touchDownHandler = new EventHandler(this.elementPanel, 'touchstart', this.onMouseDown.bind(this), { passive: true });
 
         this.elementContent.removeAttribute("hidden");
     }

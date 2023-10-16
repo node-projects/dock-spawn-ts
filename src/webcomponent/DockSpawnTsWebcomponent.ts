@@ -91,8 +91,8 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let dockPanelTypeAttribute = element.getAttribute('dock-spawn-panel-type');
         if (dockPanelTypeAttribute)
             dockPanelType = <PanelType><any>dockPanelTypeAttribute;
-
-        let container = new PanelContainer(slot, this.dockManager, element.title, dockPanelType);
+        let hideCloseButton = element.hasAttribute('dock-spawn-hide-close-button');
+        let container = new PanelContainer(slot, this.dockManager, element.title, dockPanelType, hideCloseButton);
         element.slot = slotName;
         this.slotElementMap.set(slot, (<HTMLElement>element));
         this.elementContainerMap.set(element, container);
@@ -162,33 +162,33 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         return this.dockManager.findNodeFromContainerElement(element);
     }
 
-    dockFill(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, title?: string) {
-        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType);
+    dockFill(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, title?: string, hideCloseButton?: boolean) {
+        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType, hideCloseButton);
         this.dockManager.dockFill(dockNode != null ? dockNode : this.dockManager.context.model.documentManagerNode, container);
     }
 
-    dockLeft(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string) {
-        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType);
+    dockLeft(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string, hideCloseButton?: boolean) {
+        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType, hideCloseButton);
         this.dockManager.dockLeft(dockNode != null ? dockNode : this.dockManager.context.model.documentManagerNode, container, ratio);
     }
 
-    dockRight(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string) {
-        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType);
+    dockRight(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string, hideCloseButton?: boolean) {
+        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType, hideCloseButton);
         this.dockManager.dockRight(dockNode != null ? dockNode : this.dockManager.context.model.documentManagerNode, container, ratio);
     }
 
-    dockUp(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string) {
-        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType);
+    dockUp(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string, hideCloseButton?: boolean) {
+        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType, hideCloseButton);
         this.dockManager.dockUp(dockNode != null ? dockNode : this.dockManager.context.model.documentManagerNode, container, ratio);
     }
 
-    dockDown(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string) {
-        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType);
+    dockDown(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string, hideCloseButton?: boolean) {
+        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType, hideCloseButton);
         this.dockManager.dockDown(dockNode != null ? dockNode : this.dockManager.context.model.documentManagerNode, container, ratio);
     }
 
-    floatDialog(element: HTMLElement, x: number, y: number, width: number, height: number, panelType?: PanelType, title?: string) {
-        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType);
+    floatDialog(element: HTMLElement, x: number, y: number, width: number, height: number, panelType?: PanelType, title?: string, hideCloseButton?: boolean) {
+        let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType, hideCloseButton);
         let dlg = this.dockManager.floatDialog(container, x, y, null);
         dlg.resize(width, height);
     }
