@@ -383,17 +383,16 @@ export class PanelContainer implements IDockContainerWithSize {
         //    this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
         const rect = this.elementContentWrapper.getBoundingClientRect();
         const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
-        this.elementContentContainer.style.left = (rect.x /*- rootRect.x*/) + 'px';
+        this.elementContentContainer.style.left = (rect.x - rootRect.x) + 'px';
         this.elementContentContainer.style.top = (rect.y - rootRect.y) + 'px';
         this.elementContentContainer.style.width = rect.width + 'px';
         this.elementContentContainer.style.height = rect.height + 'px';
     }
 
     setDialogPosition(x: number, y: number) {
-        const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
-        this.elementContentContainer.style.left = (x - rootRect.x) + 'px';
+        this.elementContentContainer.style.left = x + 'px';
         //todo, 25px if it is a dialog, is it always 25px? where do we know...
-        this.elementContentContainer.style.top = (y + this.elementTitle.clientHeight /*- rootRect.y*/) + 'px';
+        this.elementContentContainer.style.top = (y + this.elementTitle.clientHeight) + 'px';
     }
 
     setVisible(isVisible: boolean) {
