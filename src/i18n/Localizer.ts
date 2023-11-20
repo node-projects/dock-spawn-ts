@@ -1,4 +1,4 @@
-import { Defaults, GetLocalizerParameters, TranslationKey } from "./Defaults";
+import { Defaults, GetLocalizerParameters, TranslationKey } from "./Defaults.js";
 
 function formatString(template: string, ...params: any[]): string {
     return template.replace(/{(\d+)}/g, (_match: string, n: string) => {
