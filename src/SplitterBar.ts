@@ -8,16 +8,14 @@ export class SplitterBar {
     nextContainer: IDockContainer;
     stackedVertical: boolean;
     barElement: HTMLDivElement;
-    mouseDownHandler: EventHandler;
-    touchDownHandler: EventHandler;
+    pointerDownHandler: EventHandler;
     minPanelSize: number;
     readyToProcessNextDrag: boolean;
     dockSpawnResizedEvent: CustomEvent<{}>;
     previousMouseEvent: { x: number, y: number };
-    mouseMovedHandler: EventHandler;
-    mouseUpHandler: EventHandler;
-    touchMovedHandler: EventHandler;
-    touchUpHandler: EventHandler;
+    pointerMovedHandler: EventHandler;
+    pointerUpHandler: EventHandler;
+    
     private iframeEventHandlers: EventHandler[];
 
     constructor(previousContainer: IDockContainer, nextContainer: IDockContainer, stackedVertical: boolean) {
@@ -28,28 +26,24 @@ export class SplitterBar {
         this.stackedVertical = stackedVertical;
         this.barElement = document.createElement('div');
         this.barElement.classList.add(stackedVertical ? 'splitbar-horizontal' : 'splitbar-vertical');
-        this.mouseDownHandler = new EventHandler(this.barElement, 'mousedown', this.onMouseDown.bind(this));
-        this.touchDownHandler = new EventHandler(this.barElement, 'touchstart', this.onMouseDown.bind(this));
+        this.pointerDownHandler = new EventHandler(this.barElement, 'pointerdown', this.onPointerDown.bind(this));
         this.minPanelSize = 50; // TODO: Get from container configuration
         this.readyToProcessNextDrag = true;
         this.dockSpawnResizedEvent = new CustomEvent("DockSpawnResizedEvent", { composed: true, bubbles: true });
         this.iframeEventHandlers = [];
     }
 
-    onMouseDown(e: IMouseOrTouchEvent) {
-        if (e.touches) {
-            if (e.touches.length > 1)
-                return;
-            e = e.touches[0];
-        }
+    onPointerDown(e: PointerEvent) {
+        this.barElement.setPointerCapture(e.pointerId);
         this._startDragging(e);
     }
 
-    onMouseUp() {
+    onPointerUp(e: PointerEvent) {
+        this.barElement.releasePointerCapture(e.pointerId);
         this._stopDragging();
     }
 
-    onMouseMovedIframe(e: IMouseOrTouchEvent, iframe: HTMLIFrameElement) {
+    onPointerMovedIframe(e: IMouseOrTouchEvent, iframe: HTMLIFrameElement) {
         if (e.changedTouches != null) {
             e = e.changedTouches[0];
         }
@@ -57,7 +51,7 @@ export class SplitterBar {
         this.handleMoveEvent({ x: e.clientX + posIf.x, y: e.clientY + posIf.y });
     }
 
-    onMouseMoved(e: IMouseOrTouchEvent) {
+    onPointerMoved(e: IMouseOrTouchEvent) {
         if (e.changedTouches != null) {
             e = e.changedTouches[0];
         }
@@ -123,34 +117,22 @@ export class SplitterBar {
 
     _startDragging(e: IMouseOrTouchEvent) {
         Utils.disableGlobalTextSelection(this.previousContainer.dockManager.config.dialogRootElement);
-        if (this.mouseMovedHandler) {
-            this.mouseMovedHandler.cancel();
-            delete this.mouseMovedHandler;
+        if (this.pointerMovedHandler) {
+            this.pointerMovedHandler.cancel();
+            delete this.pointerMovedHandler;
         }
-        if (this.touchMovedHandler) {
-            this.touchMovedHandler.cancel();
-            delete this.touchMovedHandler;
+        if (this.pointerUpHandler) {
+            this.pointerUpHandler.cancel();
+            delete this.pointerUpHandler;
         }
-        if (this.mouseUpHandler) {
-            this.mouseUpHandler.cancel();
-            delete this.mouseUpHandler;
-        }
-        if (this.touchUpHandler) {
-            this.touchUpHandler.cancel();
-            delete this.touchUpHandler;
-        }
-        this.mouseMovedHandler = new EventHandler(window, 'mousemove', this.onMouseMoved.bind(this));
-        this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
-        this.touchMovedHandler = new EventHandler(window, 'touchmove', this.onMouseMoved.bind(this));
-        this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
+        this.pointerMovedHandler = new EventHandler(window, 'pointermove', this.onPointerMoved.bind(this));
+        this.pointerUpHandler = new EventHandler(window, 'pointerup', this.onPointerUp.bind(this));
 
         if (this.previousContainer.dockManager.iframes) {
             for (let f of this.previousContainer.dockManager.iframes) {
-                let mmi = this.onMouseMovedIframe.bind(this);
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mousemove', (e) => mmi(e, f)));
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mouseup', this.onMouseUp.bind(this)));
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchmove', (e) => mmi(e, f)));
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchend', this.onMouseUp.bind(this)));
+                let mmi = this.onPointerMovedIframe.bind(this);
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'pointermove', (e) => mmi(e, f)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'pointerup', this.onPointerUp.bind(this)));
             }
         }
 
@@ -159,21 +141,13 @@ export class SplitterBar {
 
     _stopDragging() {
         Utils.enableGlobalTextSelection(this.previousContainer.dockManager.config.dialogRootElement);
-        if (this.mouseMovedHandler) {
-            this.mouseMovedHandler.cancel();
-            delete this.mouseMovedHandler;
+        if (this.pointerMovedHandler) {
+            this.pointerMovedHandler.cancel();
+            delete this.pointerMovedHandler;
         }
-        if (this.touchMovedHandler) {
-            this.touchMovedHandler.cancel();
-            delete this.touchMovedHandler;
-        }
-        if (this.mouseUpHandler) {
-            this.mouseUpHandler.cancel();
-            delete this.mouseUpHandler;
-        }
-        if (this.touchUpHandler) {
-            this.touchUpHandler.cancel();
-            delete this.touchUpHandler;
+        if (this.pointerUpHandler) {
+            this.pointerUpHandler.cancel();
+            delete this.pointerUpHandler;
         }
         for (let e of this.iframeEventHandlers) {
             e.cancel();

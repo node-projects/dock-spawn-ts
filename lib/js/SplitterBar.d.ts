@@ -6,8 +6,7 @@ export declare class SplitterBar {
     nextContainer: IDockContainer;
     stackedVertical: boolean;
     barElement: HTMLDivElement;
-    mouseDownHandler: EventHandler;
-    touchDownHandler: EventHandler;
+    pointerDownHandler: EventHandler;
     minPanelSize: number;
     readyToProcessNextDrag: boolean;
     dockSpawnResizedEvent: CustomEvent<{}>;
@@ -15,16 +14,14 @@ export declare class SplitterBar {
         x: number;
         y: number;
     };
-    mouseMovedHandler: EventHandler;
-    mouseUpHandler: EventHandler;
-    touchMovedHandler: EventHandler;
-    touchUpHandler: EventHandler;
+    pointerMovedHandler: EventHandler;
+    pointerUpHandler: EventHandler;
     private iframeEventHandlers;
     constructor(previousContainer: IDockContainer, nextContainer: IDockContainer, stackedVertical: boolean);
-    onMouseDown(e: IMouseOrTouchEvent): void;
-    onMouseUp(): void;
-    onMouseMovedIframe(e: IMouseOrTouchEvent, iframe: HTMLIFrameElement): void;
-    onMouseMoved(e: IMouseOrTouchEvent): void;
+    onPointerDown(e: PointerEvent): void;
+    onPointerUp(e: PointerEvent): void;
+    onPointerMovedIframe(e: IMouseOrTouchEvent, iframe: HTMLIFrameElement): void;
+    onPointerMoved(e: IMouseOrTouchEvent): void;
     handleMoveEvent(pos: {
         x: number;
         y: number;
