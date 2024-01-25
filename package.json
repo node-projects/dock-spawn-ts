@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "2.524.0",
+  "version": "2.525.0",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -10,14 +10,14 @@
     "start": "http-server"
   },
   "devDependencies": {
-    "@babel/cli": "^7.23.0",
-    "@babel/core": "^7.23.3",
-    "@babel/preset-env": "^7.23.3",
-    "@types/node": "^20.9.0",
+    "@babel/cli": "^7.23.4",
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.8",
+    "@types/node": "^20.11.6",
     "http-server": "^14.1.1",
-    "typescript": "^5.2.2",
+    "typescript": "^5.3.3",
     "uglify-js": "^3.17.4",
-    "webpack": "^5.89.0",
+    "webpack": "^5.90.0",
     "webpack-cli": "^5.1.4"
   },
   "main": "/lib/js/Exports.js",
