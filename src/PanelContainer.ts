@@ -11,6 +11,7 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { PanelType } from "./enums/PanelType.js";
 import { Dialog } from "./Dialog.js";
 import { TabPage } from './TabPage.js';
+import { Localizer } from "./i18n/Localizer.js";
 
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
@@ -57,7 +58,7 @@ export class PanelContainer implements IDockContainerWithSize {
 
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
         if (!title)
-            title = 'Panel';
+            title = Localizer.getString('DefaultPanelName');
         if (!panelType)
             panelType = PanelType.panel;
         this.panelType = panelType;
