@@ -5,6 +5,7 @@ import { EventHandler } from "./EventHandler.js";
 import { Utils } from "./Utils.js";
 import { PanelType } from "./enums/PanelType.js";
 import { DockNode } from "./DockNode.js";
+import { Localizer } from "./i18n/Localizer.js";
 
 /**
  * A tab handle represents the tab button on the tab strip
@@ -96,11 +97,11 @@ export class TabHandle {
 
     static createContextMenuContentCallback = (tabHandle: TabHandle, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => {
         let btnCloseAll = document.createElement('div');
-        btnCloseAll.innerText = 'Close all documents';
+        btnCloseAll.innerText = Localizer.getString('CloseAll');
         contextMenuContainer.append(btnCloseAll);
 
         let btnCloseAllButThis = document.createElement('div');
-        btnCloseAllButThis.innerText = 'Close all documents but this';
+        btnCloseAllButThis.innerText = Localizer.getString('CloseAllButThis');
         contextMenuContainer.append(btnCloseAllButThis);
 
         btnCloseAll.onclick = () => {
