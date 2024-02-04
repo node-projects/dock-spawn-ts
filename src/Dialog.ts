@@ -5,6 +5,8 @@ import { DraggableContainer } from "./DraggableContainer.js";
 import { ResizableContainer } from "./ResizableContainer.js";
 import { EventHandler } from "./EventHandler.js";
 import { Utils } from "./Utils.js";
+import { Localizer } from "./i18n/Localizer.js";
+import { DockNode } from "./DockNode.js";
 
 export class Dialog {
     elementDialog: HTMLDivElement & { floatingDialog: Dialog };
@@ -16,13 +18,15 @@ export class Dialog {
     resizable: ResizableContainer;
     disableResize: boolean;
     mouseDownHandler: any;
-    touchDownHandler: any;
     onKeyPressBound: any;
     noDocking: boolean;
     isHidden: boolean;
     keyPressHandler: EventHandler;
     focusHandler: EventHandler;
     grayoutParent: PanelContainer;
+    contextmenuHandler: EventHandler;
+    _ctxMenu: HTMLDivElement;
+    _windowsContextMenuCloseBound: any;
 
     constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, disableResize?: boolean) {
         this.panel = panel;
@@ -58,9 +62,10 @@ export class Dialog {
         this.elementDialog.classList.add('dialog-floating');
 
         this.focusHandler = new EventHandler(this.elementDialog, 'focus', this.onFocus.bind(this), true);
-        this.mouseDownHandler = new EventHandler(this.elementDialog, 'mousedown', this.onMouseDown.bind(this), true);
-        this.touchDownHandler = new EventHandler(this.elementDialog, 'touchstart', this.onMouseDown.bind(this));
+        this.mouseDownHandler = new EventHandler(this.elementDialog, 'pointerdown', this.onMouseDown.bind(this), true);
         this.keyPressHandler = new EventHandler(this.elementDialog, 'keypress', this.dockManager.onKeyPressBound, true);
+        this.contextmenuHandler = new EventHandler(this.panel.elementTitle, 'contextmenu', this.oncontextMenuClicked.bind(this));
+
         this.resize(this.panel.elementPanel.clientWidth, this.panel.elementPanel.clientHeight);
         this.isHidden = false;
 
@@ -88,8 +93,9 @@ export class Dialog {
             this.dockManager.activePanel = this.panel;
     }
 
-    onMouseDown() {
-        this.bringToFront();
+    onMouseDown(e: PointerEvent) {
+        if (e.button != 2)
+            this.bringToFront();
     }
 
     destroy() {
@@ -103,13 +109,13 @@ export class Dialog {
             this.mouseDownHandler.cancel();
             delete this.mouseDownHandler;
         }
-        if (this.touchDownHandler) {
-            this.touchDownHandler.cancel();
-            delete this.touchDownHandler;
-        }
         if (this.keyPressHandler) {
             this.keyPressHandler.cancel();
             delete this.keyPressHandler;
+        }
+        if (this.contextmenuHandler) {
+            this.contextmenuHandler.cancel();
+            delete this.contextmenuHandler;
         }
         Utils.removeNode(this.elementDialog);
         this.draggable.removeDecorator();
@@ -172,5 +178,61 @@ export class Dialog {
             this.isHidden = false;
             this.dockManager.notifyOnShowDialog(this);
         }
+    }
+
+    static createContextMenuContentCallback = (dialog: Dialog, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => {
+        if (!dialog.panel._hideCloseButton) {
+            let btnCloseDialog = document.createElement('div');
+            btnCloseDialog.innerText = Localizer.getString('CloseDialog');
+            contextMenuContainer.append(btnCloseDialog);
+
+            btnCloseDialog.onclick = () => {
+                dialog.panel.close();
+                dialog.closeContextMenu();
+            };
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    oncontextMenuClicked(e: MouseEvent) {
+        e.preventDefault();
+
+        if (!this._ctxMenu && Dialog.createContextMenuContentCallback) {
+            this._ctxMenu = document.createElement('div');
+            this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
+
+            let res = Dialog.createContextMenuContentCallback(this, this._ctxMenu, this.dockManager.context.model.documentManagerNode.children);
+            if (res !== false) {
+                this._ctxMenu.style.left = e.pageX + "px";
+                this._ctxMenu.style.top = e.pageY + "px";
+                document.body.appendChild(this._ctxMenu);
+                this._windowsContextMenuCloseBound = this.windowsContextMenuClose.bind(this)
+                window.addEventListener('pointerup', this._windowsContextMenuCloseBound);
+            } else {
+                this._ctxMenu = null;
+            }
+        } else {
+            this.closeContextMenu();
+        }
+    }
+
+    closeContextMenu() {
+        if (this._ctxMenu) {
+            document.body.removeChild(this._ctxMenu);
+            delete this._ctxMenu;
+            window.removeEventListener('pointerup', this._windowsContextMenuCloseBound);
+        }
+    }
+
+    windowsContextMenuClose(e: Event) {
+        let cp = e.composedPath();
+        for (let i in cp) {
+            let el = cp[i];
+            if (el == this._ctxMenu)
+                return;
+        }
+        this.closeContextMenu();
     }
 }

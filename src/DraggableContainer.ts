@@ -6,7 +6,6 @@ import { Utils } from "./Utils.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
 import { IState } from "./interfaces/IState.js";
-import { DockWheelItem } from "./DockWheelItem.js";
 import { PanelContainer } from "./PanelContainer.js";
 
 export class DraggableContainer implements IDockContainer {
@@ -22,9 +21,7 @@ export class DraggableContainer implements IDockContainer {
     minimumAllowedChildNodes: number;
     previousMousePosition: { x: any; y: any; };
     mouseMoveHandler: EventHandler;
-    touchMoveHandler: EventHandler;
     mouseUpHandler: EventHandler;
-    touchUpHandler: EventHandler;
     private iframeEventHandlers: EventHandler[];
 
     constructor(dialog: Dialog, delegate: PanelContainer, topLevelElement: HTMLElement, dragHandle: HTMLElement) {
@@ -93,50 +90,31 @@ export class DraggableContainer implements IDockContainer {
         }
     }
 
-    onMouseDown(event: TouchEvent | MouseEvent) {
+    onMouseDown(event: PointerEvent) {
+        if (event.button == 2)
+            return;
         if (event.preventDefault)
             event.preventDefault();
 
-        let touchOrMouseData: { clientX: number, clientY: number } = null;
-        if ((<TouchEvent>event).touches) {
-            if ((<TouchEvent>event).touches.length > 1)
-                return;
-            touchOrMouseData = (<TouchEvent>event).touches[0];
-        } else {
-            touchOrMouseData = <MouseEvent>event;
-        }
-
-        this._startDragging(touchOrMouseData);
-        this.previousMousePosition = { x: touchOrMouseData.clientX, y: touchOrMouseData.clientY };
+        this._startDragging(event);
+        this.previousMousePosition = { x: event.clientX, y: event.clientY };
         if (this.mouseMoveHandler) {
             this.mouseMoveHandler.cancel();
             delete this.mouseMoveHandler;
-        }
-        if (this.touchMoveHandler) {
-            this.touchMoveHandler.cancel();
-            delete this.touchMoveHandler;
         }
         if (this.mouseUpHandler) {
             this.mouseUpHandler.cancel();
             delete this.mouseUpHandler;
         }
-        if (this.touchUpHandler) {
-            this.touchUpHandler.cancel();
-            delete this.touchUpHandler;
-        }
 
-        this.mouseMoveHandler = new EventHandler(window, 'mousemove', this.onMouseMove.bind(this));
-        this.touchMoveHandler = new EventHandler(<Element>event.target, 'touchmove', this.onMouseMove.bind(this), { passive: false });
-        this.mouseUpHandler = new EventHandler(window, 'mouseup', this.onMouseUp.bind(this));
-        this.touchUpHandler = new EventHandler(<Element>event.target, 'touchend', this.onMouseUp.bind(this));
+        this.mouseMoveHandler = new EventHandler(window, 'pointermove', this.onMouseMove.bind(this));
+        this.mouseUpHandler = new EventHandler(window, 'pointerup', this.onMouseUp.bind(this));
 
         if (this.dockManager.iframes) {
             for (let f of this.dockManager.iframes) {
                 let mmi = this.onMouseMovedIframe.bind(this);
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mousemove', (e) => mmi(e, f)));
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'mouseup', this.onMouseUp.bind(this)));
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchmove', (e) => mmi(e, f)));
-                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'touchend', this.onMouseUp.bind(this)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'pointermove', (e) => mmi(e, f)));
+                this.iframeEventHandlers.push(new EventHandler(f.contentWindow, 'pointerup', this.onMouseUp.bind(this)));
             }
         }
     }
@@ -145,12 +123,8 @@ export class DraggableContainer implements IDockContainer {
         this._stopDragging(event);
         this.mouseMoveHandler.cancel();
         delete this.mouseMoveHandler;
-        this.touchMoveHandler.cancel();
-        delete this.touchMoveHandler;
         this.mouseUpHandler.cancel();
         delete this.mouseUpHandler;
-        this.touchUpHandler.cancel();
-        delete this.touchUpHandler;
         for (let e of this.iframeEventHandlers) {
             e.cancel();
         }
@@ -173,47 +147,18 @@ export class DraggableContainer implements IDockContainer {
         Utils.enableGlobalTextSelection(this.dockManager.config.dialogRootElement);
     }
 
-    onMouseMovedIframe(e: MouseEvent, iframe: HTMLIFrameElement) {
+    onMouseMovedIframe(e: PointerEvent, iframe: HTMLIFrameElement) {
         let posIf = iframe.getBoundingClientRect();
         this.onMouseMove(e, { x: posIf.x, y: posIf.y });
     }
 
-    onMouseMove(event: TouchEvent | MouseEvent, iframeOffset?: { x: number, y: number }) {
+    onMouseMove(event: PointerEvent, iframeOffset?: { x: number, y: number }) {
         if (event.preventDefault)
             event.preventDefault();
 
-        let br = document.body.getBoundingClientRect();
-
-        if ((<TouchEvent>event).touches != null) {
-            if ((<TouchEvent>event).touches.length > 1)
-                return;
-            for (let w in this.dockManager.dockWheel.wheelItems) {
-                let item: DockWheelItem = this.dockManager.dockWheel.wheelItems[w];
-                let offset = item.element.getBoundingClientRect();
-                if ((<TouchEvent>event).touches[0].clientX > (offset.left - br.left) &&
-                    (<TouchEvent>event).touches[0].clientX < (offset.left + item.element.clientWidth - br.left) &&
-                    (<TouchEvent>event).touches[0].clientY > (offset.top - br.top) &&
-                    (<TouchEvent>event).touches[0].clientY < (offset.top + item.element.clientHeight - br.top)) {
-                    item.onMouseMoved();
-                } else {
-                    if (item.active)
-                        item.onMouseOut();
-                }
-            }
-        }
-
-        let touchOrMouseData: { clientX: number, clientY: number } = null;
-        if ((<TouchEvent>event).changedTouches) {
-            if ((<TouchEvent>event).changedTouches.length > 1)
-                return;
-            touchOrMouseData = (<TouchEvent>event).changedTouches[0];
-        } else {
-            touchOrMouseData = <MouseEvent>event;
-        }
-
-        let currentMousePosition = new Point(touchOrMouseData.clientX, touchOrMouseData.clientY);
+        let currentMousePosition = new Point(event.clientX, event.clientY);
         if (iframeOffset)
-            currentMousePosition = new Point(touchOrMouseData.clientX + iframeOffset.x, touchOrMouseData.clientY + iframeOffset.y);
+            currentMousePosition = new Point(event.clientX + iframeOffset.x, event.clientY + iframeOffset.y);
 
         let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, false, false);
         let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, false, false);
@@ -227,6 +172,6 @@ export class DraggableContainer implements IDockContainer {
         this.topLevelElement.style.left = left + 'px';
         this.topLevelElement.style.top = top + 'px';
 
-        this.dialog.panel.setDialogPosition(left,top);
+        this.dialog.panel.setDialogPosition(left, top);
     }
 }

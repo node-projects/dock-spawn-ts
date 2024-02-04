@@ -20,9 +20,7 @@ export declare class DraggableContainer implements IDockContainer {
         y: any;
     };
     mouseMoveHandler: EventHandler;
-    touchMoveHandler: EventHandler;
     mouseUpHandler: EventHandler;
-    touchUpHandler: EventHandler;
     private iframeEventHandlers;
     constructor(dialog: Dialog, delegate: PanelContainer, topLevelElement: HTMLElement, dragHandle: HTMLElement);
     destroy(): void;
@@ -36,15 +34,15 @@ export declare class DraggableContainer implements IDockContainer {
     resize(width: number, height: number): void;
     performLayout(children: IDockContainer[]): void;
     removeDecorator(): void;
-    onMouseDown(event: TouchEvent | MouseEvent): void;
+    onMouseDown(event: PointerEvent): void;
     onMouseUp(event: any): void;
     _startDragging(event: {
         clientX: number;
         clientY: number;
     }): void;
     _stopDragging(event: any): void;
-    onMouseMovedIframe(e: MouseEvent, iframe: HTMLIFrameElement): void;
-    onMouseMove(event: TouchEvent | MouseEvent, iframeOffset?: {
+    onMouseMovedIframe(e: PointerEvent, iframe: HTMLIFrameElement): void;
+    onMouseMove(event: PointerEvent, iframeOffset?: {
         x: number;
         y: number;
     }): void;

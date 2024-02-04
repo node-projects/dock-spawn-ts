@@ -5,6 +5,7 @@ export type GetLocalizerParameters<K extends TranslationKey> = K extends keyof L
     : [];
 
 export const Defaults = {
+    'CloseDialog': 'Close dialog',
     'CloseAll': 'Close all documents',
     'CloseAllButThis': 'Close all documents but this',
     'DefaultPanelName': 'Panel'
