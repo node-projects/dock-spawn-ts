@@ -85,6 +85,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     set width(value: number);
     get height(): number;
     set height(value: number);
+    private panelDocked;
     resize(width: number, height: number): void;
     _setPanelDimensions(width: number, height: number): void;
     setDialogPosition(x: number, y: number): void;
@@ -97,5 +98,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     getRawTitle(): string;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean): void;
     onCloseButtonClicked(e: Event): void;
+    undockToBrowserDialog(): void;
     close(): Promise<void>;
+    private closeInternal;
 }

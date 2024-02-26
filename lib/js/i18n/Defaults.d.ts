@@ -5,6 +5,7 @@ export declare const Defaults: {
     CloseAll: string;
     CloseAllButThis: string;
     DefaultPanelName: string;
+    NewBrowserWindow: string;
 };
 export interface LocalizerParameters {
 }

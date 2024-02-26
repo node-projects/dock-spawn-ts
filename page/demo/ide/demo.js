@@ -4,7 +4,8 @@ import { PanelType } from "../../../lib/js/enums/PanelType.js";
 
 let dockManager,
     storeKey = 'lastState';
-let infovis;
+/** @type {PanelContainer} */
+let infovisContainer;
 let outlineNode;
 let solution;
 let editorOutput;
@@ -47,10 +48,13 @@ window.onload = () => {
     window.onresize(null);
 
     dockManager.closePanelContainerCallback = async (panel) => {
-        let p = prompt("close?", " ")
-        if (p)
-            return true;
-        return false;
+        if (panel.panelType == 'document') {
+            let p = confirm("really close?")
+            if (p)
+                return true;
+            return false;
+        }
+        return true;
     }
 
     dockManager.addLayoutListener({
@@ -109,13 +113,17 @@ window.onload = () => {
         }
     });
 
+    solution = new PanelContainer(document.getElementById("solution_window"), dockManager);
+    infovisContainer = new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
+    infovisContainer.width = 600;
+    infovisContainer.height = 400;
+
     let properties;
     if (!lastState) {
         // Convert existing elements on the page into "Panels".
         // They can then be docked on to the dock manager
         // Panels get a titlebar and a close button, and can also be
         // converted to a floating dialog box which can be dragged / resized
-        solution = new PanelContainer(document.getElementById("solution_window"), dockManager);
         properties = new PanelContainer(document.getElementById("properties_window"), dockManager);
         let toolbox = new PanelContainer(document.getElementById("toolbox_window"), dockManager);
         let outline = new PanelContainer(document.getElementById("outline_window"), dockManager);
@@ -123,11 +131,7 @@ window.onload = () => {
         let output = new PanelContainer(document.getElementById("output_window"), dockManager);
         let editor1 = new PanelContainer(document.getElementById("editor1_window"), dockManager, null, PanelType.document, false);
         let editor2 = new PanelContainer(document.getElementById("editor2_window"), dockManager, null, PanelType.document, true);
-        //editor2.hideCloseButton(true);
-        infovis = new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
-        infovis.width = 600;
-        infovis.height = 400;
-
+        
         // Dock the panels on the dock manager
         let documentNode = dockManager.context.model.documentManagerNode;
         outlineNode = dockManager.dockLeft(documentNode, outline, 0.15);
@@ -138,7 +142,7 @@ window.onload = () => {
         dockManager.dockRight(documentNode, toolbox, 0.20);
         dockManager.dockFill(documentNode, editor1);
         dockManager.dockFill(documentNode, editor2);
-        dockManager.floatDialog(infovis, 50, 50, null, true);
+        dockManager.floatDialog(infovisContainer, 50, 50, null, true);
     }
 
     document.getElementById("dlg").onclick = () => {
@@ -202,13 +206,18 @@ window.onload = () => {
 };
 
 function openDlg() {
-    dockManager.floatDialog(infovis, 50, 50);
+    dockManager.floatDialog(infovisContainer, 50, 50);
 }
 //@ts-ignore
 window.openDlg = openDlg;
 
 function openSide() {
-    dockManager.dockFill(outlineNode, solution);
+    if (outlineNode?.parent)
+        dockManager.dockFill(outlineNode, solution);
+    else {
+        let documentNode = dockManager.context.model.documentManagerNode;
+        dockManager.dockLeft(documentNode, solution);
+    }
 }
 
 function logOutput(msg) {
