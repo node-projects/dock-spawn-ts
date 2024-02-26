@@ -29,6 +29,7 @@ export class PanelContainer implements IDockContainerWithSize {
     name: string;
     state: ISize;
     elementContent: HTMLElement & { resizeHandler?: any, _dockSpawnPanelContainer: PanelContainer };
+    private _resolvedElementContent: HTMLElement;
     elementContentContainer: HTMLElement;
     elementContentWrapper: HTMLElement;
     dockManager: DockManager;
@@ -252,6 +253,11 @@ export class PanelContainer implements IDockContainerWithSize {
 
         this.mouseDownHandler = new EventHandler(this.elementPanel, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementPanel, 'touchstart', this.onMouseDown.bind(this), { passive: true });
+
+        this._resolvedElementContent = this.elementContent;
+        if (this.elementContent instanceof HTMLSlotElement) {
+            this._resolvedElementContent = <HTMLElement>this.elementContent.assignedElements()?.[0];
+        }
     }
 
     onMouseDown() {
@@ -346,6 +352,16 @@ export class PanelContainer implements IDockContainerWithSize {
             this._cachedHeight = value;
             this.elementPanel.style.height = value + 'px';
         }
+    }
+
+    get resolvedElementContent(): HTMLElement {
+        if (this._resolvedElementContent)
+            return this._resolvedElementContent;
+        this._resolvedElementContent = this.elementContent;
+        if (this.elementContent instanceof HTMLSlotElement) {
+            this._resolvedElementContent = <HTMLElement>this.elementContent.assignedElements()?.[0];
+        }
+        return this._resolvedElementContent;
     }
 
     private panelDocked() {
@@ -457,10 +473,7 @@ export class PanelContainer implements IDockContainerWithSize {
     }
 
     undockToBrowserDialog() {
-        let el: HTMLElement = this.elementContent;
-        if (el instanceof HTMLSlotElement)
-            el = <HTMLElement>el.assignedElements()[0]
-        moveElementToNewBrowserWindow(el, {
+        moveElementToNewBrowserWindow(this.resolvedElementContent, {
             title: '',
             closeCallback: () => { },
             newWindowClosedCallback: () => { },
