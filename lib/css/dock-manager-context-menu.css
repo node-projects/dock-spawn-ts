@@ -1,0 +1,19 @@
+.dockspab-tab-handle-context-menu {
+	position: absolute;
+	z-index: 10000000;
+	background-color: white;
+	border: white;
+	border: black solid 2px;
+	padding: 5px;
+}
+
+.dockspab-tab-handle-context-menu>div {
+	cursor: pointer;
+	padding: 2px;
+}
+
+.dockspab-tab-handle-context-menu>div:hover {
+	background-color: gray;
+	cursor: pointer;
+	padding: 2px;
+}
