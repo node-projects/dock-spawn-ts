@@ -100,10 +100,6 @@ export class TabHandle {
         btnCloseAll.innerText = Localizer.getString('CloseAll');
         contextMenuContainer.append(btnCloseAll);
 
-        let btnCloseAllButThis = document.createElement('div');
-        btnCloseAllButThis.innerText = Localizer.getString('CloseAllButThis');
-        contextMenuContainer.append(btnCloseAllButThis);
-
         btnCloseAll.onclick = () => {
             let length = documentMangerNodes.length;
             for (let i = length - 1; i >= 0; i--) {
@@ -114,6 +110,10 @@ export class TabHandle {
             tabHandle.closeContextMenu();
         };
 
+        let btnCloseAllButThis = document.createElement('div');
+        btnCloseAllButThis.innerText = Localizer.getString('CloseAllButThis');
+        contextMenuContainer.append(btnCloseAllButThis);
+
         btnCloseAllButThis.onclick = () => {
             let length = documentMangerNodes.length;
             for (let i = length - 1; i >= 0; i--) {
@@ -121,6 +121,15 @@ export class TabHandle {
                 if (tabHandle.parent.container != panel && panel.panelType == PanelType.document)
                     panel.close();
             }
+            tabHandle.closeContextMenu();
+        };
+        
+        let btnNewBrowserWindow = document.createElement('div');
+        btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
+        contextMenuContainer.append(btnNewBrowserWindow);
+
+        btnNewBrowserWindow.onclick = () => {
+            (<PanelContainer>tabHandle.parent.container).undockToBrowserDialog();
             tabHandle.closeContextMenu();
         };
     }

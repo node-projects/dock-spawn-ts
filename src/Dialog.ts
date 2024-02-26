@@ -190,6 +190,16 @@ export class Dialog {
                 dialog.panel.close();
                 dialog.closeContextMenu();
             };
+
+            let btnNewBrowserWindow = document.createElement('div');
+            btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
+            contextMenuContainer.append(btnNewBrowserWindow);
+
+            btnNewBrowserWindow.onclick = () => {
+                dialog.panel.undockToBrowserDialog();
+                dialog.closeContextMenu();
+            };
+
             return true;
         } else {
             return false;

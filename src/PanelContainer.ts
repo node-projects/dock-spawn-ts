@@ -12,6 +12,7 @@ import { PanelType } from "./enums/PanelType.js";
 import { Dialog } from "./Dialog.js";
 import { TabPage } from './TabPage.js';
 import { Localizer } from "./i18n/Localizer.js";
+import { moveElementToNewBrowserWindow } from "./BrowserDialogHelper.js";
 
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
@@ -70,7 +71,6 @@ export class PanelContainer implements IDockContainerWithSize {
         elementContent.style.height = '100%'
         elementContent.style.top = '0'
         elementContent.style.bottom = '0'
-        elementContent.hidden = false;
         this.elementContentContainer = document.createElement('div');
         this.elementContentContainer.className = 'panel-element-content-container';
         this.elementContentContainer.style.position = 'absolute';
@@ -252,8 +252,6 @@ export class PanelContainer implements IDockContainerWithSize {
 
         this.mouseDownHandler = new EventHandler(this.elementPanel, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementPanel, 'touchstart', this.onMouseDown.bind(this), { passive: true });
-
-        this.elementContent.removeAttribute("hidden");
     }
 
     onMouseDown() {
@@ -350,12 +348,19 @@ export class PanelContainer implements IDockContainerWithSize {
         }
     }
 
+    private panelDocked() {
+        if (this.elementContent.hidden)
+            this.elementContent.hidden = false;
+        this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
+    }
+
     resize(width: number, height: number) {
         // if (this._cachedWidth === width && this._cachedHeight === height)
         // {
         //     // Already in the desired size
         //     return;
         // }
+        this.panelDocked();
         this.setVisible(true);
         this._setPanelDimensions(width, height);
         this._cachedWidth = width;
@@ -451,18 +456,39 @@ export class PanelContainer implements IDockContainerWithSize {
         this.close();
     }
 
+    undockToBrowserDialog() {
+        moveElementToNewBrowserWindow(this.elementContent, {
+            title: '',
+            closeCallback: () => { },
+            newWindowClosedCallback: () => { },
+            focused: (e) => {
+                this.dockManager.activePanel = this;
+            },
+            blured: (e) => {
+                this.dockManager.activePanel = null;
+            }
+        });
+        this.closeInternal(false);
+    }
+
     async close() {
+        this.closeInternal(true);
+    }
+
+    private async closeInternal(runCallback: boolean) {
         let close = true;
 
         if (this.elementContentContainer.parentElement === this.dockManager.config.dialogRootElement) {
-            this.dockManager.config.dialogRootElement.removeChild(this.elementContentContainer);
-
-            if (this.closePanelContainerCallback)
+            if (!runCallback)
+                close = true;
+            else if (this.closePanelContainerCallback)
                 close = await this.closePanelContainerCallback(this);
             else if (this.dockManager.closePanelContainerCallback)
                 close = await this.dockManager.closePanelContainerCallback(this);
 
             if (close) {
+                this.dockManager.config.dialogRootElement.removeChild(this.elementContentContainer);
+
                 if (this.isDialog) {
                     if (this.floatingDialog) {
                         //this.floatingDialog.hide();
