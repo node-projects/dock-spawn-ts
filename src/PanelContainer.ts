@@ -76,15 +76,18 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContentContainer.className = 'panel-element-content-container';
         this.elementContentContainer.style.position = 'absolute';
         (<any>this.elementContentContainer)._panel = this;
-        this.elementContentContainer.addEventListener('pointerdown', () => {
-            if (this.isDialog) {
-                this._floatingDialog.bringToFront();
-            } else {
-                if (this.tabPage)
-                    this.tabPage.setSelected(true, true);
+        this.elementContentContainer.addEventListener('click', (e) => {
+            try {
+                if (this.isDialog) {
+                    this._floatingDialog.bringToFront();
+                } else {
+                    if (this.tabPage)
+                        this.tabPage.setSelected(true, true);
+                }
+                this.dockManager.activePanel = this;
             }
-            this.dockManager.activePanel = this;
-        });
+            catch { }
+        }, { passive: true });
         this.elementContentContainer.appendChild(elementContent);
         dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
 
@@ -474,7 +477,7 @@ export class PanelContainer implements IDockContainerWithSize {
 
     undockToBrowserDialog() {
         moveElementToNewBrowserWindow(this.resolvedElementContent, {
-            title: '',
+            title: this.title,
             closeCallback: () => { },
             newWindowClosedCallback: () => { },
             focused: (e) => {
