@@ -479,7 +479,7 @@ export class PanelContainer implements IDockContainerWithSize {
 
     undockToBrowserDialog() {
         moveElementToNewBrowserWindow(this.resolvedElementContent, {
-            title: this.title,
+            title: this.elementTitleText.textContent,
             closeCallback: () => {
                 this.undockedToNewBrowserWindow = true;
                 this.closeInternal(false);
