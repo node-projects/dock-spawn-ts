@@ -76,7 +76,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this.elementContentContainer.className = 'panel-element-content-container';
         this.elementContentContainer.style.position = 'absolute';
         (<any>this.elementContentContainer)._panel = this;
-        this.elementContentContainer.addEventListener('click', (e) => {
+        this.elementContentContainer.addEventListener('pointerdown', (e) => {
             try {
                 if (this.isDialog) {
                     this._floatingDialog.bringToFront();
@@ -370,7 +370,8 @@ export class PanelContainer implements IDockContainerWithSize {
     private panelDocked() {
         if (this.elementContent.hidden)
             this.elementContent.hidden = false;
-        this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
+        if (this.elementContentContainer.parentElement !== this.dockManager.config.dialogRootElement)
+            this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
     }
 
     resize(width: number, height: number) {
