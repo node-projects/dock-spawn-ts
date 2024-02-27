@@ -48,6 +48,7 @@ export class PanelContainer implements IDockContainerWithSize {
     touchDownHandler: EventHandler;
     panelType: PanelType;
     tabPage?: TabPage;
+    undockedToNewBrowserWindow = false;
 
     lastDialogSize?: ISize;
 
@@ -479,8 +480,13 @@ export class PanelContainer implements IDockContainerWithSize {
     undockToBrowserDialog() {
         moveElementToNewBrowserWindow(this.resolvedElementContent, {
             title: this.title,
-            closeCallback: () => { },
-            newWindowClosedCallback: () => { },
+            closeCallback: () => {
+                this.undockedToNewBrowserWindow = true;
+                this.closeInternal(false);
+            },
+            newWindowClosedCallback: () => {
+                this.undockedToNewBrowserWindow = false;
+            },
             focused: (e) => {
                 this.dockManager.activePanel = this;
             },
@@ -488,7 +494,6 @@ export class PanelContainer implements IDockContainerWithSize {
                 this.dockManager.activePanel = null;
             }
         });
-        this.closeInternal(false);
     }
 
     async close() {
