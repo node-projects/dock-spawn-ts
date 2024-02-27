@@ -486,6 +486,7 @@ export class PanelContainer implements IDockContainerWithSize {
             },
             newWindowClosedCallback: () => {
                 this.undockedToNewBrowserWindow = false;
+                this.dockManager.notifyOnClosePanel(this);
             },
             focused: (e) => {
                 this.dockManager.activePanel = this;
