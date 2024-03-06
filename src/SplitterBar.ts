@@ -15,7 +15,7 @@ export class SplitterBar {
     previousMouseEvent: { x: number, y: number };
     pointerMovedHandler: EventHandler;
     pointerUpHandler: EventHandler;
-    
+
     private iframeEventHandlers: EventHandler[];
 
     constructor(previousContainer: IDockContainer, nextContainer: IDockContainer, stackedVertical: boolean) {
@@ -48,14 +48,14 @@ export class SplitterBar {
             e = e.changedTouches[0];
         }
         let posIf = iframe.getBoundingClientRect();
-        this.handleMoveEvent({ x: e.clientX + posIf.x, y: e.clientY + posIf.y });
+        this.handleMoveEvent({ x: parseInt("" + e.clientX + posIf.x), y: parseInt("" + e.clientY + posIf.y) });
     }
 
     onPointerMoved(e: IMouseOrTouchEvent) {
         if (e.changedTouches != null) {
             e = e.changedTouches[0];
         }
-        this.handleMoveEvent({ x: e.clientX, y: e.clientY });
+        this.handleMoveEvent({ x: parseInt("" + e.clientX), y: parseInt("" + e.clientY) });
     }
 
     handleMoveEvent(pos: { x: number, y: number }) {
