@@ -7,6 +7,13 @@ import style1 from "../../../lib/css/dock-manager-style.css" with { type : 'css'
 //@ts-ignore
 import style2 from "../../../lib/css/dock-manager.css" with { type : 'css'}
 
+const css = function (strings: TemplateStringsArray, ...values: any[]): CSSStyleSheet {
+    const cssStyleSheet = new CSSStyleSheet();
+    //@ts-ignore
+    cssStyleSheet.replaceSync(toParString(strings, values));
+    return cssStyleSheet;
+};
+
 export class DockSpawnTsWebcomponent extends HTMLElement {
     public dockManager: DockManager;
     private slotId: number = 0;
@@ -16,11 +23,15 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     private initialized = false;
     private elementContainerMap: Map<HTMLElement, PanelContainer> = new Map();
 
+    static style = css`:host {
+        display: block;
+    }`;
+
     constructor() {
         super();
 
         const shadowRoot = this.attachShadow({ mode: 'open' });
-        shadowRoot.adoptedStyleSheets = [style1, style2];
+        shadowRoot.adoptedStyleSheets = [DockSpawnTsWebcomponent.style, style1, style2];
 
         this.windowResizedBound = this.windowResized.bind(this);
         this.slotElementMap = new WeakMap();
