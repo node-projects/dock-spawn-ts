@@ -9,10 +9,6 @@ import { PanelContainer } from "./PanelContainer.js";
  */
 export class DocumentTabPage extends TabPage {
 
-    container: IDockContainer;
-    panel: PanelContainer;
-    containerElement: HTMLElement;
-
     constructor(host: TabHost, container: IDockContainer) {
         super(host, container);
 

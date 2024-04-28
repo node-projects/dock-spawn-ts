@@ -2,10 +2,12 @@ import { DockManager } from "../DockManager.js";
 import { PanelContainer } from "../PanelContainer.js";
 import { PanelType } from "../enums/PanelType.js";
 import { DockNode } from "../DockNode.js";
+//@ts-ignore
+import style1 from "../../../lib/css/dock-manager-style.css" with { type : 'css'}
+//@ts-ignore
+import style2 from "../../../lib/css/dock-manager.css" with { type : 'css'}
 
 export class DockSpawnTsWebcomponent extends HTMLElement {
-    public static cssRootDirectory = "../../lib/css/";
-
     public dockManager: DockManager;
     private slotId: number = 0;
     private windowResizedBound;
@@ -17,39 +19,24 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     constructor() {
         super();
 
+        const shadowRoot = this.attachShadow({ mode: 'open' });
+        shadowRoot.adoptedStyleSheets = [style1, style2];
+
         this.windowResizedBound = this.windowResized.bind(this);
         this.slotElementMap = new WeakMap();
     }
 
     private initDockspawn() {
-        const shadowRoot = this.attachShadow({ mode: 'open' });
-
-        const linkElement1 = document.createElement("link");
-        linkElement1.rel = "stylesheet";
-        linkElement1.href = DockSpawnTsWebcomponent.cssRootDirectory + "dock-manager.css";
-        linkElement1.onload = this.cssLoaded.bind(this);
-        const linkElement2 = document.createElement("link");
-        linkElement2.rel = "stylesheet";
-        linkElement2.href = DockSpawnTsWebcomponent.cssRootDirectory + "dock-manager-style.css";
-        shadowRoot.appendChild(linkElement1);
-        shadowRoot.appendChild(linkElement2);
-
         const dockSpawnDiv = document.createElement('div')
         dockSpawnDiv.id = "dockSpawnDiv";
         dockSpawnDiv.style.width = "100%";
         dockSpawnDiv.style.height = "100%";
         dockSpawnDiv.style.position = "relative";
-        shadowRoot.appendChild(dockSpawnDiv);
+        this.shadowRoot.appendChild(dockSpawnDiv);
 
         this.dockManager = new DockManager(dockSpawnDiv);
         this.dockManager.config.dialogRootElement = dockSpawnDiv;
-    }
 
-    public getElementInSlot(slot: HTMLSlotElement): HTMLElement {
-        return this.slotElementMap.get(slot);
-    }
-
-    private cssLoaded() {
         setTimeout(() => {
             this.dockManager.initialize();
 
@@ -80,6 +67,10 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
             });
             this.observer.observe(this, { childList: true });
         }, 50);
+    }
+
+    public getElementInSlot(slot: HTMLSlotElement): HTMLElement {
+        return this.slotElementMap.get(slot);
     }
 
     private handleAddedChildNode(element: HTMLElement) {

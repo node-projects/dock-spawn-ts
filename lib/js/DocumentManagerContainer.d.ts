@@ -7,7 +7,6 @@ import { IState } from "./interfaces/IState.js";
  * 3D view in a modelling package etc
  */
 export declare class DocumentManagerContainer extends FillDockContainer {
-    minimumAllowedChildNodes: number;
     constructor(dockManager: DockManager);
     private _createDocumentTabPage;
     saveState(state: IState): void;

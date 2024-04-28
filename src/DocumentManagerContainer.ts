@@ -14,8 +14,6 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 
 export class DocumentManagerContainer extends FillDockContainer {
 
-    minimumAllowedChildNodes: number;
-   
     constructor(dockManager: DockManager) {
         super(dockManager, TabHostDirection.TOP);
         

@@ -1,1 +1,1 @@
-{"version":3,"file":"DockModel.js","sourceRoot":"","sources":["../../src/DockModel.ts"],"names":[],"mappings":"AAGA,MAAM,OAAO,SAAS;IAKlB;QACI,IAAI,CAAC,QAAQ,GAAG,IAAI,CAAC,mBAAmB,GAAG,SAAS,CAAC;IACzD,CAAC;CACJ"}
+{"version":3,"file":"DockModel.js","sourceRoot":"","sources":["../../src/DockModel.ts"],"names":[],"mappings":"AAGA,MAAM,OAAO,SAAS;IAClB,QAAQ,CAAW;IACnB,mBAAmB,CAAW;IAC9B,OAAO,CAAU;IAEjB;QACI,IAAI,CAAC,QAAQ,GAAG,IAAI,CAAC,mBAAmB,GAAG,SAAS,CAAC;IACzD,CAAC;CACJ"}

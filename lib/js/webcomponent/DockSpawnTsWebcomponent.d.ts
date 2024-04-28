@@ -3,7 +3,6 @@ import { PanelContainer } from "../PanelContainer.js";
 import { PanelType } from "../enums/PanelType.js";
 import { DockNode } from "../DockNode.js";
 export declare class DockSpawnTsWebcomponent extends HTMLElement {
-    static cssRootDirectory: string;
     dockManager: DockManager;
     private slotId;
     private windowResizedBound;
@@ -14,7 +13,6 @@ export declare class DockSpawnTsWebcomponent extends HTMLElement {
     constructor();
     private initDockspawn;
     getElementInSlot(slot: HTMLSlotElement): HTMLElement;
-    private cssLoaded;
     private handleAddedChildNode;
     private handleRemovedChildNode;
     connectedCallback(): void;
