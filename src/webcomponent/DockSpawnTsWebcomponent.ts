@@ -7,9 +7,20 @@ import style1 from "../../../lib/css/dock-manager-style.css" with { type : 'css'
 //@ts-ignore
 import style2 from "../../../lib/css/dock-manager.css" with { type : 'css'}
 
+function toParString(strings: TemplateStringsArray, values: any[]) {
+    if (strings.length === 1)
+        return strings.raw[0];
+    else {
+        let r = ''
+        for (let i = 0; i < strings.length; i++) {
+            r += strings[i] + (values[i] ?? '');
+        }
+        return r;
+    }
+}
+
 const css = function (strings: TemplateStringsArray, ...values: any[]): CSSStyleSheet {
     const cssStyleSheet = new CSSStyleSheet();
-    //@ts-ignore
     cssStyleSheet.replaceSync(toParString(strings, values));
     return cssStyleSheet;
 };
@@ -23,7 +34,8 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     private initialized = false;
     private elementContainerMap: Map<HTMLElement, PanelContainer> = new Map();
 
-    static style = css`:host {
+    static style = css`
+    :host {
         display: block;
     }`;
 
