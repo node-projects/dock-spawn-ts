@@ -80,6 +80,7 @@ export class TabHandle {
             this.contextMenuHandler = new EventHandler(this.elementBase, 'contextmenu', this.oncontextMenuClicked.bind(this));
         }
 
+        this.windowsContextMenuClose = this.windowsContextMenuClose.bind(this);
         //this.zIndexCounter = parent.host.dockManager.zIndexTabHandle;
     }
 
@@ -123,7 +124,7 @@ export class TabHandle {
             }
             tabHandle.closeContextMenu();
         };
-        
+
         let btnNewBrowserWindow = document.createElement('div');
         btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
         contextMenuContainer.append(btnNewBrowserWindow);
@@ -146,8 +147,7 @@ export class TabHandle {
             this._ctxMenu.style.left = e.pageX + "px";
             this._ctxMenu.style.top = e.pageY + "px";
             document.body.appendChild(this._ctxMenu);
-            this._windowsContextMenuCloseBound = this.windowsContextMenuClose.bind(this)
-            window.addEventListener('mouseup', this._windowsContextMenuCloseBound);
+            window.addEventListener('mouseup', this.windowsContextMenuClose);
         } else {
             this.closeContextMenu();
         }
@@ -157,7 +157,7 @@ export class TabHandle {
         if (this._ctxMenu) {
             document.body.removeChild(this._ctxMenu);
             delete this._ctxMenu;
-            window.removeEventListener('mouseup', this._windowsContextMenuCloseBound);
+            window.removeEventListener('mouseup', this.windowsContextMenuClose);
         }
     }
 
@@ -284,12 +284,12 @@ export class TabHandle {
             this.contextMenuHandler.cancel();
         }
 
-        if(this.elementBase){
+        if (this.elementBase) {
             Utils.removeNode(this.elementBase);
             delete this.elementBase;
         }
-        
-        if(this.elementCloseButton){
+
+        if (this.elementCloseButton) {
             Utils.removeNode(this.elementCloseButton);
             delete this.elementCloseButton;
         }

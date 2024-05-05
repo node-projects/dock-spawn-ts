@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -10,10 +10,10 @@
     "start": "http-server"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24.1",
-    "@babel/core": "^7.24.4",
-    "@babel/preset-env": "^7.24.4",
-    "@types/node": "^20.12.7",
+    "@babel/cli": "^7.24.5",
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
+    "@types/node": "^20.12.8",
     "http-server": "^14.1.1",
     "typescript": "^5.4.5",
     "uglify-js": "^3.17.4",

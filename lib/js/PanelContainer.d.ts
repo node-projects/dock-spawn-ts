@@ -46,6 +46,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     panelType: PanelType;
     tabPage?: TabPage;
     undockedToNewBrowserWindow: boolean;
+    contextMenuHandler: EventHandler;
     lastDialogSize?: ISize;
     _floatingDialog?: Dialog;
     _canUndock: boolean;
@@ -53,7 +54,13 @@ export declare class PanelContainer implements IDockContainerWithSize {
     _cachedHeight: number;
     _hideCloseButton: boolean;
     _grayOut: HTMLDivElement;
+    _ctxMenu: HTMLDivElement;
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean);
+    _initialize(): void;
+    static createContextMenuContentCallback: (panelContainer: PanelContainer, contextMenuContainer: HTMLDivElement) => void;
+    oncontextMenuClicked(e: MouseEvent): void;
+    closeContextMenu(): void;
+    windowsContextMenuClose(e: Event): void;
     canUndock(state: boolean): void;
     addListener(listener: any): void;
     removeListener(listener: any): void;
@@ -65,7 +72,6 @@ export declare class PanelContainer implements IDockContainerWithSize {
     setActiveChild(): void;
     get containerElement(): HTMLDivElement;
     grayOut(show: boolean): void;
-    _initialize(): void;
     onMouseDown(): void;
     hideCloseButton(state: boolean): void;
     destroy(): void;
