@@ -28,3 +28,4 @@ export * from './TabPage.js';
 export * from './UndockInitiator.js';
 export * from './Utils.js';
 export * from './VerticalDockContainer.js';
+export * from './i18n/Localizer.js';
