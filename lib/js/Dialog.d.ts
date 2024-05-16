@@ -43,7 +43,7 @@ export declare class Dialog {
     close(): void;
     remove(): void;
     show(): void;
-    static createContextMenuContentCallback: (dialog: Dialog, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => boolean;
+    static createContextMenuContentCallback: (dialog: Dialog, documentMangerNodes: DockNode[]) => Node[];
     oncontextMenuClicked(e: MouseEvent): void;
     closeContextMenu(): void;
     windowsContextMenuClose(e: Event): void;
