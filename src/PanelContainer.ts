@@ -173,26 +173,36 @@ export class PanelContainer implements IDockContainerWithSize {
         }
     }
 
-    static createContextMenuContentCallback = (panelContainer: PanelContainer, contextMenuContainer: HTMLDivElement) => {
-        let btnNewBrowserWindow = document.createElement('div');
-        btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
-        contextMenuContainer.append(btnNewBrowserWindow);
+    static createContextMenuContentCallback = (panelContainer: PanelContainer): Node[] => {
+        const result = [];
 
-        btnNewBrowserWindow.onclick = () => {
-            panelContainer.undockToBrowserDialog();
-            panelContainer.closeContextMenu();
-        };
+        if (panelContainer.dockManager.config.enableBrowserWindows) {
+            let btnNewBrowserWindow = document.createElement('div');
+            btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
+            result.push(btnNewBrowserWindow);
+    
+            btnNewBrowserWindow.onclick = () => {
+                panelContainer.undockToBrowserDialog();
+                panelContainer.closeContextMenu();
+            };
+        }
+
+        return result;
     }
 
     oncontextMenuClicked(e: MouseEvent) {
         e.preventDefault();
 
         if (!this._ctxMenu && PanelContainer.createContextMenuContentCallback) {
+            const menuItems = PanelContainer.createContextMenuContentCallback(this);
+
+            if (menuItems.length == 0) {
+                return;
+            }
+            
             this._ctxMenu = document.createElement('div');
             this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
-
-            PanelContainer.createContextMenuContentCallback(this, this._ctxMenu);
-
+            this._ctxMenu.append(...menuItems);
             this._ctxMenu.style.left = e.pageX + "px";
             this._ctxMenu.style.top = e.pageY + "px";
             document.body.appendChild(this._ctxMenu);

@@ -180,49 +180,57 @@ export class Dialog {
         }
     }
 
-    static createContextMenuContentCallback = (dialog: Dialog, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => {
+    static createContextMenuContentCallback = (dialog: Dialog, documentMangerNodes: DockNode[]): Node[] => {
         if (!dialog.panel._hideCloseButton) {
-            let btnCloseDialog = document.createElement('div');
-            btnCloseDialog.innerText = Localizer.getString('CloseDialog');
-            contextMenuContainer.append(btnCloseDialog);
+            return [];
+        }
 
-            btnCloseDialog.onclick = () => {
-                dialog.panel.close();
-                dialog.closeContextMenu();
-            };
+        const result = [];
 
+        let btnCloseDialog = document.createElement('div');
+        btnCloseDialog.innerText = Localizer.getString('CloseDialog');
+        result.push(btnCloseDialog);
+
+        btnCloseDialog.onclick = () => {
+            dialog.panel.close();
+            dialog.closeContextMenu();
+        };
+
+        if (dialog.dockManager.config.enableBrowserWindows) {
             let btnNewBrowserWindow = document.createElement('div');
             btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
-            contextMenuContainer.append(btnNewBrowserWindow);
+            result.push(btnNewBrowserWindow);
 
             btnNewBrowserWindow.onclick = () => {
                 dialog.panel.undockToBrowserDialog();
                 dialog.closeContextMenu();
             };
-
-            return true;
-        } else {
-            return false;
         }
+
+        return result;
     }
 
     oncontextMenuClicked(e: MouseEvent) {
         e.preventDefault();
 
         if (!this._ctxMenu && Dialog.createContextMenuContentCallback) {
+            const menuItems = Dialog.createContextMenuContentCallback(
+                this, 
+                this.dockManager.context.model.documentManagerNode.children
+            );
+
+            if (menuItems.length == 0) {
+                return;
+            }
+
             this._ctxMenu = document.createElement('div');
             this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
-
-            let res = Dialog.createContextMenuContentCallback(this, this._ctxMenu, this.dockManager.context.model.documentManagerNode.children);
-            if (res !== false) {
-                this._ctxMenu.style.left = e.pageX + "px";
-                this._ctxMenu.style.top = e.pageY + "px";
-                document.body.appendChild(this._ctxMenu);
-                this._windowsContextMenuCloseBound = this.windowsContextMenuClose.bind(this)
-                window.addEventListener('pointerup', this._windowsContextMenuCloseBound);
-            } else {
-                this._ctxMenu = null;
-            }
+            this._ctxMenu.append(...menuItems);
+            this._ctxMenu.style.left = e.pageX + "px";
+            this._ctxMenu.style.top = e.pageY + "px";
+            document.body.appendChild(this._ctxMenu);
+            this._windowsContextMenuCloseBound = this.windowsContextMenuClose.bind(this)
+            window.addEventListener('pointerup', this._windowsContextMenuCloseBound);
         } else {
             this.closeContextMenu();
         }

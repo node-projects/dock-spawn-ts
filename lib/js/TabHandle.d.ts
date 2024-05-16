@@ -37,7 +37,7 @@ export declare class TabHandle {
     addListener(listener: any): void;
     removeListener(listener: any): void;
     undockEnabled(state: boolean): void;
-    static createContextMenuContentCallback: (tabHandle: TabHandle, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => void;
+    static createContextMenuContentCallback: (tabHandle: TabHandle, documentMangerNodes: DockNode[]) => Node[];
     oncontextMenuClicked(e: MouseEvent): void;
     closeContextMenu(): void;
     windowsContextMenuClose(e: Event): void;

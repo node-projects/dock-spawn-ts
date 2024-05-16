@@ -96,10 +96,12 @@ export class TabHandle {
         this.undockInitiator.enabled = state;
     }
 
-    static createContextMenuContentCallback = (tabHandle: TabHandle, contextMenuContainer: HTMLDivElement, documentMangerNodes: DockNode[]) => {
+    static createContextMenuContentCallback = (tabHandle: TabHandle, documentMangerNodes: DockNode[]): Node[] => {
+        const result = [];
+
         let btnCloseAll = document.createElement('div');
         btnCloseAll.innerText = Localizer.getString('CloseAll');
-        contextMenuContainer.append(btnCloseAll);
+        result.push(btnCloseAll);
 
         btnCloseAll.onclick = () => {
             let length = documentMangerNodes.length;
@@ -113,7 +115,7 @@ export class TabHandle {
 
         let btnCloseAllButThis = document.createElement('div');
         btnCloseAllButThis.innerText = Localizer.getString('CloseAllButThis');
-        contextMenuContainer.append(btnCloseAllButThis);
+        result.push(btnCloseAllButThis);
 
         btnCloseAllButThis.onclick = () => {
             let length = documentMangerNodes.length;
@@ -125,25 +127,38 @@ export class TabHandle {
             tabHandle.closeContextMenu();
         };
 
-        let btnNewBrowserWindow = document.createElement('div');
-        btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
-        contextMenuContainer.append(btnNewBrowserWindow);
+console.log(tabHandle.parent.container.dockManager.config.enableBrowserWindows);
 
-        btnNewBrowserWindow.onclick = () => {
-            (<PanelContainer>tabHandle.parent.container).undockToBrowserDialog();
-            tabHandle.closeContextMenu();
-        };
+        if (tabHandle.parent.container.dockManager.config.enableBrowserWindows) {
+            let btnNewBrowserWindow = document.createElement('div');
+            btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
+            result.push(btnNewBrowserWindow);
+    
+            btnNewBrowserWindow.onclick = () => {
+                (<PanelContainer>tabHandle.parent.container).undockToBrowserDialog();
+                tabHandle.closeContextMenu();
+            };
+        }
+
+        return result;
     }
 
     oncontextMenuClicked(e: MouseEvent) {
         e.preventDefault();
 
         if (!this._ctxMenu && TabHandle.createContextMenuContentCallback) {
+            const menuItems = TabHandle.createContextMenuContentCallback(
+                this, 
+                this.parent.container.dockManager.context.model.documentManagerNode.children
+            );
+
+            if (menuItems.length == 0) {
+                return;
+            }
+            
             this._ctxMenu = document.createElement('div');
             this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
-
-            TabHandle.createContextMenuContentCallback(this, this._ctxMenu, this.parent.container.dockManager.context.model.documentManagerNode.children);
-
+            this._ctxMenu.append(...menuItems);
             this._ctxMenu.style.left = e.pageX + "px";
             this._ctxMenu.style.top = e.pageY + "px";
             document.body.appendChild(this._ctxMenu);

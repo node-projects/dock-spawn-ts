@@ -57,7 +57,7 @@ export declare class PanelContainer implements IDockContainerWithSize {
     _ctxMenu: HTMLDivElement;
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean);
     _initialize(): void;
-    static createContextMenuContentCallback: (panelContainer: PanelContainer, contextMenuContainer: HTMLDivElement) => void;
+    static createContextMenuContentCallback: (panelContainer: PanelContainer) => Node[];
     oncontextMenuClicked(e: MouseEvent): void;
     closeContextMenu(): void;
     windowsContextMenuClose(e: Event): void;

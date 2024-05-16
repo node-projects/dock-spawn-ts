@@ -4,4 +4,5 @@ export declare class DockConfig {
     escClosesDialog?: boolean;
     dialogRootElement: HTMLElement;
     moveOnlyWithinDockConatiner?: boolean;
+    enableBrowserWindows?: boolean;
 }
