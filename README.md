@@ -112,7 +112,7 @@ Usage Example is in page/demo/demo_simple_es5.html
 
 | Url                                            | Licence         | Touch support | Dialogs | Dialogs in new Browserwindows |
 |------------------------------------------------|-----------------|---------------|---------|-------------------------------|
-| dock-spawn-ts                                  | MIT             | Yes           | Yes     | No                            |
+| dock-spawn-ts                                  | MIT             | Yes           | Yes     | Yes                            |
 | https://github.com/golden-layout/golden-layout | MIT             | No            | No      | Yes                           |
 | https://github.com/WebCabin/wcDocker           | MIT             | Yes           | Yes     | No                            |
 | https://jspanel.de                             | MIT             | Yes           | Yes     | No                            |
