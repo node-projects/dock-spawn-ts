@@ -121,3 +121,4 @@ Usage Example is in page/demo/demo_simple_es5.html
 | https://github.com/tupilabs/vue-lumino         | Apache2         | ?             | No      | No                            |
 | https://github.com/mathuo/dockview             | MIT             | ?             | No      | No                            |
    
+https://github.com/nomcopter/react-mosaic
