@@ -110,15 +110,15 @@ Usage Example is in page/demo/demo_simple_es5.html
 
 # other html docking frameworks in comparison
 
-| Url                                            | Licence         | Touch support | Dialogs | Dialogs in new Browserwindows |
-|------------------------------------------------|-----------------|---------------|---------|-------------------------------|
-| dock-spawn-ts                                  | MIT             | Yes           | Yes     | No                            |
-| https://github.com/golden-layout/golden-layout | MIT             | No            | No      | Yes                           |
-| https://github.com/WebCabin/wcDocker           | MIT             | Yes           | Yes     | No                            |
-| https://jspanel.de                             | MIT             | Yes           | Yes     | No                            |
-| http://www.htmldockfloat.com                   | Commerical/free | No            | Yes     | No                            |
-| http://phosphorjs.github.io/                   | BSD 3           | ?             | ?       | No                            |
-| https://github.com/tupilabs/vue-lumino         | Apache2         | ?             | No      | No                            |
-| https://github.com/mathuo/dockview             | MIT             | ?             | No      | No                            |
+| Url                                            | Licence         | Touch support | Dialogs | Keep Content in DOM | Autocolapsing Panels | Dialogs in new Browserwindows | Dock Back from extra Browserwindow |
+|------------------------------------------------|-----------------|---------------|---------|---------------------|----------------------|-------------------------------|------------------------------------|
+| dock-spawn-ts                                  | MIT             | Yes           | Yes     | Yes                 | No                   | Yes                           | No                                 |
+| https://github.com/golden-layout/golden-layout | MIT             | No            | No      |                     |                      | Yes                           |                                    |
+| https://github.com/WebCabin/wcDocker           | MIT             | Yes           | Yes     |                     |                      | No                            |                                    |
+| https://jspanel.de                             | MIT             | Yes           | Yes     |                     |                      | No                            |                                    |
+| http://www.htmldockfloat.com                   | Commerical/free | No            | Yes     |                     |                      | No                            |                                    |
+| http://phosphorjs.github.io/                   | BSD 3           | ?             | ?       |                     |                      | No                            |                                    |
+| https://github.com/tupilabs/vue-lumino         | Apache2         | ?             | No      |                     |                      | No                            |                                    |
+| https://github.com/mathuo/dockview             | MIT             | ?             | No      |                     |                      | No                            |                                    |
    
 https://github.com/nomcopter/react-mosaic
