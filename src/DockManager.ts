@@ -752,12 +752,12 @@ export class DockManager {
         });
     }
 
-    notifyOnActiveDocumentChange(panel: PanelContainer, oldActive: PanelContainer) {
-        this.layoutEventListeners.forEach((listener) => {
+    async notifyOnActiveDocumentChange(panel: PanelContainer, oldActive: PanelContainer) {
+        for (const listener of this.layoutEventListeners) {
             if (listener.onActiveDocumentChange) {
-                listener.onActiveDocumentChange(this, panel, oldActive);
+                await listener.onActiveDocumentChange(this, panel, oldActive);
             }
-        });
+        }
     }
 
     saveState() {
