@@ -98,8 +98,8 @@ window.onload = () => {
             localStorage.setItem(storeKey, dockManager.saveState());
             updateState();
         },
-        onTabsReorder: (dockManager, dialog) => {
-            logOutput('onTabsReorder(dialog:' + dialog.panel.title + ')');
+        onTabsReorder: (dockManager, dockNode) => {
+            logOutput('onTabsReorder(container:' + dockNode.container.name + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
             updateState();
         },
