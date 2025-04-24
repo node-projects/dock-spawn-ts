@@ -180,7 +180,7 @@ export class PanelContainer implements IDockContainerWithSize {
             let btnNewBrowserWindow = document.createElement('div');
             btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
             result.push(btnNewBrowserWindow);
-    
+
             btnNewBrowserWindow.onclick = () => {
                 panelContainer.undockToBrowserDialog();
                 panelContainer.closeContextMenu();
@@ -199,7 +199,7 @@ export class PanelContainer implements IDockContainerWithSize {
             if (menuItems.length == 0) {
                 return;
             }
-            
+
             this._ctxMenu = document.createElement('div');
             this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
             this._ctxMenu.append(...menuItems);
@@ -474,12 +474,14 @@ export class PanelContainer implements IDockContainerWithSize {
 
         //if (this.elementContentContainer.parentElement != this.dockManager.config.dialogRootElement)
         //    this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
-        const rect = this.elementContentWrapper.getBoundingClientRect();
-        const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
-        this.elementContentContainer.style.left = (rect.x - rootRect.x) + 'px';
-        this.elementContentContainer.style.top = (rect.y - rootRect.y) + 'px';
-        this.elementContentContainer.style.width = rect.width + 'px';
-        this.elementContentContainer.style.height = rect.height + 'px';
+        requestAnimationFrame(() => {
+            const rect = this.elementContentWrapper.getBoundingClientRect();
+            const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
+            this.elementContentContainer.style.left = (rect.x - rootRect.x) + 'px';
+            this.elementContentContainer.style.top = (rect.y - rootRect.y) + 'px';
+            this.elementContentContainer.style.width = rect.width + 'px';
+            this.elementContentContainer.style.height = rect.height + 'px';
+        });
     }
 
     setDialogPosition(x: number, y: number) {
