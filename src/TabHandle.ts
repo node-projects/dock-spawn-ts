@@ -131,7 +131,7 @@ export class TabHandle {
             let btnNewBrowserWindow = document.createElement('div');
             btnNewBrowserWindow.innerText = Localizer.getString('NewBrowserWindow');
             result.push(btnNewBrowserWindow);
-    
+
             btnNewBrowserWindow.onclick = () => {
                 (<PanelContainer>tabHandle.parent.container).undockToBrowserDialog();
                 tabHandle.closeContextMenu();
@@ -146,14 +146,14 @@ export class TabHandle {
 
         if (!this._ctxMenu && TabHandle.createContextMenuContentCallback) {
             const menuItems = TabHandle.createContextMenuContentCallback(
-                this, 
+                this,
                 this.parent.container.dockManager.context.model.documentManagerNode.children
             );
 
             if (menuItems.length == 0) {
                 return;
             }
-            
+
             this._ctxMenu = document.createElement('div');
             this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
             this._ctxMenu.append(...menuItems);
@@ -212,7 +212,7 @@ export class TabHandle {
         this.touchUpHandler = new EventHandler(window, 'touchend', this.onMouseUp.bind(this));
     }
 
-    onMouseUp(e) {
+    onMouseUp() {
         if (this.elementBase) {
             this.elementBase.classList.remove('dockspan-tab-handle-dragged');
         }
@@ -239,9 +239,13 @@ export class TabHandle {
         });
     }
 
-    onMouseMove(e) {
+    onMouseMove(e: MouseEvent) {
         e.preventDefault();
 
+        if (e.buttons == 0) {
+            this.onMouseUp();
+            return;
+        }
         if (Math.abs(this.stargDragPosition - e.clientX) < 10)
             return;
         if (this.elementBase != null) { //Todo: because of this is null, we need to drag 2 times, needs fix

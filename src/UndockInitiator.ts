@@ -153,9 +153,14 @@ export class UndockInitiator {
             e = e.touches[0];
         }
 
+        if ((<MouseEvent>e).buttons == 0){
+            this.onMouseUp();
+            return;
+        }
+
         let position = new Point(e.clientX, e.clientY);
         let dy = position.y - this.dragStartPosition.y;
-        
+
         if (dy > this.thresholdPixels || dy < -this.thresholdPixels) {
             this.enabled = false;
             this._requestUndock(e);
@@ -166,7 +171,7 @@ export class UndockInitiator {
         let top = 0;
         let left = 0;
         let currentElement = this.element;
-        
+
         do {
             top += currentElement.offsetTop || 0;
             left += currentElement.offsetLeft || 0;
