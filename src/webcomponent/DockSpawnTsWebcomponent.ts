@@ -3,9 +3,9 @@ import { PanelContainer } from "../PanelContainer.js";
 import { PanelType } from "../enums/PanelType.js";
 import { DockNode } from "../DockNode.js";
 //@ts-ignore
-import style1 from "../../../lib/css/dock-manager-style.css" with { type : 'css'}
+import style1 from "../../../lib/css/dock-manager-style.css" with { type: 'css'}
 //@ts-ignore
-import style2 from "../../../lib/css/dock-manager.css" with { type : 'css'}
+import style2 from "../../../lib/css/dock-manager.css" with { type: 'css'}
 
 function toParString(strings: TemplateStringsArray, values: any[]) {
     if (strings.length === 1)
@@ -80,11 +80,11 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
 
             this.observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
-                    mutation.addedNodes.forEach((node) => {
-                        this.handleAddedChildNode(node as HTMLElement);
-                    });
                     mutation.removedNodes.forEach((node) => {
                         this.handleRemovedChildNode(node as HTMLElement);
+                    });
+                    mutation.addedNodes.forEach((node) => {
+                        this.handleAddedChildNode(node as HTMLElement);
                     });
                 });
             });
