@@ -139,6 +139,7 @@ export declare class DockManager {
     notifyOnTabChange(tabpage: TabPage): void;
     notifyOnActivePanelChange(panel: PanelContainer, oldActive: PanelContainer): void;
     notifyOnActiveDocumentChange(panel: PanelContainer, oldActive: PanelContainer): Promise<void>;
+    notifyOnNewWindow(panel: PanelContainer, win: Window): void;
     saveState(): string;
     loadState(json: string): Promise<void>;
     getPanels(): PanelContainer[];

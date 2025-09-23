@@ -760,6 +760,15 @@ export class DockManager {
         }
     }
 
+    notifyOnNewWindow(panel: PanelContainer, win: Window) {
+        this._checkShowBackgroundContext();
+        this.layoutEventListeners.forEach((listener) => {
+            if (listener.onNewWindow) {
+                listener.onNewWindow(this, panel, win);
+            }
+        });
+    }
+
     saveState() {
         let serializer = new DockGraphSerializer();
         return serializer.serialize(this.context.model);

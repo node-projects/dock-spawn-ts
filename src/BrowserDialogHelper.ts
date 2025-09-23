@@ -1,10 +1,13 @@
-export function moveElementToNewBrowserWindow(element: HTMLElement, params: {
+import { PanelContainer } from "./PanelContainer.js";
+
+export function moveElementToNewBrowserWindow(panelContainer: PanelContainer, params: {
     title?: string,
     closeCallback?: () => void,
     newWindowClosedCallback?: () => void,
     focused: (e: FocusEvent) => void,
     blured: (e: FocusEvent) => void,
 }) {
+    const element = panelContainer.resolvedElementContent;
     const rect = element.getBoundingClientRect();
     const newWindowBounds = { x: rect.x + 24, y: rect.y + 60, width: rect.width, height: rect.height };
     const win = window.open('about:blank', undefined, `popup=yes,left=${newWindowBounds.x},top=${newWindowBounds.y},width=${newWindowBounds.width},height=${newWindowBounds.height}`);
@@ -58,6 +61,9 @@ export function moveElementToNewBrowserWindow(element: HTMLElement, params: {
     }
 
     params.closeCallback();
+    panelContainer.dockManager.notifyOnNewWindow(panelContainer, win);
+    
+    return win;
 }
 
 function cloneStyleSheet(window: Window, stylesheet: CSSStyleSheet, cache: Map<CSSStyleSheet, CSSStyleSheet>) {
