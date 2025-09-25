@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "3.8.1",
+  "version": "3.8.2",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -25,7 +25,8 @@
     "webpack": "^5.99.5",
     "webpack-cli": "^6.0.1"
   },
-  "main": "/lib/js/Exports.js",
+  "type": "module",
+  "main": "./lib/js/index-webcomponent.js",
   "files": [
     "lib/**/*",
     "src/**/*"
