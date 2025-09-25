@@ -1,19 +1,24 @@
 {
   "name": "dock-spawn-ts",
-  "version": "3.7.0",
+  "version": "3.8.0",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "start": "http-server"
+    "start": "http-server",
+    "prepublishOnly": "npm run build && npm run bundle && npm run bundle2",
+    "bundle": "esbuild ./lib/js/index.js --format=esm --minify --platform=neutral --bundle --outfile=./lib/js/index-min.js",
+    "bundle2": "esbuild ./lib/js/index-webcomponent.js --format=esm --external:*.css --minify --platform=neutral --bundle --outfile=./lib/js/index-webcomponent-min.js"
+  
   },
   "devDependencies": {
     "@babel/cli": "^7.27.0",
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "@types/node": "^22.14.1",
+    "esbuild": "^0.25.10",
     "http-server": "^14.1.1",
     "typescript": "^5.8.3",
     "uglify-js": "^3.19.3",
