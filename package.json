@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "3.8.0",
+  "version": "3.8.1",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -10,7 +10,7 @@
     "start": "http-server",
     "prepublishOnly": "npm run tsc && npm run bundle && npm run bundle2",
     "bundle": "esbuild ./lib/js/index.js --format=esm --minify --platform=neutral --bundle --outfile=./lib/js/index-min.js",
-    "bundle2": "esbuild ./lib/js/index-webcomponent.js --format=esm --external:*.css --minify --platform=neutral --bundle --outfile=./lib/js/index-webcomponent-min.js"
+    "bundle2": "esbuild ./lib/js/index-webcomponent.js --format=esm --loader:.css=copy --minify --platform=neutral --bundle --outfile=./lib/js/index-webcomponent-min.js"
   
   },
   "devDependencies": {
