@@ -34,6 +34,7 @@ export class SplitterBar {
     }
 
     onPointerDown(e: PointerEvent) {
+        e.preventDefault(); // -> for exaple if you resize over a dragable element this is needed
         this.barElement.setPointerCapture(e.pointerId);
         this._startDragging(e);
     }
