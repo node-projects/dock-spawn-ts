@@ -122,8 +122,10 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let dockToAttribute = element.getAttribute('dock-spawn-dock-to');
         if (dockToAttribute) {
             //@ts-ignore
-            let dockToElement = this.getRootNode().getElementById(dockToAttribute) as HTMLElement;
-            dockRelativeTo = this.dockManager.findNodeFromContainerElement(this.elementContainerMap.get(dockToElement).containerElement);
+            const dockToElement = this.getRootNode().getElementById(dockToAttribute) as HTMLElement;
+            if (dockToElement) {
+                dockRelativeTo = this.dockManager.findNodeFromContainerElement(this.elementContainerMap.get(dockToElement).containerElement);
+            }
         }
 
         if (dockType == 'left')
