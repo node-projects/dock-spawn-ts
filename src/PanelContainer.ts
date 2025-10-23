@@ -491,7 +491,7 @@ export class PanelContainer implements IDockContainerWithSize {
     }
 
     setVisible(isVisible: boolean) {
-        this.elementContentContainer.style.display = isVisible ? 'block' : 'none';
+        this.elementContentContainer.style.visibility = isVisible ? 'visible' : 'hidden';
     }
 
     setTitle(title: string) {
