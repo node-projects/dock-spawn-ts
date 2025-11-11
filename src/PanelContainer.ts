@@ -383,7 +383,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this.isDialog = true;
         this.undockInitiator.enabled = false;
         this.elementContentWrapper.style.display = "block";
-        this.elementContentContainer.style.display = 'none';
+        this.elementContentContainer.style.visibility = 'hidden';
         this.elementPanel.style.position = "";
         this.dockManager.requestClose(this);
     }
