@@ -49,6 +49,7 @@ export class TabPage {
         this.handle.destroy();
 
         if (this.container instanceof PanelContainer) {
+            this.container.elementContentContainer.style.zIndex = '';
             let panel = this.container;
             delete panel.onTitleChanged;
         }
@@ -72,6 +73,13 @@ export class TabPage {
     setSelected(flag: boolean, isActive: boolean) {
         this.selected = flag;
         this.handle.setSelected(flag);
+
+        if (this.container instanceof PanelContainer) {
+            if (flag)
+                this.container.elementContentContainer.style.zIndex = '1';
+            else
+                this.container.elementContentContainer.style.zIndex = '';
+        }
 
         if (!this._initContent)
             this.host.contentElement.appendChild(this.containerElement);
