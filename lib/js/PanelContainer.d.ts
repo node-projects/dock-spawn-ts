@@ -1,19 +1,20 @@
-import { DockManager } from "./DockManager.js";
-import { UndockInitiator } from "./UndockInitiator.js";
 import { ContainerType } from "./ContainerType.js";
-import { EventHandler } from "./EventHandler.js";
-import { ISize } from "./interfaces/ISize.js";
-import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
-import { IState } from "./interfaces/IState.js";
-import { Point } from "./Point.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
-import { PanelType } from "./enums/PanelType.js";
 import { Dialog } from "./Dialog.js";
+import { DockManager } from "./DockManager.js";
+import { EventHandler } from "./EventHandler.js";
+import { Point } from "./Point.js";
 import { TabPage } from './TabPage.js';
+import { UndockInitiator } from "./UndockInitiator.js";
+import { PanelType } from "./enums/PanelType.js";
+import { IContextMenuProvider } from "./interfaces/IContextMenuProvider.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
+import { ISize } from "./interfaces/ISize.js";
+import { IState } from "./interfaces/IState.js";
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
  */
-export declare class PanelContainer implements IDockContainerWithSize {
+export declare class PanelContainer implements IDockContainerWithSize, IContextMenuProvider {
     closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
     onTitleChanged: (panelContainer: PanelContainer, title: string) => void;
     elementPanel: HTMLDivElement;
@@ -55,9 +56,11 @@ export declare class PanelContainer implements IDockContainerWithSize {
     _hideCloseButton: boolean;
     _grayOut: HTMLDivElement;
     _ctxMenu: HTMLDivElement;
+    private _contextMenuProvider;
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean);
     _initialize(): void;
     static createContextMenuContentCallback: (panelContainer: PanelContainer) => Node[];
+    createContextMenuItems(): Node[];
     oncontextMenuClicked(e: MouseEvent): void;
     closeContextMenu(): void;
     windowsContextMenuClose(e: Event): void;

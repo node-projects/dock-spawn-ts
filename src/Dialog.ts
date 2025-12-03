@@ -1,14 +1,15 @@
 import { DockManager } from "./DockManager.js";
-import { Point } from "./Point.js";
-import { PanelContainer } from "./PanelContainer.js";
+import { DockNode } from "./DockNode.js";
 import { DraggableContainer } from "./DraggableContainer.js";
-import { ResizableContainer } from "./ResizableContainer.js";
 import { EventHandler } from "./EventHandler.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { Point } from "./Point.js";
+import { ResizableContainer } from "./ResizableContainer.js";
 import { Utils } from "./Utils.js";
 import { Localizer } from "./i18n/Localizer.js";
-import { DockNode } from "./DockNode.js";
+import { IContextMenuProvider } from "./interfaces/IContextMenuProvider.js";
 
-export class Dialog {
+export class Dialog implements IContextMenuProvider {
     elementDialog: HTMLDivElement & { floatingDialog: Dialog };
     draggable: DraggableContainer;
     panel: PanelContainer;
@@ -24,9 +25,6 @@ export class Dialog {
     keyPressHandler: EventHandler;
     focusHandler: EventHandler;
     grayoutParent: PanelContainer;
-    contextmenuHandler: EventHandler;
-    _ctxMenu: HTMLDivElement;
-    _windowsContextMenuCloseBound: any;
 
     constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, disableResize?: boolean) {
         this.panel = panel;
@@ -64,7 +62,6 @@ export class Dialog {
         this.focusHandler = new EventHandler(this.elementDialog, 'focus', this.onFocus.bind(this), true);
         this.mouseDownHandler = new EventHandler(this.elementDialog, 'pointerdown', this.onMouseDown.bind(this), true);
         this.keyPressHandler = new EventHandler(this.elementDialog, 'keypress', this.dockManager.onKeyPressBound, true);
-        this.contextmenuHandler = new EventHandler(this.panel.elementTitle, 'contextmenu', this.oncontextMenuClicked.bind(this));
 
         this.resize(this.panel.elementPanel.clientWidth, this.panel.elementPanel.clientHeight);
         this.isHidden = false;
@@ -113,15 +110,12 @@ export class Dialog {
             this.keyPressHandler.cancel();
             delete this.keyPressHandler;
         }
-        if (this.contextmenuHandler) {
-            this.contextmenuHandler.cancel();
-            delete this.contextmenuHandler;
-        }
+
         Utils.removeNode(this.elementDialog);
         this.draggable.removeDecorator();
         Utils.removeNode(this.panel.elementPanel);
         Utils.arrayRemove(this.dockManager.context.model.dialogs, this);
-        delete this.panel.floatingDialog;
+        this.panel.floatingDialog = undefined;
 
         if (this.grayoutParent) {
             this.grayoutParent.grayOut(false);
@@ -192,8 +186,8 @@ export class Dialog {
         result.push(btnCloseDialog);
 
         btnCloseDialog.onclick = () => {
+            dialog.panel.closeContextMenu();
             dialog.panel.close();
-            dialog.closeContextMenu();
         };
 
         if (dialog.dockManager.config.enableBrowserWindows) {
@@ -202,55 +196,17 @@ export class Dialog {
             result.push(btnNewBrowserWindow);
 
             btnNewBrowserWindow.onclick = () => {
+                dialog.panel.closeContextMenu();
                 dialog.panel.undockToBrowserDialog();
-                dialog.closeContextMenu();
             };
         }
 
         return result;
     }
 
-    oncontextMenuClicked(e: MouseEvent) {
-        e.preventDefault();
-
-        if (!this._ctxMenu && Dialog.createContextMenuContentCallback) {
-            const menuItems = Dialog.createContextMenuContentCallback(
-                this, 
-                this.dockManager.context.model.documentManagerNode.children
-            );
-
-            if (menuItems.length == 0) {
-                return;
-            }
-
-            this._ctxMenu = document.createElement('div');
-            this._ctxMenu.className = 'dockspab-tab-handle-context-menu';
-            this._ctxMenu.append(...menuItems);
-            this._ctxMenu.style.left = e.pageX + "px";
-            this._ctxMenu.style.top = e.pageY + "px";
-            document.body.appendChild(this._ctxMenu);
-            this._windowsContextMenuCloseBound = this.windowsContextMenuClose.bind(this)
-            window.addEventListener('pointerup', this._windowsContextMenuCloseBound);
-        } else {
-            this.closeContextMenu();
-        }
-    }
-
-    closeContextMenu() {
-        if (this._ctxMenu) {
-            document.body.removeChild(this._ctxMenu);
-            delete this._ctxMenu;
-            window.removeEventListener('pointerup', this._windowsContextMenuCloseBound);
-        }
-    }
-
-    windowsContextMenuClose(e: Event) {
-        let cp = e.composedPath();
-        for (let i in cp) {
-            let el = cp[i];
-            if (el == this._ctxMenu)
-                return;
-        }
-        this.closeContextMenu();
+    public createContextMenuItems(): Node[] {
+        return Dialog.createContextMenuContentCallback(
+            this, 
+            this.dockManager.context.model.documentManagerNode.children);
     }
 }

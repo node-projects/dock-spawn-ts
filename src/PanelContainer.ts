@@ -1,23 +1,24 @@
-import { DockManager } from "./DockManager.js";
-import { Utils } from "./Utils.js";
-import { UndockInitiator } from "./UndockInitiator.js";
-import { ContainerType } from "./ContainerType.js";
-import { EventHandler } from "./EventHandler.js";
-import { ISize } from "./interfaces/ISize.js";
-import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
-import { IState } from "./interfaces/IState.js";
-import { Point } from "./Point.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
-import { PanelType } from "./enums/PanelType.js";
-import { Dialog } from "./Dialog.js";
-import { TabPage } from './TabPage.js';
-import { Localizer } from "./i18n/Localizer.js";
 import { moveElementToNewBrowserWindow } from "./BrowserDialogHelper.js";
+import { ContainerType } from "./ContainerType.js";
+import { Dialog } from "./Dialog.js";
+import { DockManager } from "./DockManager.js";
+import { EventHandler } from "./EventHandler.js";
+import { Point } from "./Point.js";
+import { TabPage } from './TabPage.js';
+import { UndockInitiator } from "./UndockInitiator.js";
+import { Utils } from "./Utils.js";
+import { PanelType } from "./enums/PanelType.js";
+import { Localizer } from "./i18n/Localizer.js";
+import { IContextMenuProvider } from "./interfaces/IContextMenuProvider.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
+import { ISize } from "./interfaces/ISize.js";
+import { IState } from "./interfaces/IState.js";
 
 /**
  * This dock container wraps the specified element on a panel frame with a title bar and close button
  */
-export class PanelContainer implements IDockContainerWithSize {
+export class PanelContainer implements IDockContainerWithSize, IContextMenuProvider {
 
     public closePanelContainerCallback: (panelContainer: PanelContainer) => Promise<boolean>;
 
@@ -60,6 +61,7 @@ export class PanelContainer implements IDockContainerWithSize {
     _hideCloseButton: boolean;
     _grayOut: HTMLDivElement;
     _ctxMenu: HTMLDivElement;
+    private _contextMenuProvider: IContextMenuProvider;
 
     constructor(elementContent: HTMLElement, dockManager: DockManager, title?: string, panelType?: PanelType, hideCloseButton?: boolean) {
         if (!title)
@@ -104,6 +106,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this._canUndock = dockManager._undockEnabled;
         this.eventListeners = [];
         this._hideCloseButton = hideCloseButton;
+        this._contextMenuProvider = this;
         this.windowsContextMenuClose = this.windowsContextMenuClose.bind(this);
 
         this._initialize();
@@ -162,7 +165,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this._updateTitle();
 
         this.undockInitiator = new UndockInitiator(this.elementTitle, this.performUndockToDialog.bind(this));
-        delete this.floatingDialog;
+        this.floatingDialog = undefined;
 
         this.mouseDownHandler = new EventHandler(this.elementPanel, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementPanel, 'touchstart', this.onMouseDown.bind(this), { passive: true });
@@ -190,11 +193,15 @@ export class PanelContainer implements IDockContainerWithSize {
         return result;
     }
 
+    public createContextMenuItems(): Node[] {
+        return PanelContainer.createContextMenuContentCallback(this);
+    }
+
     oncontextMenuClicked(e: MouseEvent) {
         e.preventDefault();
 
-        if (!this._ctxMenu && PanelContainer.createContextMenuContentCallback) {
-            const menuItems = PanelContainer.createContextMenuContentCallback(this);
+        if (!this._ctxMenu) {
+            const menuItems = this._contextMenuProvider.createContextMenuItems();
 
             if (menuItems.length == 0) {
                 return;
@@ -255,6 +262,7 @@ export class PanelContainer implements IDockContainerWithSize {
         this._floatingDialog = value;
         let canUndock = (this._floatingDialog === undefined);
         this.undockInitiator.enabled = canUndock;
+        this._contextMenuProvider = value ?? this;
     }
 
     static async loadFromState(state: IState, dockManager: DockManager) {
