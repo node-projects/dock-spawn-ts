@@ -54,7 +54,6 @@ export class ResizableContainer implements IDockContainer {
         this.resizeHandles = [];
 
         if (this.resizeDirection & ResizeDirection.North) {
-
             this._buildResizeHandle(false, false, true, false);
         }
 
