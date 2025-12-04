@@ -1,24 +1,25 @@
-import { DockWheel } from "./DockWheel.js";
-import { Utils } from "./Utils.js";
-import { Point } from "./Point.js";
-import { DockManagerContext } from "./DockManagerContext.js";
-import { DockNode } from "./DockNode.js";
-import { DockLayoutEngine } from "./DockLayoutEngine.js";
-import { EventHandler } from "./EventHandler.js";
 import { Dialog } from "./Dialog.js";
-import { DockGraphSerializer } from "./DockGraphSerializer.js";
-import { DockGraphDeserializer } from "./DockGraphDeserializer.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
-import { TabPage } from "./TabPage.js";
-import { SplitterDockContainer } from "./SplitterDockContainer.js";
-import { PanelContainer } from "./PanelContainer.js";
-import { FillDockContainer } from "./FillDockContainer.js";
-import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
-import { DockModel } from "./DockModel.js";
-import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
 import { DockConfig } from "./DockConfig.js";
+import { DockGraphDeserializer } from "./DockGraphDeserializer.js";
+import { DockGraphSerializer } from "./DockGraphSerializer.js";
+import { DockLayoutEngine } from "./DockLayoutEngine.js";
+import { DockManagerContext } from "./DockManagerContext.js";
+import { DockModel } from "./DockModel.js";
+import { DockNode } from "./DockNode.js";
+import { DockWheel } from "./DockWheel.js";
 import { PanelType } from "./enums/PanelType.js";
+import { ResizeDirection } from "./enums/ResizeDirection.js";
+import { EventHandler } from "./EventHandler.js";
+import { FillDockContainer } from "./FillDockContainer.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
+import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { IState } from "./interfaces/IState.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { Point } from "./Point.js";
+import { SplitterDockContainer } from "./SplitterDockContainer.js";
+import { TabPage } from "./TabPage.js";
+import { Utils } from "./Utils.js";
 
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.
@@ -371,7 +372,7 @@ export class DockManager {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine), false);
     }
 
-    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, disableResize?: boolean): Dialog {
+    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, resizeDirection?: ResizeDirection): Dialog {
         let retdiag = undefined;
 
         //check the dialog do not already exist
@@ -393,7 +394,7 @@ export class DockManager {
         let panel = container;
         Utils.removeNode(panel.elementPanel);
         panel.isDialog = true;
-        let dialog = new Dialog(panel, this, grayoutParent, disableResize);
+        let dialog = new Dialog(panel, this, grayoutParent, resizeDirection);
         dialog.setPosition(x, y);
         return dialog;
     }
@@ -519,9 +520,9 @@ export class DockManager {
      * Opens a Element in a Dialog
      * It is assumed that only leaf nodes (panels) can be undocked
      */
-    openInDialog(container: PanelContainer, event, dragOffset: Point, disableResize?: boolean) {
+    openInDialog(container: PanelContainer, event, dragOffset: Point, resizeDirection?: ResizeDirection) {
         // Create a new dialog window for the undocked panel
-        let dialog = new Dialog(container, this, null, disableResize);
+        let dialog = new Dialog(container, this, null, resizeDirection);
 
         if (event != null) {
             // Adjust the relative position

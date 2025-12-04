@@ -8,6 +8,7 @@ import { ResizableContainer } from "./ResizableContainer.js";
 import { Utils } from "./Utils.js";
 import { Localizer } from "./i18n/Localizer.js";
 import { IContextMenuProvider } from "./interfaces/IContextMenuProvider.js";
+import { ResizeDirection } from "./enums/ResizeDirection.js";
 
 export class Dialog implements IContextMenuProvider {
     elementDialog: HTMLDivElement & { floatingDialog: Dialog };
@@ -17,7 +18,7 @@ export class Dialog implements IContextMenuProvider {
     eventListener: DockManager;
     position: Point;
     resizable: ResizableContainer;
-    disableResize: boolean;
+    resizeDirection: ResizeDirection;
     mouseDownHandler: any;
     onKeyPressBound: any;
     noDocking: boolean;
@@ -26,12 +27,14 @@ export class Dialog implements IContextMenuProvider {
     focusHandler: EventHandler;
     grayoutParent: PanelContainer;
 
-    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, disableResize?: boolean) {
+    static defaultResizeDirection: ResizeDirection = ResizeDirection.All & ~ResizeDirection.NorthEast;
+
+    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, resizeDirection?: ResizeDirection) {
         this.panel = panel;
         this.dockManager = dockManager;
         this.eventListener = dockManager;
         this.grayoutParent = grayoutParent;
-        this.disableResize = disableResize;
+        this.resizeDirection = resizeDirection ?? Dialog.defaultResizeDirection;
         this._initialize();
         this.dockManager.context.model.dialogs.push(this);
         this.position = dockManager.defaultDialogPosition;
@@ -54,7 +57,7 @@ export class Dialog implements IContextMenuProvider {
         this.elementDialog.tabIndex = 0;
         this.elementDialog.appendChild(this.panel.elementPanel);
         this.draggable = new DraggableContainer(this, this.panel, this.elementDialog, this.panel.elementTitle);
-        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement, this.disableResize);
+        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement, this.resizeDirection);
 
         this.dockManager.config.dialogRootElement.appendChild(this.elementDialog);
         this.elementDialog.classList.add('dialog-floating');

@@ -1,4 +1,5 @@
 export * from './enums/PanelType.js';
+export * from './enums/ResizeDirection.js';
 export * from './enums/TabHostDirection.js';
 export * from './enums/WheelTypes.js';
 export * from './i18n/Defaults.js';

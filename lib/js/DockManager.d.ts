@@ -1,17 +1,18 @@
-import { DockWheel } from "./DockWheel.js";
-import { Point } from "./Point.js";
-import { DockManagerContext } from "./DockManagerContext.js";
-import { DockNode } from "./DockNode.js";
-import { DockLayoutEngine } from "./DockLayoutEngine.js";
-import { EventHandler } from "./EventHandler.js";
 import { Dialog } from "./Dialog.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
-import { TabPage } from "./TabPage.js";
-import { PanelContainer } from "./PanelContainer.js";
-import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
-import { DockModel } from "./DockModel.js";
 import { DockConfig } from "./DockConfig.js";
+import { DockLayoutEngine } from "./DockLayoutEngine.js";
+import { DockManagerContext } from "./DockManagerContext.js";
+import { DockModel } from "./DockModel.js";
+import { DockNode } from "./DockNode.js";
+import { DockWheel } from "./DockWheel.js";
+import { ResizeDirection } from "./enums/ResizeDirection.js";
+import { EventHandler } from "./EventHandler.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { IState } from "./interfaces/IState.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { Point } from "./Point.js";
+import { TabPage } from "./TabPage.js";
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.
  * It owns a Html Div element inside which all panels are docked
@@ -90,7 +91,7 @@ export declare class DockManager {
     dockDown(referenceNode: DockNode, container: PanelContainer, ratio: number): DockNode;
     /** Dock the [container] as a tab inside the [referenceNode] node */
     dockFill(referenceNode: DockNode, container: PanelContainer): DockNode;
-    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, disableResize?: boolean): Dialog;
+    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, resizeDirection?: ResizeDirection): Dialog;
     private _requestDockDialog;
     private _checkShowBackgroundContext;
     private _requestDockContainer;
@@ -108,7 +109,7 @@ export declare class DockManager {
      * Opens a Element in a Dialog
      * It is assumed that only leaf nodes (panels) can be undocked
      */
-    openInDialog(container: PanelContainer, event: any, dragOffset: Point, disableResize?: boolean): Dialog;
+    openInDialog(container: PanelContainer, event: any, dragOffset: Point, resizeDirection?: ResizeDirection): Dialog;
     /** Undocks a panel and converts it into a floating dialog window
      * It is assumed that only leaf nodes (panels) can be undocked
      */

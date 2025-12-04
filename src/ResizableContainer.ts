@@ -1,13 +1,14 @@
-import { Dialog } from "./Dialog.js";
-import { ResizeHandle } from "./ResizeHandle.js";
-import { EventHandler } from "./EventHandler.js";
-import { DockManager } from "./DockManager.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
+import { Dialog } from "./Dialog.js";
+import { DockManager } from "./DockManager.js";
+import { EventHandler } from "./EventHandler.js";
 import { Point } from "./Point.js";
+import { ResizeHandle } from "./ResizeHandle.js";
 import { Utils } from "./Utils.js";
-import { IThickness } from "./interfaces/IThickness.js";
+import { ResizeDirection } from "./enums/ResizeDirection.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { IState } from "./interfaces/IState.js";
+import { IThickness } from "./interfaces/IThickness.js";
 
 /**
  * Decorates a dock container with resizer handles around its base element
@@ -27,11 +28,11 @@ export class ResizableContainer implements IDockContainer {
     resizeHandles: ResizeHandle[];
     previousMousePosition: Point;
     private iframeEventHandlers: EventHandler[];
-    private disableResize: boolean;
+    private resizeDirection: ResizeDirection;
 
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, disableResize: boolean = false) {
+    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, resizeDirection: ResizeDirection) {
         this.dialog = dialog;
-        this.disableResize = disableResize;
+        this.resizeDirection = resizeDirection;
         this.delegate = delegate;
         this.containerElement = delegate.containerElement;
         this.dockManager = delegate.dockManager;
@@ -51,16 +52,38 @@ export class ResizableContainer implements IDockContainer {
 
     _buildResizeHandles() {
         this.resizeHandles = [];
-        //    this._buildResizeHandle(true, false, true, false); // Dont need the corner resizer near the close button
-        if (!this.disableResize) {
-            this._buildResizeHandle(false, true, true, false);
-            this._buildResizeHandle(true, false, false, true);
-            this._buildResizeHandle(false, true, false, true);
 
-            this._buildResizeHandle(true, false, false, false);
-            this._buildResizeHandle(false, true, false, false);
+        if (this.resizeDirection & ResizeDirection.North) {
+
             this._buildResizeHandle(false, false, true, false);
+        }
+
+        if (this.resizeDirection & ResizeDirection.East) {
+            this._buildResizeHandle(true, false, false, false);
+        }
+
+        if (this.resizeDirection & ResizeDirection.South) {
             this._buildResizeHandle(false, false, false, true);
+        }
+
+        if (this.resizeDirection & ResizeDirection.West) {
+            this._buildResizeHandle(false, true, false, false);
+        }
+
+        if (this.resizeDirection & ResizeDirection.NorthWest) {
+            this._buildResizeHandle(false, true, true, false);
+        }
+
+        if (this.resizeDirection & ResizeDirection.NorthEast) {
+            this._buildResizeHandle(true, false, true, false);
+        }
+
+        if (this.resizeDirection & ResizeDirection.SouthEast) {
+            this._buildResizeHandle(true, false, false, true);
+        }
+
+        if (this.resizeDirection & ResizeDirection.SouthWest) {
+            this._buildResizeHandle(false, true, false, true);
         }
     }
 
