@@ -1,7 +1,6 @@
 import { DockManager } from "../../../lib/js/DockManager.js";
 import { PanelContainer } from "../../../lib/js/PanelContainer.js";
 import { PanelType } from "../../../lib/js/enums/PanelType.js";
-import { ResizeDirection } from "../../../lib/js/enums/ResizeDirection.js";
 
 let dockManager,
     storeKey = 'lastState';
@@ -143,7 +142,7 @@ window.onload = () => {
         dockManager.dockRight(documentNode, toolbox, 0.20);
         dockManager.dockFill(documentNode, editor1);
         dockManager.dockFill(documentNode, editor2);
-        dockManager.floatDialog(infovisContainer, 50, 50, null, ResizeDirection.None);
+        dockManager.floatDialog(infovisContainer, 50, 50, null, true);
     }
 
     document.getElementById("dlg").onclick = () => {

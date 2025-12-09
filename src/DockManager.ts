@@ -8,7 +8,6 @@ import { DockModel } from "./DockModel.js";
 import { DockNode } from "./DockNode.js";
 import { DockWheel } from "./DockWheel.js";
 import { PanelType } from "./enums/PanelType.js";
-import { ResizeDirection } from "./enums/ResizeDirection.js";
 import { EventHandler } from "./EventHandler.js";
 import { FillDockContainer } from "./FillDockContainer.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
@@ -372,7 +371,7 @@ export class DockManager {
         return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine), false);
     }
 
-    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, resizeDirection?: ResizeDirection): Dialog {
+    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, disableResize?: boolean): Dialog {
         let retdiag = undefined;
 
         //check the dialog do not already exist
@@ -394,7 +393,7 @@ export class DockManager {
         let panel = container;
         Utils.removeNode(panel.elementPanel);
         panel.isDialog = true;
-        let dialog = new Dialog(panel, this, grayoutParent, resizeDirection);
+        let dialog = new Dialog(panel, this, grayoutParent, disableResize);
         dialog.setPosition(x, y);
         return dialog;
     }
@@ -520,9 +519,9 @@ export class DockManager {
      * Opens a Element in a Dialog
      * It is assumed that only leaf nodes (panels) can be undocked
      */
-    openInDialog(container: PanelContainer, event, dragOffset: Point, resizeDirection?: ResizeDirection) {
+    openInDialog(container: PanelContainer, event, dragOffset: Point, disableResize?: boolean) {
         // Create a new dialog window for the undocked panel
-        let dialog = new Dialog(container, this, null, resizeDirection);
+        let dialog = new Dialog(container, this, null, disableResize);
 
         if (event != null) {
             // Adjust the relative position

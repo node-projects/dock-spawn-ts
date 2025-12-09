@@ -5,7 +5,6 @@ import { DockManagerContext } from "./DockManagerContext.js";
 import { DockModel } from "./DockModel.js";
 import { DockNode } from "./DockNode.js";
 import { DockWheel } from "./DockWheel.js";
-import { ResizeDirection } from "./enums/ResizeDirection.js";
 import { EventHandler } from "./EventHandler.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
@@ -91,7 +90,7 @@ export declare class DockManager {
     dockDown(referenceNode: DockNode, container: PanelContainer, ratio: number): DockNode;
     /** Dock the [container] as a tab inside the [referenceNode] node */
     dockFill(referenceNode: DockNode, container: PanelContainer): DockNode;
-    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, resizeDirection?: ResizeDirection): Dialog;
+    floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, disableResize?: boolean): Dialog;
     private _requestDockDialog;
     private _checkShowBackgroundContext;
     private _requestDockContainer;
@@ -109,7 +108,7 @@ export declare class DockManager {
      * Opens a Element in a Dialog
      * It is assumed that only leaf nodes (panels) can be undocked
      */
-    openInDialog(container: PanelContainer, event: any, dragOffset: Point, resizeDirection?: ResizeDirection): Dialog;
+    openInDialog(container: PanelContainer, event: any, dragOffset: Point, disableResize?: boolean): Dialog;
     /** Undocks a panel and converts it into a floating dialog window
      * It is assumed that only leaf nodes (panels) can be undocked
      */

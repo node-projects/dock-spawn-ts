@@ -18,7 +18,7 @@ export class Dialog implements IContextMenuProvider {
     eventListener: DockManager;
     position: Point;
     resizable: ResizableContainer;
-    resizeDirection: ResizeDirection;
+    disableResize: boolean;
     mouseDownHandler: any;
     onKeyPressBound: any;
     noDocking: boolean;
@@ -27,14 +27,12 @@ export class Dialog implements IContextMenuProvider {
     focusHandler: EventHandler;
     grayoutParent: PanelContainer;
 
-    static defaultResizeDirection: ResizeDirection = ResizeDirection.All & ~ResizeDirection.NorthEast;
-
-    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, resizeDirection?: ResizeDirection) {
+    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, disableResize?: boolean) {
         this.panel = panel;
         this.dockManager = dockManager;
         this.eventListener = dockManager;
         this.grayoutParent = grayoutParent;
-        this.resizeDirection = resizeDirection ?? Dialog.defaultResizeDirection;
+        this.disableResize = disableResize;
         this._initialize();
         this.dockManager.context.model.dialogs.push(this);
         this.position = dockManager.defaultDialogPosition;
@@ -57,7 +55,12 @@ export class Dialog implements IContextMenuProvider {
         this.elementDialog.tabIndex = 0;
         this.elementDialog.appendChild(this.panel.elementPanel);
         this.draggable = new DraggableContainer(this, this.panel, this.elementDialog, this.panel.elementTitle);
-        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement, this.resizeDirection);
+
+        const resizeDirection: ResizeDirection = this.disableResize
+            ? ResizeDirection.None
+            : ResizeDirection.All & ~ResizeDirection.NorthEast;
+            
+        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement, resizeDirection);
 
         this.dockManager.config.dialogRootElement.appendChild(this.elementDialog);
         this.elementDialog.classList.add('dialog-floating');
