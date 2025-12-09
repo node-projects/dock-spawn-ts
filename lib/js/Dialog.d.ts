@@ -1,11 +1,12 @@
 import { DockManager } from "./DockManager.js";
-import { Point } from "./Point.js";
-import { PanelContainer } from "./PanelContainer.js";
-import { DraggableContainer } from "./DraggableContainer.js";
-import { ResizableContainer } from "./ResizableContainer.js";
-import { EventHandler } from "./EventHandler.js";
 import { DockNode } from "./DockNode.js";
-export declare class Dialog {
+import { DraggableContainer } from "./DraggableContainer.js";
+import { EventHandler } from "./EventHandler.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { Point } from "./Point.js";
+import { ResizableContainer } from "./ResizableContainer.js";
+import { IContextMenuProvider } from "./interfaces/IContextMenuProvider.js";
+export declare class Dialog implements IContextMenuProvider {
     elementDialog: HTMLDivElement & {
         floatingDialog: Dialog;
     };
@@ -23,9 +24,6 @@ export declare class Dialog {
     keyPressHandler: EventHandler;
     focusHandler: EventHandler;
     grayoutParent: PanelContainer;
-    contextmenuHandler: EventHandler;
-    _ctxMenu: HTMLDivElement;
-    _windowsContextMenuCloseBound: any;
     constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, disableResize?: boolean);
     saveState(x: number, y: number): void;
     static fromElement(id: string, dockManager: DockManager): Dialog;
@@ -44,7 +42,5 @@ export declare class Dialog {
     remove(): void;
     show(): void;
     static createContextMenuContentCallback: (dialog: Dialog, documentMangerNodes: DockNode[]) => Node[];
-    oncontextMenuClicked(e: MouseEvent): void;
-    closeContextMenu(): void;
-    windowsContextMenuClose(e: Event): void;
+    createContextMenuItems(): Node[];
 }
