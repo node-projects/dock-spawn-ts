@@ -6,9 +6,9 @@ import { PanelContainer } from "./PanelContainer.js";
 import { Point } from "./Point.js";
 import { ResizableContainer } from "./ResizableContainer.js";
 import { Utils } from "./Utils.js";
+import { ResizeDirection } from "./enums/ResizeDirection.js";
 import { Localizer } from "./i18n/Localizer.js";
 import { IContextMenuProvider } from "./interfaces/IContextMenuProvider.js";
-import { ResizeDirection } from "./enums/ResizeDirection.js";
 
 export class Dialog implements IContextMenuProvider {
     elementDialog: HTMLDivElement & { floatingDialog: Dialog };
