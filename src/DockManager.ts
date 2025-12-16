@@ -1,24 +1,24 @@
-import { DockWheel } from "./DockWheel.js";
-import { Utils } from "./Utils.js";
-import { Point } from "./Point.js";
-import { DockManagerContext } from "./DockManagerContext.js";
-import { DockNode } from "./DockNode.js";
-import { DockLayoutEngine } from "./DockLayoutEngine.js";
-import { EventHandler } from "./EventHandler.js";
 import { Dialog } from "./Dialog.js";
-import { DockGraphSerializer } from "./DockGraphSerializer.js";
-import { DockGraphDeserializer } from "./DockGraphDeserializer.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
-import { TabPage } from "./TabPage.js";
-import { SplitterDockContainer } from "./SplitterDockContainer.js";
-import { PanelContainer } from "./PanelContainer.js";
-import { FillDockContainer } from "./FillDockContainer.js";
-import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
-import { DockModel } from "./DockModel.js";
-import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
 import { DockConfig } from "./DockConfig.js";
+import { DockGraphDeserializer } from "./DockGraphDeserializer.js";
+import { DockGraphSerializer } from "./DockGraphSerializer.js";
+import { DockLayoutEngine } from "./DockLayoutEngine.js";
+import { DockManagerContext } from "./DockManagerContext.js";
+import { DockModel } from "./DockModel.js";
+import { DockNode } from "./DockNode.js";
+import { DockWheel } from "./DockWheel.js";
 import { PanelType } from "./enums/PanelType.js";
+import { EventHandler } from "./EventHandler.js";
+import { FillDockContainer } from "./FillDockContainer.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
+import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { IState } from "./interfaces/IState.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { Point } from "./Point.js";
+import { SplitterDockContainer } from "./SplitterDockContainer.js";
+import { TabPage } from "./TabPage.js";
+import { Utils } from "./Utils.js";
 
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.

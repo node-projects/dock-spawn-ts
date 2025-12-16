@@ -6,6 +6,7 @@ import { PanelContainer } from "./PanelContainer.js";
 import { Point } from "./Point.js";
 import { ResizableContainer } from "./ResizableContainer.js";
 import { Utils } from "./Utils.js";
+import { ResizeDirection } from "./enums/ResizeDirection.js";
 import { Localizer } from "./i18n/Localizer.js";
 import { IContextMenuProvider } from "./interfaces/IContextMenuProvider.js";
 
@@ -54,7 +55,12 @@ export class Dialog implements IContextMenuProvider {
         this.elementDialog.tabIndex = 0;
         this.elementDialog.appendChild(this.panel.elementPanel);
         this.draggable = new DraggableContainer(this, this.panel, this.elementDialog, this.panel.elementTitle);
-        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement, this.disableResize);
+
+        const resizeDirection: ResizeDirection = this.disableResize
+            ? ResizeDirection.None
+            : ResizeDirection.All & ~ResizeDirection.NorthEast;
+            
+        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement, resizeDirection);
 
         this.dockManager.config.dialogRootElement.appendChild(this.elementDialog);
         this.elementDialog.classList.add('dialog-floating');

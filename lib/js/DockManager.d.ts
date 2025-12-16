@@ -1,17 +1,17 @@
-import { DockWheel } from "./DockWheel.js";
-import { Point } from "./Point.js";
-import { DockManagerContext } from "./DockManagerContext.js";
-import { DockNode } from "./DockNode.js";
-import { DockLayoutEngine } from "./DockLayoutEngine.js";
-import { EventHandler } from "./EventHandler.js";
 import { Dialog } from "./Dialog.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
-import { TabPage } from "./TabPage.js";
-import { PanelContainer } from "./PanelContainer.js";
-import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
-import { DockModel } from "./DockModel.js";
 import { DockConfig } from "./DockConfig.js";
+import { DockLayoutEngine } from "./DockLayoutEngine.js";
+import { DockManagerContext } from "./DockManagerContext.js";
+import { DockModel } from "./DockModel.js";
+import { DockNode } from "./DockNode.js";
+import { DockWheel } from "./DockWheel.js";
+import { EventHandler } from "./EventHandler.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { IState } from "./interfaces/IState.js";
+import { PanelContainer } from "./PanelContainer.js";
+import { Point } from "./Point.js";
+import { TabPage } from "./TabPage.js";
 /**
  * Dock manager manages all the dock panels in a hierarchy, similar to visual studio.
  * It owns a Html Div element inside which all panels are docked

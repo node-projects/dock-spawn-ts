@@ -1,11 +1,12 @@
-import { Dialog } from "./Dialog.js";
-import { ResizeHandle } from "./ResizeHandle.js";
-import { DockManager } from "./DockManager.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
+import { Dialog } from "./Dialog.js";
+import { DockManager } from "./DockManager.js";
 import { Point } from "./Point.js";
-import { IThickness } from "./interfaces/IThickness.js";
+import { ResizeHandle } from "./ResizeHandle.js";
+import { ResizeDirection } from "./enums/ResizeDirection.js";
+import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { IState } from "./interfaces/IState.js";
+import { IThickness } from "./interfaces/IThickness.js";
 /**
  * Decorates a dock container with resizer handles around its base element
  * This enables the container to be resized from all directions
@@ -23,8 +24,8 @@ export declare class ResizableContainer implements IDockContainer {
     resizeHandles: ResizeHandle[];
     previousMousePosition: Point;
     private iframeEventHandlers;
-    private disableResize;
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, disableResize?: boolean);
+    private resizeDirection;
+    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, resizeDirection: ResizeDirection);
     setActiveChild(): void;
     _buildResizeHandles(): void;
     _buildResizeHandle(east: boolean, west: boolean, north: boolean, south: boolean): void;
