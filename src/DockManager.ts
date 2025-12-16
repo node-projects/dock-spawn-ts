@@ -208,7 +208,8 @@ export class DockManager {
 
         let offsetX = 0, offsetY = 0;
         for (let dialog of this.context.model.dialogs) {
-            if (dialog.position.x > this.element.clientWidth || dialog.position.y > this.element.clientHeight) {
+            const position = dialog.getPosition();
+            if (position.x > this.element.clientWidth || position.y > this.element.clientHeight) {
                 if (offsetX > this.element.clientWidth || offsetY > this.element.clientHeight)
                     offsetX = 0, offsetY = 0;
                 dialog.setPosition(100 + offsetX, 100 + offsetY);
@@ -394,6 +395,7 @@ export class DockManager {
         Utils.removeNode(panel.elementPanel);
         panel.isDialog = true;
         let dialog = new Dialog(panel, this, grayoutParent, disableResize);
+        dialog.initialize();
         dialog.setPosition(x, y);
         return dialog;
     }
@@ -483,6 +485,7 @@ export class DockManager {
 
         // Create a new dialog window for the undocked panel
         let dialog = new Dialog(panelContainer, this, null);
+        dialog.initialize();
 
         if (panelContainer.lastDialogSize)
             dialog.resize(panelContainer.lastDialogSize.width, panelContainer.lastDialogSize.height);
@@ -522,6 +525,7 @@ export class DockManager {
     openInDialog(container: PanelContainer, event, dragOffset: Point, disableResize?: boolean) {
         // Create a new dialog window for the undocked panel
         let dialog = new Dialog(container, this, null, disableResize);
+        dialog.initialize();
 
         if (event != null) {
             // Adjust the relative position
