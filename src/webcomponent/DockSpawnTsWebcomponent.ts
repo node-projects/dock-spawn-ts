@@ -207,7 +207,8 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     floatDialog(element: HTMLElement, x: number, y: number, width: number, height: number, panelType?: PanelType, title?: string, hideCloseButton?: boolean) {
         let container = new PanelContainer(element as HTMLElement, this.dockManager, title, panelType, hideCloseButton);
         let dlg = this.dockManager.floatDialog(container, x, y, null);
-        return dlg.resize(width, height);
+        dlg.resize(width, height);
+        return dlg;
     }
 }
 
