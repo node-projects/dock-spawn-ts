@@ -115,6 +115,8 @@ export class DockGraphDeserializer {
                     Utils.removeNode(container.elementPanel);
                     container.isDialog = true;
                     let dialog = new Dialog(container, this.dockManager);
+                    dialog.initialize();
+
                     if (dialogInfo.position.x > document.body.clientWidth ||
                         dialogInfo.position.y > document.body.clientHeight - 70) {
                         dialogInfo.position.x = 20;

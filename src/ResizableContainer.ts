@@ -1,7 +1,7 @@
 import { ContainerType } from "./ContainerType.js";
-import { Dialog } from "./Dialog.js";
 import { DockManager } from "./DockManager.js";
 import { EventHandler } from "./EventHandler.js";
+import { FloatingPanel } from "./FloatingPanel.js";
 import { Point } from "./Point.js";
 import { ResizeHandle } from "./ResizeHandle.js";
 import { Utils } from "./Utils.js";
@@ -17,7 +17,7 @@ import { IThickness } from "./interfaces/IThickness.js";
 export class ResizableContainer implements IDockContainer {
 
     topLevelElement: HTMLElement;
-    dialog: Dialog;
+    floatingPanel: FloatingPanel;
     delegate: IDockContainer;
     dockManager: DockManager;
     containerElement: HTMLElement;
@@ -30,8 +30,8 @@ export class ResizableContainer implements IDockContainer {
     private iframeEventHandlers: EventHandler[];
     private resizeDirection: ResizeDirection;
 
-    constructor(dialog: Dialog, delegate: IDockContainer, topLevelElement: HTMLElement, resizeDirection: ResizeDirection) {
-        this.dialog = dialog;
+    constructor(dialog: FloatingPanel, delegate: IDockContainer, topLevelElement: HTMLElement, resizeDirection: ResizeDirection) {
+        this.floatingPanel = dialog;
         this.resizeDirection = resizeDirection;
         this.delegate = delegate;
         this.containerElement = delegate.containerElement;
@@ -183,8 +183,8 @@ export class ResizableContainer implements IDockContainer {
             return;
         this.readyToProcessNextResize = false;
 
-        if (this.dialog.panel)
-            this.dockManager.suspendLayout(this.dialog.panel);
+        if (this.floatingPanel.panel)
+            this.dockManager.suspendLayout(this.floatingPanel.panel);
         let currentMousePosition = new Point(touchOrMouseData.clientX, touchOrMouseData.clientY);
         if (iframeOffset)
             currentMousePosition = new Point(touchOrMouseData.clientX + iframeOffset.x, touchOrMouseData.clientY + iframeOffset.y);
@@ -193,8 +193,8 @@ export class ResizableContainer implements IDockContainer {
         this._performDrag(handle, dx, dy);
         this.previousMousePosition = currentMousePosition;
         this.readyToProcessNextResize = true;
-        if (this.dialog.panel)
-            this.dockManager.resumeLayout(this.dialog.panel);
+        if (this.floatingPanel.panel)
+            this.dockManager.resumeLayout(this.floatingPanel.panel);
 
         this.dockManager.notifyOnContainerResized(this);
     }
