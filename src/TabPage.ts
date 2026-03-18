@@ -74,12 +74,14 @@ export class TabPage {
         this.selected = flag;
         this.handle.setSelected(flag);
 
+        /*
         if (this.container instanceof PanelContainer) {
             if (flag)
                 this.container.elementContentContainer.style.zIndex = '1';
             else
                 this.container.elementContentContainer.style.zIndex = '';
         }
+        */
 
         if (!this._initContent)
             this.host.contentElement.appendChild(this.containerElement);
