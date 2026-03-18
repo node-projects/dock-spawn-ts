@@ -216,7 +216,7 @@ export class SplitterPanel {
             if (child.containerElement.style.display == 'none')
                 child.containerElement.style.display = 'block';
             let original = this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth;
-            let newSize = scaleMultiplier > 1 ? Math.floor(original * scaleMultiplier) : Math.ceil(original * scaleMultiplier);
+            let newSize = Math.floor(original * scaleMultiplier);
             updatedTotalChildPanelSize += newSize;
 
             // If this is the last node, add any extra pixels to fix the rounding off errors and match the requested size
