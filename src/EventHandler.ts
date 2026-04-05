@@ -3,7 +3,7 @@ export class EventHandler {
     eventName: string;
     source: Element | Window;
 
-    constructor(source: Element | Window, eventName: string, target: EventListenerOrEventListenerObject, useCapture?: boolean | AddEventListenerOptions) {
+    constructor(source: Element | Window, eventName: string, target: EventListenerOrEventListenerObject | ((e: any) => void), useCapture?: boolean | AddEventListenerOptions) {
         this.target = target;
         this.eventName = eventName;
         this.source = source;

@@ -161,12 +161,12 @@ export class DockLayoutEngine {
         if (state == 'left' && nodeIndexToDelete == 0)
             return;
 
-        let indexes = Array.apply(null, { length: N }).map(Number.call, Number);
+        let indexes = Array.apply(null, <any>{ length: N }).map(Number.call, Number);
         let indexValue = indexes.splice(nodeIndexToDelete, 1)[0]; //remove element
         indexes.splice(state === 'left' ? index - 1 : index, 0, indexValue); //insert
 
-        node.children = Utils.orderByIndexes(node.children, indexes); //apply
-        (<FillDockContainer>node.container).tabHost.performTabsLayout(indexes);
+        node.children = Utils.orderByIndexes(node.children, <any>indexes); //apply
+        (<FillDockContainer>node.container).tabHost.performTabsLayout(<any>indexes);
         this.dockManager.notifyOnTabsReorder(node);
     }
 

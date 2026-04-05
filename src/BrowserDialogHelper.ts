@@ -8,9 +8,14 @@ export function moveElementToNewBrowserWindow(panelContainer: PanelContainer, pa
     blured: (e: FocusEvent) => void,
 }) {
     const element = panelContainer.resolvedElementContent;
-    const rect = element.getBoundingClientRect();
+    let newWindowElement = element;
+    if (panelContainer.dockManager.prepareElementForNewWindow) {
+        newWindowElement = panelContainer.dockManager.prepareElementForNewWindow(element);
+    }
+
+    const rect = newWindowElement.getBoundingClientRect();
     const newWindowBounds = { x: rect.x + 24, y: rect.y + 60, width: rect.width, height: rect.height };
-    const win = window.open('about:blank', undefined, `popup=yes,left=${newWindowBounds.x},top=${newWindowBounds.y},width=${newWindowBounds.width},height=${newWindowBounds.height}`);
+    const win = <Window>window.open('about:blank', undefined, `popup=yes,left=${newWindowBounds.x},top=${newWindowBounds.y},width=${newWindowBounds.width},height=${newWindowBounds.height}`);
     win.onfocus = (e) => params.focused(e);
     win.onblur = (e) => params.blured(e);
     let styles = [...document.head.querySelectorAll('link')].map(x => x.cloneNode());
@@ -32,11 +37,15 @@ export function moveElementToNewBrowserWindow(panelContainer: PanelContainer, pa
     }
     `;
     win.document.head.appendChild(st);
-    const titleEl = win.document.createElement("title");
-    titleEl.innerText = params.title;
-    win.document.head.appendChild(titleEl);
+    if (params.title) {
+        const titleEl = win.document.createElement("title");
+        titleEl.innerText = <string>params.title;
+        win.document.head.appendChild(titleEl);
+    }
 
-    win.onunload = () => params.newWindowClosedCallback();
+    if (params.newWindowClosedCallback) {
+        win.onunload = () => params.newWindowClosedCallback!();
+    }
 
     const cache = new Map<CSSStyleSheet, CSSStyleSheet>();
     const listSs = new Map<Element, CSSStyleSheet[]>();
@@ -50,19 +59,20 @@ export function moveElementToNewBrowserWindow(panelContainer: PanelContainer, pa
             }
         }
     }
-    backupSs(element);
-    for (const e of element.querySelectorAll('*')) {
+    backupSs(newWindowElement);
+    for (const e of newWindowElement.querySelectorAll('*')) {
         backupSs(e);
     }
 
-    win.document.body.appendChild(win.document.adoptNode(element));
+    win.document.body.appendChild(win.document.adoptNode(newWindowElement));
     for (const e of listSs) {
-        e[0].shadowRoot.adoptedStyleSheets = e[1];
+        e[0]!.shadowRoot!.adoptedStyleSheets = e[1];
     }
 
-    params.closeCallback();
+    if (params.closeCallback)
+        params.closeCallback();
     panelContainer.dockManager.notifyOnNewWindow(panelContainer, win);
-    
+
     return win;
 }
 

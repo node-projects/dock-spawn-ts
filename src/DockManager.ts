@@ -626,7 +626,7 @@ export class DockManager {
 
             if (topNode.container.containerElement === containerElement)
                 return topNode;
-            [].push.apply(stack, topNode.children);
+            [].push.apply(stack, <any>topNode.children);
         }
 
         return null;
@@ -759,6 +759,8 @@ export class DockManager {
             }
         }
     }
+
+    prepareElementForNewWindow: (element: HTMLElement) => HTMLElement = null;
 
     notifyOnNewWindow(panel: PanelContainer, win: Window) {
         this._checkShowBackgroundContext();

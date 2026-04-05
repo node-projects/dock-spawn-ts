@@ -1,4 +1,4 @@
-import { DockNode } from "./DockNode";
+import { DockNode } from "./DockNode.js";
 
 export class Utils {
 
