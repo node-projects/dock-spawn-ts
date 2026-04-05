@@ -1,16 +1,18 @@
 import { PanelContainer } from "./PanelContainer.js";
 
-export function moveElementToNewBrowserWindow(panelContainer: PanelContainer, params: {
+export type NewWindowParams = {
     title?: string,
     closeCallback?: () => void,
     newWindowClosedCallback?: () => void,
     focused: (e: FocusEvent) => void,
     blured: (e: FocusEvent) => void,
-}) {
+};
+
+export function moveElementToNewBrowserWindow(panelContainer: PanelContainer, params: NewWindowParams) {
     const element = panelContainer.resolvedElementContent;
     let newWindowElement = element;
     if (panelContainer.dockManager.prepareElementForNewWindow) {
-        newWindowElement = panelContainer.dockManager.prepareElementForNewWindow(element);
+        newWindowElement = panelContainer.dockManager.prepareElementForNewWindow(element, params);
     }
 
     const rect = newWindowElement.getBoundingClientRect();

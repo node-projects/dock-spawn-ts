@@ -10,6 +10,7 @@ import { DockWheel } from "./DockWheel.js";
 import { PanelType } from "./enums/PanelType.js";
 import { EventHandler } from "./EventHandler.js";
 import { FillDockContainer } from "./FillDockContainer.js";
+import { NewWindowParams } from "./index.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
 import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
@@ -760,7 +761,7 @@ export class DockManager {
         }
     }
 
-    prepareElementForNewWindow: (element: HTMLElement) => HTMLElement = null;
+    prepareElementForNewWindow: (element: HTMLElement, params: NewWindowParams) => HTMLElement = null;
 
     notifyOnNewWindow(panel: PanelContainer, win: Window) {
         this._checkShowBackgroundContext();

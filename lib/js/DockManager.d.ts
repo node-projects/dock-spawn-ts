@@ -6,6 +6,7 @@ import { DockModel } from "./DockModel.js";
 import { DockNode } from "./DockNode.js";
 import { DockWheel } from "./DockWheel.js";
 import { EventHandler } from "./EventHandler.js";
+import { NewWindowParams } from "./index.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ILayoutEventListener } from "./interfaces/ILayoutEventListener.js";
 import { IState } from "./interfaces/IState.js";
@@ -139,7 +140,7 @@ export declare class DockManager {
     notifyOnTabChange(tabpage: TabPage): void;
     notifyOnActivePanelChange(panel: PanelContainer, oldActive: PanelContainer): void;
     notifyOnActiveDocumentChange(panel: PanelContainer, oldActive: PanelContainer): Promise<void>;
-    prepareElementForNewWindow: (element: HTMLElement) => HTMLElement;
+    prepareElementForNewWindow: (element: HTMLElement, params: NewWindowParams) => HTMLElement;
     notifyOnNewWindow(panel: PanelContainer, win: Window): void;
     saveState(): string;
     loadState(json: string): Promise<void>;
