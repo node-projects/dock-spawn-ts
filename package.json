@@ -1,6 +1,6 @@
 {
   "name": "dock-spawn-ts",
-  "version": "3.14.0",
+  "version": "3.16.0",
   "description": "DockSpawn Typescript Version",
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
@@ -21,6 +21,8 @@
     "http-server": "^14.1.1",
     "typescript": "^6.0.2",
     "uglify-js": "^3.19.3",
+    "webpack": "^5.105.4",
+    "webpack-cli": "^7.0.2"
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2"
   },

@@ -37,6 +37,12 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     static style = css`
     :host {
         display: block;
+    }
+    .panel-element-content-container {
+        pointer-events: auto;
+    }
+    #dialogDiv{
+        pointer-events: none;
     }`;
 
     constructor() {
@@ -54,11 +60,22 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         dockSpawnDiv.id = "dockSpawnDiv";
         dockSpawnDiv.style.width = "100%";
         dockSpawnDiv.style.height = "100%";
-        dockSpawnDiv.style.position = "relative";
+        dockSpawnDiv.style.position = "absolute";
+        dockSpawnDiv.style.top = "0";
+        dockSpawnDiv.style.left = "0";
         this.shadowRoot.appendChild(dockSpawnDiv);
 
         this.dockManager = new DockManager(dockSpawnDiv);
-        this.dockManager.config.dialogRootElement = dockSpawnDiv;
+
+        const dialogDiv = document.createElement('div');
+        dialogDiv.id = "dialogDiv";
+        dialogDiv.style.width = "100%";
+        dialogDiv.style.height = "100%";
+        dialogDiv.style.position = "absolute";
+        dialogDiv.style.top = "0";
+        dialogDiv.style.left = "0";
+        this.dockManager.config.dialogRootElement = dialogDiv;
+        this.shadowRoot.appendChild(dialogDiv);
 
         setTimeout(() => {
             this.dockManager.initialize();

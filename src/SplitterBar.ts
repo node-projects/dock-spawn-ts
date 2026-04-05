@@ -137,7 +137,7 @@ export class SplitterBar {
             }
         }
 
-        this.previousMouseEvent = { x: e.clientX, y: e.clientY };
+        this.previousMouseEvent = { x: parseInt("" + e.clientX), y: parseInt("" + e.clientY) };
     }
 
     _stopDragging() {
