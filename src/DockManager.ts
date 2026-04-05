@@ -761,7 +761,7 @@ export class DockManager {
         }
     }
 
-    prepareElementForNewWindow: (element: HTMLElement, params: NewWindowParams) => HTMLElement = null;
+    prepareElementForNewWindow: (element: HTMLElement, params: NewWindowParams, newWindow: Window) => HTMLElement = null;
 
     notifyOnNewWindow(panel: PanelContainer, win: Window) {
         this._checkShowBackgroundContext();

@@ -11,13 +11,12 @@ export type NewWindowParams = {
 export function moveElementToNewBrowserWindow(panelContainer: PanelContainer, params: NewWindowParams) {
     const element = panelContainer.resolvedElementContent;
     let newWindowElement = element;
-    if (panelContainer.dockManager.prepareElementForNewWindow) {
-        newWindowElement = panelContainer.dockManager.prepareElementForNewWindow(element, params);
-    }
-
     const rect = newWindowElement.getBoundingClientRect();
     const newWindowBounds = { x: rect.x + 24, y: rect.y + 60, width: rect.width, height: rect.height };
     const win = <Window>window.open('about:blank', undefined, `popup=yes,left=${newWindowBounds.x},top=${newWindowBounds.y},width=${newWindowBounds.width},height=${newWindowBounds.height}`);
+    if (panelContainer.dockManager.prepareElementForNewWindow) {
+        newWindowElement = panelContainer.dockManager.prepareElementForNewWindow(element, params, win);
+    }
     win.onfocus = (e) => params.focused(e);
     win.onblur = (e) => params.blured(e);
     let styles = [...document.head.querySelectorAll('link')].map(x => x.cloneNode());
