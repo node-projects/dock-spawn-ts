@@ -391,7 +391,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this.isDialog = true;
         this.undockInitiator.enabled = false;
         this.elementContentWrapper.style.display = "block";
-        this.elementContentContainer.style.visibility = 'hidden';
+        this.elementContentContainer.style.display = 'none';
         this.elementPanel.style.position = "";
         this.dockManager.requestClose(this);
     }
@@ -499,7 +499,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     setVisible(isVisible: boolean) {
-        this.elementContentContainer.style.visibility = isVisible ? '' : 'hidden';
+        this.elementContentContainer.style.display = isVisible ? '' : 'none';
     }
 
     setTitle(title: string) {
