@@ -1,4 +1,4 @@
-import { PanelType } from "../enums/PanelType";
+import { PanelType } from "../enums/PanelType.js";
 export interface IState {
     width?: number;
     height?: number;

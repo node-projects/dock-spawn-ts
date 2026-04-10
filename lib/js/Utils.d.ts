@@ -1,4 +1,4 @@
-import { DockNode } from "./DockNode";
+import { DockNode } from "./DockNode.js";
 export declare class Utils {
     private static _counter;
     static getPixels(pixels: string): number;
