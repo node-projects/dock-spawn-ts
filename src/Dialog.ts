@@ -1,186 +1,99 @@
 import { DockManager } from "./DockManager.js";
 import { DockNode } from "./DockNode.js";
 import { DraggableContainer } from "./DraggableContainer.js";
-import { EventHandler } from "./EventHandler.js";
+import { FloatingPanel } from "./FloatingPanel.js";
 import { PanelContainer } from "./PanelContainer.js";
 import { Point } from "./Point.js";
 import { ResizableContainer } from "./ResizableContainer.js";
 import { Utils } from "./Utils.js";
 import { ResizeDirection } from "./enums/ResizeDirection.js";
 import { Localizer } from "./i18n/Localizer.js";
-import { IContextMenuProvider } from "./interfaces/IContextMenuProvider.js";
 
-export class Dialog implements IContextMenuProvider {
-    elementDialog: HTMLDivElement & { floatingDialog: Dialog };
+export class Dialog extends FloatingPanel {
     draggable: DraggableContainer;
-    panel: PanelContainer;
-    dockManager: DockManager;
-    eventListener: DockManager;
-    position: Point;
     resizable: ResizableContainer;
-    disableResize: boolean;
-    mouseDownHandler: any;
-    onKeyPressBound: any;
+    eventListener: DockManager;
     noDocking: boolean;
-    isHidden: boolean;
-    keyPressHandler: EventHandler;
-    focusHandler: EventHandler;
     grayoutParent: PanelContainer;
 
-    constructor(panel: PanelContainer, dockManager: DockManager, grayoutParent?: PanelContainer, disableResize?: boolean) {
-        this.panel = panel;
-        this.dockManager = dockManager;
-        this.eventListener = dockManager;
+    constructor(
+        panel: PanelContainer,
+        dockManager: DockManager,
+        grayoutParent?: PanelContainer,
+        disableResize?: boolean
+    ) {
+        super(panel, dockManager);
         this.grayoutParent = grayoutParent;
-        this.disableResize = disableResize;
-        this._initialize();
-        this.dockManager.context.model.dialogs.push(this);
-        this.position = dockManager.defaultDialogPosition;
-        this.dockManager.notifyOnCreateDialog(this);
-        panel.isDialog = true;
+        this.eventListener = dockManager;
+
+        this.draggable = new DraggableContainer(
+            this,
+            panel,
+            this.element,
+            panel.elementTitle);
+
+        const resizeDirection: ResizeDirection = disableResize
+            ? ResizeDirection.None
+            : ResizeDirection.All & ~ResizeDirection.NorthEast;
+
+        this.resizable = new ResizableContainer(
+            this,
+            this.draggable,
+            this.draggable.topLevelElement,
+            resizeDirection);
+
+        this.decoratedContainer = this.resizable;
     }
 
-    saveState(x: number, y: number) {
+    public override initialize(): void {
+        this.grayoutParent?.grayOut(true);
+
+        super.initialize();
+
+        this.dockManager.context.model.dialogs.push(this);
+        this.position = this.dockManager.defaultDialogPosition;
+        this.dockManager.notifyOnCreateDialog(this);
+    }
+
+    public saveState(x: number, y: number): void {
         this.position = new Point(x, y);
         this.dockManager.notifyOnChangeDialogPosition(this, x, y);
     }
 
-    static fromElement(id: string, dockManager: DockManager) {
-        return new Dialog(new PanelContainer(<HTMLElement>document.getElementById(id), dockManager), dockManager, null);
-    }
-
-    _initialize() {
-        this.panel.floatingDialog = this;
-        this.elementDialog = Object.assign(document.createElement('div'), { floatingDialog: this });
-        this.elementDialog.tabIndex = 0;
-        this.elementDialog.appendChild(this.panel.elementPanel);
-        this.draggable = new DraggableContainer(this, this.panel, this.elementDialog, this.panel.elementTitle);
-
-        const resizeDirection: ResizeDirection = this.disableResize
-            ? ResizeDirection.None
-            : ResizeDirection.All & ~ResizeDirection.NorthEast;
-            
-        this.resizable = new ResizableContainer(this, this.draggable, this.draggable.topLevelElement, resizeDirection);
-
-        this.dockManager.config.dialogRootElement.appendChild(this.elementDialog);
-        this.elementDialog.classList.add('dialog-floating');
-
-        this.focusHandler = new EventHandler(this.elementDialog, 'focus', this.onFocus.bind(this), true);
-        this.mouseDownHandler = new EventHandler(this.elementDialog, 'pointerdown', this.onMouseDown.bind(this), true);
-        this.keyPressHandler = new EventHandler(this.elementDialog, 'keypress', this.dockManager.onKeyPressBound, true);
-
-        this.resize(this.panel.elementPanel.clientWidth, this.panel.elementPanel.clientHeight);
-        this.isHidden = false;
-
-        if (this.grayoutParent != null) {
-            this.grayoutParent.grayOut(true);
-        }
-        this.bringToFront();
-    }
-
-    setPosition(x: number, y: number) {
-        let rect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
-        this.position = new Point(x - rect.left, y - rect.top);
-        this.elementDialog.style.left = (x - rect.left) + 'px';
-        this.elementDialog.style.top = (y - rect.top) + 'px';
-        this.panel.setDialogPosition(x, y);
+    public override setPosition(x: number, y: number): void {
+        super.setPosition(x, y);
         this.dockManager.notifyOnChangeDialogPosition(this, x, y);
     }
 
-    getPosition(): Point {
+    public getPosition(): Point {
         return new Point(this.position ? this.position.x : 0, this.position ? this.position.y : 0);
     }
 
-    onFocus() {
-        if (this.dockManager.activePanel != this.panel)
-            this.dockManager.activePanel = this.panel;
+    public override hide(): void {
+        super.hide();
+        this.grayoutParent?.grayOut(false);
     }
 
-    onMouseDown(e: PointerEvent) {
-        if (e.button != 2)
-            this.bringToFront();
-    }
+    public override destroy(): void {
+        super.destroy();
 
-    destroy() {
-        this.panel.lastDialogSize = { width: this.resizable.width, height: this.resizable.height };
-
-        if (this.focusHandler) {
-            this.focusHandler.cancel();
-            delete this.focusHandler;
-        }
-        if (this.mouseDownHandler) {
-            this.mouseDownHandler.cancel();
-            delete this.mouseDownHandler;
-        }
-        if (this.keyPressHandler) {
-            this.keyPressHandler.cancel();
-            delete this.keyPressHandler;
-        }
-
-        Utils.removeNode(this.elementDialog);
         this.draggable.removeDecorator();
-        Utils.removeNode(this.panel.elementPanel);
+        this.resizable.removeDecorator();
         Utils.arrayRemove(this.dockManager.context.model.dialogs, this);
-        this.panel.floatingDialog = undefined;
-
-        if (this.grayoutParent) {
-            this.grayoutParent.grayOut(false);
-        }
     }
 
-    resize(width: number, height: number) {
-        this.resizable.resize(width, height);
+    public static fromElement(id: string, dockManager: DockManager): Dialog {
+        const dialog: Dialog = new Dialog(
+            new PanelContainer(<HTMLElement>document.getElementById(id), dockManager),
+            dockManager,
+            null);
+
+        dialog.initialize();
+
+        return dialog;
     }
 
-    setTitle(title: string) {
-        this.panel.setTitle(title);
-    }
-
-    setTitleIcon(iconName: string) {
-        this.panel.setTitleIcon(iconName);
-    }
-
-    bringToFront() {
-        this.panel.elementContentContainer.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
-        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
-        this.dockManager.activePanel = this.panel;
-    }
-
-    hide() {
-        this.elementDialog.style.zIndex = '0';
-        this.panel.elementContentContainer.style.zIndex = '';
-        this.elementDialog.style.display = 'none';
-        if (!this.isHidden) {
-            this.isHidden = true;
-            this.dockManager.notifyOnHideDialog(this);
-        }
-        if (this.grayoutParent) {
-            this.grayoutParent.grayOut(false);
-        }
-    }
-
-    close() {
-        this.hide();
-        this.remove();
-        this.dockManager.notifyOnClosePanel(this.panel);
-        this.destroy();
-    }
-
-    remove() {
-        this.elementDialog.parentNode.removeChild(this.elementDialog);
-    }
-
-    show() {
-        this.panel.elementContentContainer.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
-        this.elementDialog.style.zIndex = <any>this.dockManager.zIndexDialogCounter++;
-        this.elementDialog.style.display = 'block';
-        if (this.isHidden) {
-            this.isHidden = false;
-            this.dockManager.notifyOnShowDialog(this);
-        }
-    }
-
-    static createContextMenuContentCallback = (dialog: Dialog, documentMangerNodes: DockNode[]): Node[] => {
+    public static createContextMenuContentCallback = (dialog: Dialog, documentMangerNodes: DockNode[]): Node[] => {
         if (!dialog.panel._hideCloseButton) {
             return [];
         }
@@ -212,7 +125,19 @@ export class Dialog implements IContextMenuProvider {
 
     public createContextMenuItems(): Node[] {
         return Dialog.createContextMenuContentCallback(
-            this, 
+            this,
             this.dockManager.context.model.documentManagerNode.children);
+    }
+
+    protected override onShow(): void {
+        this.dockManager.notifyOnShowDialog(this);
+    }
+
+    protected override onHide(): void {
+        this.dockManager.notifyOnHideDialog(this);
+    }
+
+    public get elementDialog(): HTMLDivElement & { floatingPanel: FloatingPanel } {
+        return this.element;
     }
 }

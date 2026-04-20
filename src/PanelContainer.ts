@@ -1,8 +1,8 @@
 import { moveElementToNewBrowserWindow } from "./BrowserDialogHelper.js";
 import { ContainerType } from "./ContainerType.js";
-import { Dialog } from "./Dialog.js";
 import { DockManager } from "./DockManager.js";
 import { EventHandler } from "./EventHandler.js";
+import { FloatingPanel } from "./FloatingPanel.js";
 import { Point } from "./Point.js";
 import { TabPage } from './TabPage.js';
 import { UndockInitiator } from "./UndockInitiator.js";
@@ -54,7 +54,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
 
     lastDialogSize?: ISize;
 
-    _floatingDialog?: Dialog;
+    _floatingPanel?: FloatingPanel;
     _canUndock: boolean;
     _cachedWidth: number;
     _cachedHeight: number;
@@ -84,7 +84,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this.elementContentContainer.addEventListener('pointerdown', (e) => {
             try {
                 if (this.isDialog) {
-                    this._floatingDialog.bringToFront();
+                    this._floatingPanel.bringToFront();
                 } else {
                     if (this.tabPage)
                         this.tabPage.setSelected(true, true);
@@ -101,7 +101,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this.containerType = ContainerType.panel;
         this.icon = null;
         this.minimumAllowedChildNodes = 0;
-        this._floatingDialog = undefined;
+        this._floatingPanel = undefined;
         this.isDialog = false;
         this._canUndock = dockManager._undockEnabled;
         this.eventListeners = [];
@@ -165,7 +165,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this._updateTitle();
 
         this.undockInitiator = new UndockInitiator(this.elementTitle, this.performUndockToDialog.bind(this));
-        this.floatingDialog = undefined;
+        this.floatingPanel = undefined;
 
         this.mouseDownHandler = new EventHandler(this.elementPanel, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementPanel, 'touchstart', this.onMouseDown.bind(this), { passive: true });
@@ -255,12 +255,12 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this.eventListeners.splice(this.eventListeners.indexOf(listener), 1);
     }
 
-    get floatingDialog(): Dialog {
-        return this._floatingDialog;
+    get floatingPanel(): FloatingPanel {
+        return this._floatingPanel;
     }
-    set floatingDialog(value: Dialog) {
-        this._floatingDialog = value;
-        let canUndock = (this._floatingDialog === undefined);
+    set floatingPanel(value: FloatingPanel) {
+        this._floatingPanel = value;
+        let canUndock = (this._floatingPanel === undefined);
         this.undockInitiator.enabled = canUndock;
         this._contextMenuProvider = value ?? this;
     }
@@ -592,9 +592,9 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
                 this.dockManager.config.dialogRootElement.removeChild(this.elementContentContainer);
 
                 if (this.isDialog) {
-                    if (this.floatingDialog) {
+                    if (this.floatingPanel) {
                         //this.floatingDialog.hide();
-                        this.floatingDialog.close(); // fires onClose notification
+                        this.floatingPanel.close(); // fires onClose notification
                     }
                 }
                 else {
