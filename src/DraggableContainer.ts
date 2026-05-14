@@ -20,6 +20,7 @@ export class DraggableContainer implements IDockContainer {
     touchDownHandler: EventHandler;
     minimumAllowedChildNodes: number;
     previousMousePosition: { x: any; y: any; };
+    dragOffset: Point;
     mouseMoveHandler: EventHandler;
     mouseUpHandler: EventHandler;
     private iframeEventHandlers: EventHandler[];
@@ -98,6 +99,7 @@ export class DraggableContainer implements IDockContainer {
 
         this._startDragging(event);
         this.previousMousePosition = { x: event.clientX, y: event.clientY };
+        this.setDragOffset(event.clientX, event.clientY);
         if (this.mouseMoveHandler) {
             this.mouseMoveHandler.cancel();
             delete this.mouseMoveHandler;
@@ -160,15 +162,48 @@ export class DraggableContainer implements IDockContainer {
         if (iframeOffset)
             currentMousePosition = new Point(event.clientX + iframeOffset.x, event.clientY + iframeOffset.y);
 
-        let dx = this.dockManager.checkXBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, false, false);
-        let dy = this.dockManager.checkYBounds(this.topLevelElement, currentMousePosition, this.previousMousePosition, false, false);
-        this._performDrag(dx, dy);
+        this._performDragToMouse(currentMousePosition);
         this.previousMousePosition = currentMousePosition;
+    }
+
+    setDragOffset(clientX: number, clientY: number) {
+        const rect = this.topLevelElement.getBoundingClientRect();
+        this.dragOffset = new Point(clientX - rect.left, clientY - rect.top);
+    }
+
+    _performDragToMouse(mousePosition: Point) {
+        const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
+        let left = mousePosition.x - rootRect.left - this.dragOffset.x;
+        let top = mousePosition.y - rootRect.top - this.dragOffset.y;
+        const constrained = this.constrainDragPosition(left, top);
+        this._setPosition(constrained.x, constrained.y);
+    }
+
+    private constrainDragPosition(left: number, top: number) {
+        if (this.dockManager.config.moveOnlyWithinDockConatiner) {
+            const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
+            left = Math.min(Math.max(left, 0), Math.max(0, rootRect.width - this.topLevelElement.offsetWidth));
+            top = Math.min(Math.max(top, 0), Math.max(0, rootRect.height - this.topLevelElement.offsetHeight));
+            return new Point(left, top);
+        }
+
+        const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
+        const minLeft = 40 - this.topLevelElement.offsetWidth - rootRect.left;
+        const maxLeft = window.innerWidth - 40 - rootRect.left;
+        const minTop = -rootRect.top;
+        const maxTop = window.innerHeight - 16 - rootRect.top;
+        left = Math.min(Math.max(left, minLeft), maxLeft);
+        top = Math.min(Math.max(top, minTop), maxTop);
+        return new Point(left, top);
     }
 
     _performDrag(dx: number, dy: number) {
         let left = dx + Utils.getPixels(this.topLevelElement.style.left);
         let top = dy + Utils.getPixels(this.topLevelElement.style.top);
+        this._setPosition(left, top);
+    }
+
+    private _setPosition(left: number, top: number) {
         this.topLevelElement.style.left = left + 'px';
         this.topLevelElement.style.top = top + 'px';
 

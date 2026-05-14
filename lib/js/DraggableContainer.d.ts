@@ -1,6 +1,7 @@
 import { Dialog } from "./Dialog.js";
 import { DockManager } from "./DockManager.js";
 import { EventHandler } from "./EventHandler.js";
+import { Point } from "./Point.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
 import { IState } from "./interfaces/IState.js";
@@ -19,6 +20,7 @@ export declare class DraggableContainer implements IDockContainer {
         x: any;
         y: any;
     };
+    dragOffset: Point;
     mouseMoveHandler: EventHandler;
     mouseUpHandler: EventHandler;
     private iframeEventHandlers;
@@ -46,5 +48,9 @@ export declare class DraggableContainer implements IDockContainer {
         x: number;
         y: number;
     }): void;
+    setDragOffset(clientX: number, clientY: number): void;
+    _performDragToMouse(mousePosition: Point): void;
+    private constrainDragPosition;
     _performDrag(dx: number, dy: number): void;
+    private _setPosition;
 }
