@@ -77,10 +77,10 @@ export class SplitterBar {
     }
 
     _performDrag(dx: number, dy: number) {
-        let previousWidth = this.previousContainer.containerElement.clientWidth;
-        let previousHeight = this.previousContainer.containerElement.clientHeight;
-        let nextWidth = this.nextContainer.containerElement.clientWidth;
-        let nextHeight = this.nextContainer.containerElement.clientHeight;
+        let previousWidth = this.getContainerWidth(this.previousContainer);
+        let previousHeight = this.getContainerHeight(this.previousContainer);
+        let nextWidth = this.getContainerWidth(this.nextContainer);
+        let nextHeight = this.getContainerHeight(this.nextContainer);
 
         let previousPanelSize = this.stackedVertical ? previousHeight : previousWidth;
         let nextPanelSize = this.stackedVertical ? nextHeight : nextWidth;
@@ -114,6 +114,14 @@ export class SplitterBar {
         }
 
         document.dispatchEvent(this.dockSpawnResizedEvent);
+    }
+
+    private getContainerWidth(container: IDockContainer) {
+        return container.width || container.containerElement.getBoundingClientRect().width;
+    }
+
+    private getContainerHeight(container: IDockContainer) {
+        return container.height || container.containerElement.getBoundingClientRect().height;
     }
 
     _startDragging(e: IMouseOrTouchEvent) {

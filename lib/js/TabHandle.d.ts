@@ -43,6 +43,7 @@ export declare class TabHandle {
     windowsContextMenuClose(e: Event): void;
     onMouseDown(e: any): void;
     onMouseUp(): void;
+    private cancelTabDrag;
     moveTabEvent(that: any, state: any): void;
     onMouseMove(e: MouseEvent): void;
     hideCloseButton(state: any): void;

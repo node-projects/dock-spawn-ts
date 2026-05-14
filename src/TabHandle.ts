@@ -213,6 +213,10 @@ export class TabHandle {
     }
 
     onMouseUp() {
+        this.cancelTabDrag();
+    }
+
+    private cancelTabDrag() {
         if (this.elementBase) {
             this.elementBase.classList.remove('dockspan-tab-handle-dragged');
         }
@@ -315,6 +319,7 @@ export class TabHandle {
     _performUndock(e, dragOffset) {
         if (this.parent.container.containerType === 'panel') {
             this.undockInitiator.enabled = false;
+            this.cancelTabDrag();
             let panel = this.parent.container as PanelContainer;
             return panel.performUndockToDialog(e, dragOffset);
         }

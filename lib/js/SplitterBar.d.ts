@@ -27,6 +27,8 @@ export declare class SplitterBar {
         y: number;
     }): void;
     _performDrag(dx: number, dy: number): void;
+    private getContainerWidth;
+    private getContainerHeight;
     _startDragging(e: IMouseOrTouchEvent): void;
     _stopDragging(): void;
 }
