@@ -203,8 +203,6 @@ export class DockManager {
     }
 
     resize(width: number, height: number) {
-        this.element.style.width = width + 'px';
-        this.element.style.height = height + 'px';
         this.context.model.rootNode.container.resize(width, height);
 
         let offsetX = 0, offsetY = 0;

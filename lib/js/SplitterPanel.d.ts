@@ -23,4 +23,5 @@ export declare class SplitterPanel {
     getRatios(): number[];
     setRatios(ratios: number[]): void;
     resize(width: number, height: number): void;
+    private getElasticChildIndex;
 }
