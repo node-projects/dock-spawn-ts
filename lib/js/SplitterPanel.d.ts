@@ -9,6 +9,8 @@ export declare class SplitterPanel {
     spiltterBars: SplitterBar[];
     stackedVertical: boolean;
     childContainers: IDockContainer[];
+    private preferredChildSizes;
+    private preserveNonElasticSizes;
     constructor(childContainers: IDockContainer[], stackedVertical: boolean);
     _buildSplitterDOMAndAddElements(): void;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean): void;
@@ -23,5 +25,8 @@ export declare class SplitterPanel {
     getRatios(): number[];
     setRatios(ratios: number[]): void;
     resize(width: number, height: number): void;
+    private resizeProportionally;
+    private hasElasticChild;
     private getElasticChildIndex;
+    private getChildSize;
 }

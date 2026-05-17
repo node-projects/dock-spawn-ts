@@ -12,6 +12,8 @@ export class SplitterPanel {
     spiltterBars: SplitterBar[];
     stackedVertical: boolean;
     childContainers: IDockContainer[];
+    private preferredChildSizes = new WeakMap<IDockContainer, number>();
+    private preserveNonElasticSizes = false;
 
     constructor(childContainers: IDockContainer[], stackedVertical: boolean) {
         this.childContainers = childContainers;
@@ -47,6 +49,11 @@ export class SplitterPanel {
     performLayout(children: IDockContainer[], relayoutEvenIfEqual: boolean) {
         let containersEqual = Utils.arrayEqual(this.childContainers, children);
         if (!containersEqual || relayoutEvenIfEqual) {
+            if (!relayoutEvenIfEqual) {
+                this.preferredChildSizes = new WeakMap<IDockContainer, number>();
+                this.preserveNonElasticSizes = false;
+            }
+
             this.childContainers.forEach((container) => {
                 if (!children.some((item) => item == container)) {
                     if (container.containerElement) {
@@ -128,7 +135,9 @@ export class SplitterPanel {
                 child.resize(child.width, Math.floor(size));
             else
                 child.resize(Math.floor(size), child.height);
+            this.preferredChildSizes.set(child, Math.floor(size));
         }
+        this.preserveNonElasticSizes = this.hasElasticChild();
     }
 
     getRatios(): number[] {
@@ -158,7 +167,9 @@ export class SplitterPanel {
                 child.resize(child.width, size);
             else
                 child.resize(size, child.height);
+            this.preferredChildSizes.set(child, size);
         }
+        this.preserveNonElasticSizes = this.hasElasticChild();
     }
 
     resize(width: number, height: number) {
@@ -182,7 +193,22 @@ export class SplitterPanel {
         let targetTotalChildPanelSize = this.stackedVertical ? height : width;
         targetTotalChildPanelSize -= barSize * this.spiltterBars.length;
 
-        let childSizes = this.childContainers.map((container) => this.stackedVertical ? container.height : container.width);
+        if (!this.preserveNonElasticSizes || !this.hasElasticChild()) {
+            this.resizeProportionally(width, height, targetTotalChildPanelSize);
+            return;
+        }
+
+        let resizeIndex = this.getElasticChildIndex();
+        let childSizes = this.childContainers.map((container, index) => {
+            let currentSize = this.getChildSize(container);
+            if (index === resizeIndex)
+                return currentSize;
+            let preferredSize = this.preferredChildSizes.get(container);
+            if (preferredSize === undefined || currentSize > preferredSize)
+                preferredSize = currentSize;
+            this.preferredChildSizes.set(container, preferredSize);
+            return preferredSize;
+        });
         let totalChildPanelSize = childSizes.reduce((sum, size) => sum + size, 0);
         if (totalChildPanelSize <= 0) {
             let size = targetTotalChildPanelSize / this.childContainers.length;
@@ -190,7 +216,6 @@ export class SplitterPanel {
             totalChildPanelSize = targetTotalChildPanelSize;
         }
 
-        let resizeIndex = this.getElasticChildIndex();
         let sizeDelta = targetTotalChildPanelSize - totalChildPanelSize;
         childSizes[resizeIndex] += sizeDelta;
         if (childSizes[resizeIndex] < 0) {
@@ -221,6 +246,50 @@ export class SplitterPanel {
         }
     }
 
+    private resizeProportionally(width: number, height: number, targetTotalChildPanelSize: number) {
+        for (let i = 0; i < this.childContainers.length; i++) {
+            let childContainer = this.childContainers[i];
+            if (this.stackedVertical)
+                childContainer.resize(width, !childContainer.height ? height : childContainer.height);
+            else
+                childContainer.resize(!childContainer.width ? width : childContainer.width, height);
+        }
+
+        let totalChildPanelSize = 0;
+        this.childContainers.forEach((container) => {
+            let size = this.stackedVertical ? container.height : container.width;
+            totalChildPanelSize += size;
+        });
+        totalChildPanelSize = Math.max(totalChildPanelSize, 1);
+        let scaleMultiplier = targetTotalChildPanelSize / totalChildPanelSize;
+
+        let updatedTotalChildPanelSize = 0;
+        for (let i = 0; i < this.childContainers.length; i++) {
+            let child = this.childContainers[i];
+            if (child.containerElement.style.display == 'none')
+                child.containerElement.style.display = 'block';
+            let original = this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth;
+            let newSize = Math.floor(original * scaleMultiplier);
+            updatedTotalChildPanelSize += newSize;
+
+            if (i === this.childContainers.length - 1)
+                newSize += targetTotalChildPanelSize - updatedTotalChildPanelSize;
+
+            if (this.stackedVertical)
+                child.resize(child.width, newSize);
+            else
+                child.resize(newSize, child.height);
+            this.preferredChildSizes.set(child, newSize);
+        }
+    }
+
+    private hasElasticChild(): boolean {
+        return this.childContainers.some((container) =>
+            container.containerType === ContainerType.fill ||
+            container.containerType === ContainerType.horizontal ||
+            container.containerType === ContainerType.vertical);
+    }
+
     private getElasticChildIndex(): number {
         let fillIndex = this.childContainers.findIndex((container) => container.containerType === ContainerType.fill);
         if (fillIndex >= 0)
@@ -232,5 +301,9 @@ export class SplitterPanel {
             return compositeIndex;
 
         return this.childContainers.length - 1;
+    }
+
+    private getChildSize(container: IDockContainer): number {
+        return this.stackedVertical ? container.height : container.width;
     }
 }
