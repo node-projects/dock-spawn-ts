@@ -80,10 +80,12 @@ export class Dialog implements IContextMenuProvider {
 
     setPosition(x: number, y: number) {
         let rect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
-        this.position = new Point(x - rect.left, y - rect.top);
-        this.elementDialog.style.left = (x - rect.left) + 'px';
-        this.elementDialog.style.top = (y - rect.top) + 'px';
-        this.panel.setDialogPosition(x, y);
+        let left = x - rect.left;
+        let top = y - rect.top;
+        this.position = new Point(left, top);
+        this.elementDialog.style.left = left + 'px';
+        this.elementDialog.style.top = top + 'px';
+        this.panel.setDialogPosition(left, top);
         this.dockManager.notifyOnChangeDialogPosition(this, x, y);
     }
 
