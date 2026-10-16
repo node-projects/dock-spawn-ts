@@ -1,4 +1,8 @@
 
+html {
+  height: 100%;
+}
+
 body {
   background-color: #F8F8F8;
   font-family: 'Open Sans', sans-serif;
@@ -36,6 +40,7 @@ body {
 .my-dock-manager {
   background-color: #F8F8F8;
   clear: both;
+  height: 100%;
 }
 
 .solution-window {

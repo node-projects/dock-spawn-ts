@@ -73,7 +73,7 @@ export class DockGraphDeserializer {
 
         if (containerType === 'panel') {
             container = await PanelContainer.loadFromState(containerState, this.dockManager);
-            if (!container.prepareForDocking)
+            if (!container?.prepareForDocking)
                 return null;
             container.prepareForDocking();
             Utils.removeNode(container.elementPanel);
@@ -111,7 +111,7 @@ export class DockGraphDeserializer {
             let container;
             if (containerType === 'panel') {
                 container = await PanelContainer.loadFromState(containerState, this.dockManager);
-                if (container.prepareForDocking) {
+                if (container?.prepareForDocking) {
                     Utils.removeNode(container.elementPanel);
                     container.isDialog = true;
                     let dialog = new Dialog(container, this.dockManager);
