@@ -347,27 +347,27 @@ export class DockManager {
 
     /** Dock the [container] to the left of the [referenceNode] node */
     dockLeft(referenceNode: DockNode, container: PanelContainer, ratio: number) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockLeft.bind(this.layoutEngine), false, ratio);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockLeft.bind(this.layoutEngine), ratio);
     }
 
     /** Dock the [container] to the right of the [referenceNode] node */
     dockRight(referenceNode: DockNode, container: PanelContainer, ratio: number) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockRight.bind(this.layoutEngine), true, ratio);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockRight.bind(this.layoutEngine), ratio);
     }
 
     /** Dock the [container] above the [referenceNode] node */
     dockUp(referenceNode: DockNode, container: PanelContainer, ratio: number) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockUp.bind(this.layoutEngine), false, ratio);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockUp.bind(this.layoutEngine), ratio);
     }
 
     /** Dock the [container] below the [referenceNode] node */
     dockDown(referenceNode: DockNode, container: PanelContainer, ratio: number) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockDown.bind(this.layoutEngine), true, ratio);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockDown.bind(this.layoutEngine), ratio);
     }
 
     /** Dock the [container] as a tab inside the [referenceNode] node */
     dockFill(referenceNode: DockNode, container: PanelContainer) {
-        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine), false);
+        return this._requestDockContainer(referenceNode, container, this.layoutEngine.dockFill.bind(this.layoutEngine));
     }
 
     floatDialog(container: PanelContainer, x: number, y: number, grayoutParent?: PanelContainer, disableResize?: boolean): Dialog {
@@ -419,7 +419,7 @@ export class DockManager {
         }
     }
 
-    private _requestDockContainer(referenceNode: DockNode, container: IDockContainer, layoutDockFunction: (referenceNode: DockNode, newNode: DockNode) => void, dockedToPrevious: boolean, ratio?: number) {
+    private _requestDockContainer(referenceNode: DockNode, container: IDockContainer, layoutDockFunction: (referenceNode: DockNode, newNode: DockNode) => void, ratio?: number) {
         // Get the active dialog that was dragged on to the dock wheel
         let newNode = new DockNode(container);
         if (container.containerType === 'panel') {
@@ -428,29 +428,31 @@ export class DockManager {
             Utils.removeNode(panel.elementPanel);
         }
 
-        let ratios: number[] = null;
+        const reference = referenceNode.parent?.container.containerType === 'fill' ? referenceNode.parent : referenceNode;
+        let sizes: Map<IDockContainer, number>;
         let oldSplitter: SplitterDockContainer;
-        if (referenceNode.parent && referenceNode.parent.container) {
-            oldSplitter = referenceNode.parent.container as SplitterDockContainer;
-            if (oldSplitter.getRatios)
-                ratios = oldSplitter.getRatios();
+        if (reference.parent && reference.parent.container) {
+            oldSplitter = reference.parent.container as SplitterDockContainer;
+            if (oldSplitter.splitterPanel)
+                sizes = new Map(oldSplitter.splitterPanel.childContainers.map(child =>
+                    [child, oldSplitter.stackedVertical ? child.height : child.width]));
         }
 
         layoutDockFunction(referenceNode, newNode);
 
         if (ratio && newNode.parent && (newNode.parent.container.containerType === 'vertical' || newNode.parent.container.containerType === 'horizontal')) {
             let splitter = newNode.parent.container as SplitterDockContainer;
-            if (ratios && oldSplitter == splitter) {
-                if (dockedToPrevious) {
-                    for (let i = 0; i < ratios.length; i++) {
-                        ratios[i] = ratios[i] - ratios[i] * ratio;
-                    }
-                    ratios.push(ratio);
-                } else {
-                    ratios[0] = ratios[0] - ratio;
-                    ratios.unshift(ratio);
-                }
-                splitter.setRatios(ratios);
+            if (sizes && oldSplitter == splitter) {
+                const panel = splitter.splitterPanel;
+                const bar = panel.spiltterBars[0].barElement;
+                const barSize = splitter.stackedVertical ? bar.clientHeight : bar.clientWidth;
+                const available = (splitter.stackedVertical ? splitter.height : splitter.width) - panel.spiltterBars.length * barSize;
+                const otherSize = [...sizes].reduce((sum, [child, size]) => child === reference.container ? sum : sum + size, 0);
+                const referenceSize = Math.max(0, available - otherSize);
+                const newSize = Math.floor(referenceSize * ratio);
+                // Split the reference pane at its actual position, preserving unrelated panes.
+                splitter.setSizes(newNode.parent.children.map(child => child === newNode ? newSize
+                    : child === reference ? referenceSize - newSize : sizes.get(child.container)));
             }
             else
                 splitter.setContainerRatio(container, ratio);

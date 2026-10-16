@@ -37,6 +37,11 @@ Usage Example is in page/demo/demo_simple_es5.html
 
 # how to use:
 
+When docking beside an existing pane with a ratio, the new pane takes that fraction
+of the reference pane's space after allowing for the new splitter bar. Other panes
+keep their pixel sizes. Closing or undocking a pane gives its freed space to the
+elastic document area while preserving the remaining tool panels.
+
 ```html
    dockspawn div container needs position absolute or relative 
 
