@@ -9,6 +9,16 @@ let infovisContainer;
 let outlineNode;
 let solution;
 let editorOutput;
+let testDialogId = 0;
+
+function createTestDialogContent(id) {
+    const el = document.createElement("div");
+    el.id = id;
+    el.dataset.panelCaption = 'Test Dlg';
+    el.style.background = 'lightgreen';
+    el.textContent = "TestDialog";
+    return el;
+}
 
 function refresh() {
     localStorage.setItem(storeKey, '');
@@ -17,7 +27,7 @@ function refresh() {
 //@ts-ignore
 window.refresh = refresh;
 
-window.onload = () => {
+window.onload = async () => {
     // Convert a div to the dock manager. Panels can then be docked on to it
 
     let divDockContainer = document.getElementById('dock_div');
@@ -27,9 +37,18 @@ window.onload = () => {
     window.dockManager = dockManager;
     dockManager.initialize();
 
+    // Dynamic panels must be recreated by the application when restoring a layout.
+    dockManager.getElementCallback = async (state) => {
+        let element = document.getElementById(state.element);
+        if (!element && /^test_dialog_\d+$/.test(state.element)) {
+            element = createTestDialogContent(state.element);
+        }
+        return { element };
+    };
+
     let lastState = localStorage.getItem(storeKey);
     if (lastState && lastState.length > 0) {
-        dockManager.loadState(lastState);
+        await dockManager.loadState(lastState);
     }
 
     // Output Window
@@ -113,12 +132,14 @@ window.onload = () => {
         }
     });
 
-    solution = new PanelContainer(document.getElementById("solution_window"), dockManager);
-    infovisContainer = new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
+    const restoredPanels = dockManager.getPanels();
+    const restoredPanel = (id) => restoredPanels.find(panel => panel.elementContent.id === id);
+    solution = restoredPanel("solution_window") ?? new PanelContainer(document.getElementById("solution_window"), dockManager);
+    infovisContainer = restoredPanel("infovis") ?? new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
     infovisContainer.width = 600;
     infovisContainer.height = 400;
 
-    let properties;
+    let properties = restoredPanel("properties_window");
     if (!lastState) {
         // Convert existing elements on the page into "Panels".
         // They can then be docked on to the dock manager
@@ -146,12 +167,14 @@ window.onload = () => {
     }
 
     document.getElementById("dlg").onclick = () => {
-        const el = document.createElement("div");
-        el.style.background = 'lightgreen';
-        el.style.width = "200px";
-        el.style.height = "200px";
-        el.innerHTML = "TestDialog";
+        let id;
+        do {
+            id = `test_dialog_${++testDialogId}`;
+        } while (document.getElementById(id));
+        const el = createTestDialogContent(id);
         const newPage = new PanelContainer(el, dockManager, 'Test Dlg', PanelType.document);
+        newPage.width = 200;
+        newPage.height = 200;
         const dialog = dockManager.floatDialog(newPage, 200, 200, properties);
         dialog.resize(200, 200);
     }

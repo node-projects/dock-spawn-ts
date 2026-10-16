@@ -5,7 +5,7 @@
   "license": "MIT",
   "author": "jochen.kuehner@gmx.de",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run tsc && node --test tests/*.test.js",
     "tsc": "tsc",
     "start": "http-server",
     "prepublishOnly": "npm run tsc && npm run bundle && npm run bundle2",
