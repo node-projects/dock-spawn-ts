@@ -122,6 +122,39 @@ test('tab measurement failures reject resize and allow subsequent resizes', asyn
     await retry;
 });
 
+test('wrapped tab rows resize content using the final strip height and wait for it', async t => {
+    const flush = framesFor(t);
+    const sizes = [];
+    let finish;
+    const resizedContent = new Promise(resolve => { finish = resolve; });
+    const tabs = host({ resize(width, height) {
+        sizes.push([width, height]);
+        return sizes.length === 1 ? Promise.resolve() : resizedContent;
+    } });
+    tabs.resizeTabListElement = () => { tabs.tabListElement.clientHeight = 66; };
+    let settled = false;
+    const pending = tabs.resize(300, 200).then(() => { settled = true; });
+    flush();
+    await Promise.resolve();
+    assert.deepEqual(sizes, [[300, 179], [300, 133]]);
+    assert.equal(tabs.contentElement.style.height, '133px');
+    assert.equal(settled, false);
+    finish();
+    await pending;
+});
+
+test('destroying a host before its pending frame skips tab measurement', async t => {
+    const flush = framesFor(t);
+    const tabs = host({ resize: () => Promise.resolve() });
+    tabs.groupUndockInitiator = { enabled: true };
+    tabs.mouseDownHandler = tabs.focusHandler = { cancel() {} };
+    tabs.resizeTabListElement = () => { throw Error('Destroyed DOM must not be measured'); };
+    const pending = tabs.resize(300, 200);
+    tabs.destroy();
+    flush();
+    await pending;
+});
+
 test('auto-hide resize waits for both the root and open overlay', async () => {
     const resolvers = [];
     const resize = () => new Promise(resolve => resolvers.push(resolve));

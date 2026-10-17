@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Tab overflow and multiple rows</title>
+<link rel="stylesheet" href="../lib/css/dock-manager.css">
+<link rel="stylesheet" href="../lib/css/dock-manager-style.css">
+<style>
+body { font: 14px system-ui; margin: 16px; }
+#dock { position: relative; width: 700px; max-width: 100%; height: 480px; }
+button { margin: 4px; }
+.sample { padding: 12px; }
+#results { white-space: pre-wrap; max-height: 100px; overflow: auto; }
+</style>
+<h1>Tab overflow and multiple rows</h1>
+<p>Select any tab from the dropdown. Use the row button beside it to switch modes.</p>
+<button id="run">Run regression tests</button>
+<button id="scroll">Single row</button><button id="wrap">Multiple rows</button>
+<button id="add">Add document</button>
+<pre id="results">Ready.</pre><div id="dock"></div>
+<script type="module">
+import { DockManager, PanelContainer, PanelType } from '../lib/js/index.js';
+const element = document.getElementById('dock');
+const results = document.getElementById('results');
+const manager = new DockManager(element, { enableTabGroups: true });
+manager.initialize();
+let count = 0;
+function panel(title, type) {
+    const content = document.createElement('div');
+    content.id = 'overflow-' + ++count;
+    content.className = 'sample';
+    content.innerHTML = '<label>Preserved content <input value="Edit me"></label>';
+    return new PanelContainer(content, manager, title, type);
+}
+const root = manager.context.model.documentManagerNode;
+for (let i = 1; i <= 18; i++) manager.dockFill(root, panel('Document ' + i + '.ts', PanelType.document));
+const tools = manager.dockLeft(root, panel('Explorer', PanelType.panel), 0.3);
+for (let i = 1; i <= 8; i++) manager.dockFill(tools, panel('Tool window ' + i, PanelType.panel));
+const resize = () => manager.resize(element.clientWidth, element.clientHeight);
+window.addEventListener('resize', resize);
+document.getElementById('scroll').onclick = () => manager.setTabStripMode('scroll');
+document.getElementById('wrap').onclick = () => manager.setTabStripMode('wrap');
+document.getElementById('add').onclick = () => manager.dockFill(root, panel('New document ' + count, PanelType.document));
+const assert = (condition, message) => { if (!condition) throw Error(message); results.textContent += 'PASS ' + message + '\n'; };
+document.getElementById('run').onclick = async () => {
+    results.textContent = '';
+    try {
+        await manager.setTabStripMode('scroll');
+        await resize();
+        const hosts = [root.container.tabHost, manager.getPanels().find(p => p.panelType === PanelType.panel).tabPage.host];
+        for (const host of hosts) {
+            const list = host.tabListElement;
+            const picker = host.hostElement.querySelector('select');
+            assert(list.scrollWidth > list.clientWidth, 'Single row overflows with readable tabs');
+            assert(picker.options.length === host.pages.length, 'Dropdown includes every tab');
+            picker.selectedIndex = host.pages.length - 1;
+            picker.dispatchEvent(new Event('change'));
+            assert(host.activeTab === host.pages.at(-1), 'Dropdown selects hidden last tab');
+            assert(list.scrollLeft > 0, 'Selected tab scrolls into view');
+            const input = host.activeTab.panel.elementContent.querySelector('input');
+            input.value = 'retained';
+            host.hostElement.querySelector('.dockspan-tab-strip-controls button').click();
+            await resize();
+            assert(host.tabStripMode === 'wrap' && list.clientHeight > 22, 'Row button enables multiple rows');
+            assert(host.contentElement.clientHeight + list.clientHeight + host.separatorElement.clientHeight === host.hostElement.clientHeight, 'Content fits below or above all rows');
+            assert(host.activeTab.panel.elementContent.querySelector('input') === input && input.value === 'retained', 'Switch preserves content and selection');
+        }
+        await manager.setTabStripMode('wrap');
+        const host = hosts[0];
+        const before = host.pages.length;
+        manager.dockFill(root, panel('Added document', PanelType.document));
+        await resize();
+        assert(host.hostElement.querySelector('select').options.length === before + 1, 'Added tab appears in dropdown');
+        const last = host.pages.at(-1).panel;
+        await last.close();
+        await resize();
+        assert(host.hostElement.querySelector('select').options.length === before, 'Closed tab removed from dropdown');
+        const first = host.pages[0].panel;
+        first.setTitle('Renamed document');
+        await resize();
+        assert(host.hostElement.querySelector('select').options[0].textContent.includes('Renamed'), 'Dropdown reflects title changes');
+        const width = element.style.width;
+        element.style.width = '320px';
+        await resize();
+        assert(host.tabListElement.scrollHeight >= host.tabListElement.clientHeight && host.tabListElement.clientHeight <= 240, 'Narrow pane bounds multi-row height');
+        assert(host.contentElement.clientHeight >= 0, 'Narrow pane retains valid content height');
+        element.style.width = width;
+        await resize();
+        const order = host.pages.map((_, i) => i).reverse();
+        host.performTabsLayout(order);
+        assert(host.hostElement.querySelector('select').options[0].textContent === host.pages[0].handle.elementText.textContent, 'Dropdown follows reordered tabs');
+        const members = host.pages.slice(0, 6).map(page => page.panel);
+        const group = manager.requestUndockGroup(members);
+        await group.resize(360, 280);
+        const floating = group.tabHost;
+        assert(floating.tabStripMode === 'wrap' && floating.tabListElement.clientHeight > 22, 'Floating group inherits multi-row default');
+        await manager.setTabStripMode('scroll');
+        assert(floating.tabStripMode === 'scroll' && floating.tabListElement.clientHeight === 22, 'Global switch includes floating groups');
+        manager.dockDialogFill(root, group);
+        await resize();
+        assert(hosts.every(h => h.tabListElement.clientHeight === 22), 'Global switch restores single row');
+        results.textContent += 'ALL TESTS PASSED';
+    } catch (error) { results.textContent += 'FAIL ' + error.stack; }
+};
+await resize();
+</script>
+</html>

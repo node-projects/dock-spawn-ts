@@ -70,7 +70,7 @@ test('layout removes every obsolete tab, including consecutive tabs, and retains
 function resizeHost() {
     return Object.assign(Object.create(TabHost.prototype), {
         pages: [], hostElement: { style: {} },
-        tabListElement: { clientHeight: 20 }, separatorElement: { clientHeight: 1 },
+        tabListElement: { clientHeight: 20, style: {} }, separatorElement: { clientHeight: 1 },
         contentElement: { style: {} }
     });
 }
@@ -96,22 +96,16 @@ test('rapid resizes schedule one tab resize using the most recent width', t => {
     assert.equal(frames.length, 1);
 });
 
-test('tab sizing batches writes and reads and never assigns negative widths', () => {
+test('overflow retains readable tab widths and reserves space for controls', () => {
     const host = resizeHost();
-    const operations = [];
-    const elements = [100, 200, 100].map((width, id) => ({
-        style: { set width(value) { operations.push(['write', id, value]); } },
-        get clientWidth() { operations.push(['read', id]); return width; }
-    }));
+    const elements = [100, 200, 100].map(clientWidth => ({ style: { width: '1px' }, clientWidth }));
     host.pages = elements.map(elementBase => ({ handle: { elementBase } }));
-    host.resizeTabListElement(200);
-    assert.deepEqual(operations.map(op => op[0]), [
-        'write', 'write', 'write', 'read', 'read', 'read', 'write', 'write', 'write'
-    ]);
-    assert.deepEqual(operations.slice(-3).map(op => op[2]), ['50px', '100px', '45px']);
-    operations.length = 0;
+    host.resizeTabListElement(200, 300);
+    assert.equal(host.tabListElement.style.width, '144px');
+    assert.equal(host.tabListElement.style.maxHeight, '150px');
+    assert.ok(elements.every(element => element.style.width === ''));
     host.resizeTabListElement(0);
-    assert.deepEqual(operations.slice(-3).map(op => op[2]), ['0px', '0px', '0px']);
+    assert.equal(host.tabListElement.style.width, '0px');
 });
 
 test('zero-width and destroyed tab handles do not produce invalid sizes', () => {

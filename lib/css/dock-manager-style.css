@@ -49,7 +49,7 @@
 .resize-handle, .resize-handle-corner {
     pointer-events: auto;
 }
-.dock-container, .document-manager, .dockspan-tab-handle-list-container {
+.dock-container, .document-manager, .dockspan-tab-handle-list-container, .dockspan-tab-strip-controls {
     background-color: #eeeef2;
 }
 .splitbar-horizontal, .splitbar-vertical {

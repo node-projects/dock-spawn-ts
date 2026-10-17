@@ -52,6 +52,24 @@ await dockManager.resize(width, height);
 
 The web component's `resize()` and `dockManager.invalidate()` can also be awaited.
 
+Tab strips keep readable tab widths and scroll horizontally when they overflow.
+Use the dropdown at the end of each strip to select any tab, including hidden tabs.
+The selected tab scrolls into view. Click the row button beside the dropdown to
+switch that strip between a single row and multiple rows, like Visual Studio.
+Multi-row strips use at most half the pane height and scroll vertically beyond that.
+These controls work for document tabs, bottom tool tabs and floating tab groups.
+
+```javascript
+const dockManager = new DockManager(element, { tabStripMode: 'wrap' }); // default: 'scroll'
+await dockManager.setTabStripMode('scroll'); // update all strips and the default
+await panel.tabPage.host.setTabStripMode('wrap'); // update one strip
+```
+
+The mode is a display preference for the current session; saved layouts do not
+store it. After building, open `tests/tab-overflow.html` for a demo and browser checks.
+The IDE demo at `page/demo/ide/demo.html` opens 15 editable documents to exercise
+overflow and row switching, including when upgrading an older saved demo layout.
+
 Auto-hide is disabled by default. Enable it when creating the manager:
 
 ```javascript

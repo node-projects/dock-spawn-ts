@@ -1,3 +1,5 @@
+export type TabStripMode = 'scroll' | 'wrap';
+
 export class DockConfig {
     public constructor() {
         this.escClosesWindow = true;
@@ -8,6 +10,7 @@ export class DockConfig {
         this.enableAutoHide = false;
         this.enableTabGroups = false;
         this.persistTabGroups = true;
+        this.tabStripMode = 'scroll';
     }
 
     escClosesWindow?: boolean;
@@ -21,4 +24,6 @@ export class DockConfig {
     enableTabGroups?: boolean;
     /** Save floating group membership; false restores members as separate windows. */
     persistTabGroups?: boolean;
+    /** Single scrollable row (default), or multiple rows of tabs. */
+    tabStripMode?: TabStripMode;
 }

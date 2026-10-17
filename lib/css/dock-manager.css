@@ -453,6 +453,53 @@
 	display: flex;
 }
 
+.dockspan-tab-handle-list-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+.dockspan-tab-handle-list-container::-webkit-scrollbar { display: none; }
+.dockspan-tab-handle-list-container > .dockspan-tab-handle {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    min-width: 48px;
+    max-width: 240px;
+}
+.dockspan-tab-handle-list-container.dockspan-tab-strip-wrap {
+    height: auto;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    align-content: flex-start;
+}
+.dockspan-tab-strip-wrap > .dockspan-tab-handle { max-width: 100%; }
+.dockspan-tab-strip-controls {
+    position: absolute;
+    right: 0;
+    display: flex;
+    width: 56px;
+    height: 22px;
+    pointer-events: auto;
+}
+.dockspan-tab-strip-controls[hidden] { display: none; }
+.dockspan-tab-strip-controls > * {
+    width: 28px;
+    height: 22px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    font: inherit;
+    color: inherit;
+    background: #eeeef2;
+    cursor: pointer;
+}
+.dockspan-tab-strip-controls > :hover { background: #c9def5; }
+.dockspan-tab-strip-controls > :focus-visible { outline: 1px solid #007acc; outline-offset: -1px; }
+.dockspan-tab-strip-controls > [aria-pressed="true"] { background: #a8c9ed; }
+.dockspan-tab-strip-controls > select { text-indent: 100%; }
+.dockspan-tab-strip-controls option { background: white; color: #222; text-indent: 0; }
+
 .dockspan-tab-handle-content-seperator {
 	height: 4px;
 	display: none;

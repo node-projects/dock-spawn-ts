@@ -11,6 +11,14 @@ let solution;
 let editorOutput;
 let testDialogId = 0;
 
+// Enough real editor tabs to exercise overflow and multiple rows at desktop widths.
+const overflowDocuments = ['Vehicle', 'World', 'Renderer', 'Physics', 'Input'].flatMap((name, index) => [
+    { id: `editor${6 + index * 2}_window`, title: `${name}.h`,
+        value: `#pragma once\n\nclass ${name} {\npublic:\n    void update(float delta);\n};\n` },
+    { id: `editor${7 + index * 2}_window`, title: `${name}.cpp`,
+        value: `#include "${name}.h"\n\nvoid ${name}::update(float delta) {\n    // Update ${name.toLowerCase()}.\n}\n` }
+]);
+
 function createTestDialogContent(id) {
     const el = document.createElement("div");
     el.id = id;
@@ -70,6 +78,14 @@ window.onload = async () => {
     };
 
     // Dynamic panels must be recreated by the application when restoring a layout.
+    for (const { id, title } of overflowDocuments) {
+        const element = document.createElement('div');
+        element.id = id;
+        element.dataset.panelCaption = title;
+        element.className = 'editor1-window editor-host';
+        element.hidden = true;
+        divDockContainer.appendChild(element);
+    }
     dockManager.getElementCallback = async (state) => {
         let element = document.getElementById(state.element);
         if (!element && /^test_dialog_\d+$/.test(state.element)) {
@@ -219,6 +235,14 @@ window.onload = async () => {
         }
     }
 
+    // Add the overflow examples to older saves; otherwise retain their restored positions.
+    if (!lastState || !overflowDocuments.some(({ id }) => lastState.includes(`"${id}"`))) {
+        for (const { id } of overflowDocuments) {
+            dockManager.dockFill(dockManager.context.model.documentManagerNode,
+                new PanelContainer(document.getElementById(id), dockManager, null, PanelType.document));
+        }
+    }
+
     document.getElementById("dlg").onclick = () => {
         let id;
         do {
@@ -276,7 +300,8 @@ window.onload = async () => {
     for (const [id, value] of [
         ['editor3_window', '#pragma once\n\nclass Engine {\npublic:\n    void update(float delta);\n};\n'],
         ['editor4_window', '#include "Engine.h"\n\nvoid Engine::update(float delta) {\n    // Update the simulation.\n}\n'],
-        ['editor5_window', '# Dock Spawn demo\n\nCtrl/Cmd-click tabs to select a group.\nDrag the blank tab strip to move all tabs.\nDrop one floating window over another to group them.\n']
+        ['editor5_window', '# Dock Spawn demo\n\nUse the dropdown to select hidden documents.\nClick the row button beside it to switch between one row and multiple rows.\n\nCtrl/Cmd-click tabs to select a group.\nDrag the blank tab strip to move all tabs.\nDrop one floating window over another to group them.\n'],
+        ...overflowDocuments.map(({ id, value }) => [id, value])
     ]) {
         const element = document.getElementById(id);
         element.editor = CodeMirror(element, { lineNumbers: true, value });

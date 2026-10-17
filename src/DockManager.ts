@@ -1,6 +1,6 @@
 import { Dialog } from "./Dialog.js";
 import { AutoHideManager } from './AutoHideManager.js';
-import { DockConfig } from "./DockConfig.js";
+import { DockConfig, TabStripMode } from "./DockConfig.js";
 import { DockGraphDeserializer } from "./DockGraphDeserializer.js";
 import { DockGraphSerializer } from "./DockGraphSerializer.js";
 import { DockLayoutEngine } from "./DockLayoutEngine.js";
@@ -70,6 +70,20 @@ export class DockManager {
 
     get config(): DockConfig {
         return this._config;
+    }
+
+    /** Set the default and update all docked and floating tab strips. */
+    async setTabStripMode(mode: TabStripMode): Promise<void> {
+        if (mode !== 'scroll' && mode !== 'wrap') throw new Error('Invalid tab strip mode');
+        this.config.tabStripMode = mode;
+        const hosts = new Set<import('./TabHost.js').TabHost>();
+        const visit = (node: DockNode) => {
+            if (node.container instanceof FillDockContainer) hosts.add(node.container.tabHost);
+            node.children.forEach(visit);
+        };
+        visit(this.context.model.rootNode);
+        this.context.model.dialogs.forEach(dialog => { if (dialog.tabHost) hosts.add(dialog.tabHost); });
+        await Promise.all([...hosts].map(host => host.setTabStripMode(mode)));
     }
 
     initialize() {

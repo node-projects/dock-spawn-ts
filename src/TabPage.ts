@@ -43,6 +43,7 @@ export class TabPage {
                 this.handle.elementText.classList.remove('panel-has-changes')
             }
         }
+        this.host.refreshTabs();
     }
 
     destroy() {

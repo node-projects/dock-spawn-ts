@@ -7,6 +7,8 @@ import { DockManager } from "./DockManager.js";
 import { PanelContainer } from "./PanelContainer.js";
 import { EventHandler } from './EventHandler.js';
 import { UndockInitiator } from './UndockInitiator.js';
+import { TabStripMode } from './DockConfig.js';
+import { Localizer } from './i18n/Localizer.js';
 
 /**
  * Tab Host control contains tabs known as TabPages.
@@ -28,6 +30,13 @@ export class TabHost {
     _resizeRequested: boolean;
     private tabListResize: Promise<void>;
     private tabListWidth: number;
+    private tabListHeight: number;
+    private destroyed = false;
+    tabStripMode: TabStripMode;
+    private stripControls: HTMLDivElement;
+    private tabPicker: HTMLSelectElement;
+    private modeButton: HTMLButtonElement;
+    private stripHandlers: EventHandler[] = [];
     mouseDownHandler: EventHandler;
     focusHandler: EventHandler;
     private markedTabs = new Set<TabPage>();
@@ -90,6 +99,72 @@ export class TabHost {
             && this.dockManager.config.enableTabGroups && this.dockManager._undockEnabled && this.pages.length > 0
             && this.pages.every(page => page.panel?._canUndock);
         this.groupUndockInitiator.enabled = true;
+        this.stripControls = document.createElement('div');
+        this.stripControls.className = 'dockspan-tab-strip-controls';
+        this.stripControls.style[this.tabStripDirection === TabHostDirection.TOP ? 'top' : 'bottom'] = '0';
+        this.tabPicker = document.createElement('select');
+        this.tabPicker.setAttribute('aria-label', Localizer.getString('SelectTab'));
+        this.tabPicker.title = Localizer.getString('SelectHiddenTab');
+        this.modeButton = document.createElement('button');
+        this.modeButton.type = 'button';
+        this.modeButton.textContent = '☷';
+        this.modeButton.setAttribute('aria-label', Localizer.getString('ShowTabRows'));
+        this.stripControls.append(this.modeButton, this.tabPicker);
+        this.hostElement.appendChild(this.stripControls);
+        this.stripHandlers.push(new EventHandler(this.tabPicker, 'change', () => {
+            this.pages[this.tabPicker.selectedIndex]?.onSelected();
+        }), new EventHandler(this.modeButton, 'click', () => {
+            void this.setTabStripMode(this.tabStripMode === 'wrap' ? 'scroll' : 'wrap');
+        }));
+        this.applyTabStripMode(dockManager.config.tabStripMode ?? 'scroll');
+        this.stripControls.hidden = true;
+    }
+
+    private applyTabStripMode(mode: TabStripMode) {
+        this.tabStripMode = mode;
+        this.tabListElement.classList.toggle('dockspan-tab-strip-wrap', mode === 'wrap');
+        this.modeButton.setAttribute('aria-pressed', String(mode === 'wrap'));
+        this.modeButton.title = Localizer.getString(mode === 'wrap' ? 'ShowSingleTabRow' : 'ShowTabRows');
+    }
+
+    /** Change this strip without changing the manager default for new strips. */
+    setTabStripMode(mode: TabStripMode): Promise<void> {
+        if (mode !== 'scroll' && mode !== 'wrap') throw new Error('Invalid tab strip mode');
+        this.applyTabStripMode(mode);
+        return this.resize(this.hostElement.clientWidth, this.hostElement.clientHeight);
+    }
+
+    private refreshTabPicker() {
+        if (!this.tabPicker) return;
+        this.tabPicker.replaceChildren(...this.pages.map(page => {
+            const option = document.createElement('option');
+            option.textContent = page.handle.elementText.textContent;
+            option.selected = page === this.activeTab;
+            return option;
+        }));
+    }
+
+    /** Reflow a strip after a title changes its natural tab width. */
+    refreshTabs() {
+        if (this.tabListWidth !== undefined && !this.destroyed)
+            void this.resize(this.tabListWidth, this.tabListHeight);
+    }
+
+    private revealActiveTab() {
+        const handle = this.activeTab?.handle?.elementBase;
+        if (!handle) return;
+        // Scroll only the strip; scrollIntoView would also move the outer page.
+        if (this.tabStripMode === 'wrap') {
+            const top = handle.offsetTop - this.tabListElement.offsetTop;
+            if (top < this.tabListElement.scrollTop) this.tabListElement.scrollTop = top;
+            else if (top + handle.offsetHeight > this.tabListElement.scrollTop + this.tabListElement.clientHeight)
+                this.tabListElement.scrollTop = top + handle.offsetHeight - this.tabListElement.clientHeight;
+        } else {
+            const left = handle.offsetLeft - this.tabListElement.offsetLeft;
+            if (left < this.tabListElement.scrollLeft) this.tabListElement.scrollLeft = left;
+            else if (left + handle.offsetWidth > this.tabListElement.scrollLeft + this.tabListElement.clientWidth)
+                this.tabListElement.scrollLeft = left + handle.offsetWidth - this.tabListElement.clientWidth;
+        }
     }
 
     onFocus() {
@@ -178,14 +253,21 @@ export class TabHost {
         this.hostElement.style.width = width + 'px';
         this.hostElement.style.height = height + 'px';
 
-        let tabHeight = this.tabListElement.clientHeight;
         this.tabListWidth = width;
+        this.tabListHeight = height;
         if (!this._resizeRequested) {
             this.tabListResize = new Promise<void>((resolve, reject) => {
                 requestAnimationFrame(() => {
                     try {
+                        if (this.destroyed) { resolve(); return; }
                         this.resizeTabListElement(this.tabListWidth);
-                        resolve();
+                        const tabHeight = this.tabListElement.clientHeight;
+                        if (this.stripControls) this.stripControls.style.height = tabHeight + 'px';
+                        const contentHeight = Math.max(0, this.tabListHeight - tabHeight - this.separatorElement.clientHeight);
+                        const heightChanged = this.contentElement.style.height !== contentHeight + 'px';
+                        this.contentElement.style.height = contentHeight + 'px';
+                        this.revealActiveTab();
+                        Promise.resolve(heightChanged ? this.activeTab?.resize(this.tabListWidth, contentHeight) : undefined).then(resolve, reject);
                     } catch (error) {
                         reject(error);
                     } finally {
@@ -195,30 +277,18 @@ export class TabHost {
             });
         }
         this._resizeRequested = true;
-        let separatorHeight = this.separatorElement.clientHeight;
-        let contentHeight = height - tabHeight - separatorHeight;
+        let contentHeight = Math.max(0, height - this.tabListElement.clientHeight - this.separatorElement.clientHeight);
         this.contentElement.style.height = contentHeight + 'px';
 
         await Promise.all([this.tabListResize, this.activeTab?.resize(width, contentHeight)]);
     }
 
     resizeTabListElement(width: number, height?: number) {
-        this._resizeRequested = false;
-        if (this.pages.length === 0) return;
-        const handles = this.pages.map(page => page.handle.elementBase).filter(element => element != null);
-        handles.forEach(element => { element.style.width = ''; });
-        // Batch layout reads before assigning any widths to avoid a reflow per tab.
-        const widths = handles.map(element => element.clientWidth);
-        const tabListWidth = widths.reduce((total, size) => total + size, 0);
-        if (tabListWidth === 0) return;
-        let scaleMultiplier = width / tabListWidth;
-        if (scaleMultiplier > 1.2) return; //with a reserve
-        handles.forEach((element, index) => {
-            let newSize = scaleMultiplier * widths[index];
-            if (index === handles.length - 1)
-                newSize = newSize - 5;
-            element.style.width = Math.max(0, newSize) + 'px';
-        });
+        // Reserve control space without inserting controls among reorderable handles.
+        this.tabListElement.style.width = Math.max(0, width - 56) + 'px';
+        this.tabListElement.style.maxHeight = Math.max(22, (height ?? this.tabListHeight ?? 44) / 2) + 'px';
+        this.pages.forEach(page => { if (page.handle.elementBase) page.handle.elementBase.style.width = ''; });
+        this.refreshTabPicker();
     }
 
     performLayout(children: IDockContainer[]) {
@@ -272,6 +342,7 @@ export class TabHost {
     }
 
     _setTabHandlesVisible(visible: boolean) {
+        if (this.stripControls) this.stripControls.hidden = !visible;
         if (visible) {
             this.tabListElement.classList.add('dockspan-tab-handle-list-container-visible');
             this.separatorElement.classList.add('dockspan-tab-handle-content-seperator-visible');
@@ -287,6 +358,8 @@ export class TabHost {
             let selected = (tabPage === page);
             tabPage.setSelected(selected, active);
         });
+        this.refreshTabPicker();
+        this.revealActiveTab();
     }
 
     selectForDrag(page: TabPage, toggle: boolean) {
@@ -317,6 +390,8 @@ export class TabHost {
     }
 
     destroy() {
+        this.destroyed = true;
+        this.stripHandlers?.forEach(handler => handler.cancel());
         this.groupUndockInitiator.enabled = false;
         this.mouseDownHandler.cancel();
         this.focusHandler.cancel();
