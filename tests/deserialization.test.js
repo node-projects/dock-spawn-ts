@@ -2,6 +2,68 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { DockGraphDeserializer } from '../lib/js/DockGraphDeserializer.js';
 import { PanelContainer } from '../lib/js/PanelContainer.js';
+import { DockGraphSerializer } from '../lib/js/DockGraphSerializer.js';
+import { Dialog } from '../lib/js/Dialog.js';
+
+for (const disableResize of [true, false, undefined]) {
+    test(`dialog resize behavior survives JSON round trip (disableResize: ${disableResize})`, async t => {
+        class Element {
+            parentNode = null;
+            style = {};
+            classList = { add() {} };
+            children = [];
+            clientWidth = 300;
+            clientHeight = 200;
+            offsetLeft = 0;
+            offsetTop = 0;
+            appendChild(child) { this.children.push(child); child.parentNode = this; }
+            removeChild(child) {
+                this.children.splice(this.children.indexOf(child), 1);
+                child.parentNode = null;
+            }
+            addEventListener() {}
+            getBoundingClientRect() { return { left: 0, top: 0 }; }
+        }
+        const previousDocument = globalThis.document;
+        globalThis.document = {
+            createElement: () => new Element(),
+            body: { clientWidth: 1200, clientHeight: 800 },
+            dispatchEvent() {}
+        };
+        t.after(() => { globalThis.document = previousDocument; });
+        const manager = {
+            config: { dialogRootElement: new Element() },
+            context: { model: { dialogs: [] } }, defaultDialogPosition: { x: 0, y: 0 },
+            zIndexDialogCounter: 1, notifyOnCreateDialog() {}, notifyOnChangeDialogPosition() {}
+        };
+        const createPanel = () => {
+            const elementPanel = new Element();
+            return {
+                containerType: 'panel', dockManager: manager,
+                elementPanel, containerElement: elementPanel,
+                elementTitle: new Element(), elementContentContainer: new Element(),
+                prepareForDocking() {}, setDialogPosition() {},
+                resize: async () => {},
+                saveState(state) { Object.assign(state, { element: 'visualizer', width: 300, height: 200 }); }
+            };
+        };
+        const original = new Dialog(createPanel(), manager, undefined, disableResize);
+        original.setPosition(100, 150);
+        const serializer = new DockGraphSerializer();
+        const saved = JSON.parse(JSON.stringify(serializer._buildDialogsInfo([original])));
+        assert.equal(saved[0].disableResize, disableResize);
+        if (disableResize === undefined)
+            assert.equal(Object.hasOwn(saved[0], 'disableResize'), false, 'legacy layouts omit the flag');
+        t.mock.method(PanelContainer, 'loadFromState', async () => createPanel());
+        const [restored] = await new DockGraphDeserializer(manager)._buildDialogs(saved);
+        assert.equal(restored.disableResize, disableResize);
+        assert.equal(restored.resizable.resizeHandles.length, disableResize ? 0 : 7);
+        assert.equal(restored.resizable.resizeHandles.length, original.resizable.resizeHandles.length);
+        assert.deepEqual({ ...restored.getPosition() }, { x: 100, y: 150 });
+        const savedAgain = JSON.parse(JSON.stringify(serializer._buildDialogsInfo([restored])));
+        assert.deepEqual(savedAgain, saved);
+    });
+}
 
 test('missing docked content is skipped when its DOM element no longer exists', async (t) => {
     const previousDocument = globalThis.document;

@@ -51,7 +51,8 @@ export class DockGraphSerializer {
             containerType: panelContainer.containerType,
             state: panelState,
             position: dialog.getPosition(),
-            isHidden: dialog.isHidden
+            isHidden: dialog.isHidden,
+            disableResize: dialog.disableResize
         }
             dialogsInfo.push(panelInfo);
         });

@@ -7,4 +7,6 @@ export interface IPanelInfo {
     state: IState;
     position: Point;
     isHidden: boolean;
+    /** Omitted in older layouts, where dialogs are resizable by default. */
+    disableResize?: boolean;
 }
