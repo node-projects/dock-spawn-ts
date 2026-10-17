@@ -268,7 +268,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     removeListener(listener) {
-        this.eventListeners.splice(this.eventListeners.indexOf(listener), 1);
+        Utils.arrayRemove(this.eventListeners, listener);
     }
 
     get floatingDialog(): Dialog {

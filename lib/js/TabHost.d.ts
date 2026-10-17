@@ -24,6 +24,7 @@ export declare class TabHost {
     pages: TabPage[];
     activeTab: TabPage;
     _resizeRequested: boolean;
+    private tabListWidth;
     mouseDownHandler: EventHandler;
     focusHandler: EventHandler;
     constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean);

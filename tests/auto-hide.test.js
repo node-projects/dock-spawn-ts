@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import { AutoHideManager } from '../lib/js/AutoHideManager.js';
 import { DockNode } from '../lib/js/DockNode.js';
 import { DockModel } from '../lib/js/DockModel.js';
@@ -62,6 +64,36 @@ function setup(t, side) {
     manager.autoHideManager = new AutoHideManager(manager);
     return { manager, panel, root, tool, documentNode, contentRoot, listeners, getDocked: () => docked };
 }
+
+test('IDE demo persists the completed auto-hide transition after its intermediate undock event', t => {
+    const { manager, panel } = setup(t, 'right');
+    const demo = readFileSync(new URL('../page/demo/ide/demo.js', import.meta.url), 'utf8');
+    const listenerStart = demo.indexOf('dockManager.addLayoutListener(') + 'dockManager.addLayoutListener('.length;
+    const listenerEnd = demo.indexOf('\n    });', listenerStart);
+    const saved = new Map();
+    // Exercise the demo's actual listener registration so a missing save handler
+    // cannot pass by testing the library's serializer alone.
+    const listener = runInNewContext('(' + demo.slice(listenerStart, listenerEnd + 6) + ')', {
+        localStorage: { setItem(key, value) { saved.set(key, value); } },
+        storeKey: 'lastState', logOutput() {}, updateState() {}
+    });
+    manager.layoutEventListeners = [listener];
+    manager.saveState = () => JSON.stringify(manager.context.model.autoHidePanels.map(entry => ({
+        element: entry.panel.elementContent.id, side: entry.side, width: entry.width, height: entry.height
+    })));
+    const undock = manager.layoutEngine.undock;
+    manager.layoutEngine.undock = node => {
+        undock(node);
+        listener.onUndock(manager, node);
+        assert.deepEqual(JSON.parse(saved.get('lastState')), [], 'intermediate undock has no auto-hide entry yet');
+    };
+    manager.autoHideManager.setAutoHide(panel, true);
+    assert.deepEqual(JSON.parse(saved.get('lastState')), [
+        { element: 'right', side: 'right', width: 200, height: 180 }
+    ]);
+    manager.autoHideManager.setAutoHide(panel, false);
+    assert.deepEqual(JSON.parse(saved.get('lastState')), [], 'pinning saves the removal of the edge entry');
+});
 
 for (const side of ['left', 'right', 'top', 'bottom']) {
     test(`auto-hide ${side}: resize inward edge on its axis, retain size and clean up dragging`, t => {

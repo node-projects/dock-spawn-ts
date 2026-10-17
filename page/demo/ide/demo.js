@@ -87,6 +87,11 @@ window.onload = async () => {
             localStorage.setItem(storeKey, dockManager.saveState());
             updateState();
         },
+        onAutoHideChanged: (dockManager, panel) => {
+            logOutput('onAutoHideChanged(panel:' + panel.title + ')');
+            localStorage.setItem(storeKey, dockManager.saveState());
+            updateState();
+        },
         onCreateDialog: (dockManager, dialog) => {
             logOutput('onCreateDialog(dialog:' + dialog.panel.title + ')');
             localStorage.setItem(storeKey, dockManager.saveState());
@@ -135,9 +140,14 @@ window.onload = async () => {
     const restoredPanels = dockManager.getPanels();
     const restoredPanel = (id) => restoredPanels.find(panel => panel.elementContent.id === id);
     solution = restoredPanel("solution_window") ?? new PanelContainer(document.getElementById("solution_window"), dockManager);
-    infovisContainer = restoredPanel("infovis") ?? new PanelContainer(document.getElementById("infovis"), dockManager); // invisible Dialog has no size, so size it manually
-    infovisContainer.width = 600;
-    infovisContainer.height = 400;
+    infovisContainer = restoredPanel("infovis");
+    if (!infovisContainer) {
+        infovisContainer = new PanelContainer(document.getElementById("infovis"), dockManager);
+        // A new invisible dialog needs an initial size. Restored panels already
+        // have saved dimensions, including when docked beside the documents.
+        infovisContainer.width = 600;
+        infovisContainer.height = 400;
+    }
 
     let properties = restoredPanel("properties_window");
     if (!lastState) {

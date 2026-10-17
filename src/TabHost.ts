@@ -25,6 +25,7 @@ export class TabHost {
     pages: TabPage[];
     activeTab: TabPage;
     _resizeRequested: boolean;
+    private tabListWidth: number;
     mouseDownHandler: EventHandler;
     focusHandler: EventHandler;
 
@@ -131,7 +132,7 @@ export class TabHost {
     }
 
     removeListener(listener) {
-        this.eventListeners.splice(this.eventListeners.indexOf(listener), 1);
+        Utils.arrayRemove(this.eventListeners, listener);
     }
 
     change(host: TabHost, handle: TabHandle, state, index) {
@@ -164,8 +165,9 @@ export class TabHost {
         this.hostElement.style.height = height + 'px';
 
         let tabHeight = this.tabListElement.clientHeight;
+        this.tabListWidth = width;
         if (!this._resizeRequested)
-            requestAnimationFrame(() => this.resizeTabListElement(width, height));
+            requestAnimationFrame(() => this.resizeTabListElement(this.tabListWidth));
         this._resizeRequested = true;
         let separatorHeight = this.separatorElement.clientHeight;
         let contentHeight = height - tabHeight - separatorHeight;
@@ -178,36 +180,32 @@ export class TabHost {
     resizeTabListElement(width: number, height?: number) {
         this._resizeRequested = false;
         if (this.pages.length === 0) return;
-        let tabListWidth = 0;
-        this.pages.forEach((page) => {
-            let handle = page.handle;
-            if (handle.elementBase != null){
-                handle.elementBase.style.width = ''; //clear
-                tabListWidth += handle.elementBase.clientWidth;
-            }
-        });
+        const handles = this.pages.map(page => page.handle.elementBase).filter(element => element != null);
+        handles.forEach(element => { element.style.width = ''; });
+        // Batch layout reads before assigning any widths to avoid a reflow per tab.
+        const widths = handles.map(element => element.clientWidth);
+        const tabListWidth = widths.reduce((total, size) => total + size, 0);
+        if (tabListWidth === 0) return;
         let scaleMultiplier = width / tabListWidth;
         if (scaleMultiplier > 1.2) return; //with a reserve
-        this.pages.forEach((page, index) => {
-            let handle = page.handle;
-            let newSize = scaleMultiplier * handle.elementBase.clientWidth;
-            if (index === this.pages.length - 1)
+        handles.forEach((element, index) => {
+            let newSize = scaleMultiplier * widths[index];
+            if (index === handles.length - 1)
                 newSize = newSize - 5;
-            handle.elementBase.style.width = newSize + 'px';
+            element.style.width = Math.max(0, newSize) + 'px';
         });
     }
 
     performLayout(children: IDockContainer[]) {
         // Destroy all existing tab pages not in children
-        this.pages.forEach((tab) => {
-            if (!children.some((x) => x == tab.container)) {
+        const childSet = new Set(children);
+        this.pages = this.pages.filter((tab) => {
+            if (!childSet.has(tab.container)) {
                 tab.handle.removeListener(this.tabHandleListener);
                 tab.destroy();
-                let index = this.pages.indexOf(tab);
-                if (index > -1) {
-                    this.pages.splice(index, 1);
-                }
+                return false;
             }
+            return true;
         });
 
         let oldActiveTab = this.activeTab;
