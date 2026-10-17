@@ -56,6 +56,13 @@
 }
 .dock-auto-hide-tab[aria-expanded="true"] { background: #cce4ff; }
 .dock-auto-hide-overlay { box-shadow: 0 2px 8px #0005; }
+.dock-auto-hide-resize-handle {
+    position: absolute;
+    z-index: 9002;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+}
 
 .panel-base {
 	pointer-events: none;
