@@ -270,7 +270,7 @@ export class DockManager {
     _onDialogDragStarted(sender: Dialog, e) {
         this.dockWheel.activeNode = this._findNodeOnPoint(e.clientX, e.clientY);
         this.dockWheel.activeDialog = sender;
-        if (sender.noDocking == null || sender.noDocking !== true)
+        if (this._undockEnabled && (sender.noDocking == null || sender.noDocking !== true))
             this.dockWheel.showWheel();
         if (this.mouseMoveHandler) {
             this.mouseMoveHandler.cancel();
@@ -293,7 +293,16 @@ export class DockManager {
             this.touchMoveHandler.cancel();
             delete this.touchMoveHandler;
         }
-        this.dockWheel.onDialogDropped(sender);
+        const point = e.changedTouches?.[0] ?? e;
+        const target = this.findFloatingGroupTarget(sender, point.clientX, point.clientY);
+        this.showFloatingGroupTarget(undefined);
+        if (target) {
+            this.dockWheel.hideWheel();
+            delete this.dockWheel.activeDialog;
+            this.mergeDialogs(sender, target);
+            return;
+        }
+        if (this._undockEnabled) this.dockWheel.onDialogDropped(sender);
         this.dockWheel.hideWheel();
         delete this.dockWheel.activeDialog;
         //TODO: not so good
@@ -304,7 +313,82 @@ export class DockManager {
         if (e.changedTouches != null) { // TouchMove Event
             e = e.changedTouches[0];
         }
-        this.dockWheel.activeNode = this._findNodeOnPoint(e.clientX, e.clientY);
+        const target = this.findFloatingGroupTarget(this.dockWheel.activeDialog, e.clientX, e.clientY);
+        this.showFloatingGroupTarget(target);
+        if (target) this.dockWheel.hideWheel();
+        else {
+            const dialog = this.dockWheel.activeDialog;
+            if (dialog && this._undockEnabled && !dialog.noDocking) this.dockWheel.showWheel();
+            this.dockWheel.activeNode = this._findNodeOnPoint(e.clientX, e.clientY);
+        }
+    }
+
+    private floatingGroupTarget?: Dialog;
+
+    private showFloatingGroupTarget(target?: Dialog) {
+        if (target === this.floatingGroupTarget) return;
+        const mark = (dialog: Dialog, enabled: boolean) => {
+            dialog.elementDialog.classList.toggle('dock-tab-group-drop-target', enabled);
+            dialog.panels.forEach(panel => panel.elementContentContainer.classList.toggle('dock-tab-group-drop-target', enabled));
+        };
+        if (this.floatingGroupTarget) mark(this.floatingGroupTarget, false);
+        this.floatingGroupTarget = target;
+        if (target) mark(target, true);
+    }
+
+    private findFloatingGroupTarget(source: Dialog, x: number, y: number): Dialog | undefined {
+        if (!source || !this.config.enableTabGroups || !this._undockEnabled || source.noDocking || source.grayoutParent
+            || source.panels.some(panel => !panel._canUndock)) return undefined;
+        return [...this.context.model.dialogs].filter(dialog => {
+            if (dialog === source || dialog.isHidden || dialog.noDocking || dialog.grayoutParent
+                || dialog.panels.some(panel => !panel._canUndock)) return false;
+            const rect = dialog.elementDialog.getBoundingClientRect();
+            return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+        }).sort((a, b) => Number(b.elementDialog.style.zIndex) - Number(a.elementDialog.style.zIndex))[0];
+    }
+
+    /** Merge two floating windows, preserving target order and the dragged active tab. */
+    mergeDialogs(source: Dialog, target: Dialog): Dialog {
+        if (!this.config.enableTabGroups || !this._undockEnabled || source === target
+            || source.dockManager !== this || target.dockManager !== this
+            || source.noDocking || target.noDocking || source.grayoutParent || target.grayoutParent
+            || source.isHidden || target.isHidden
+            || [...source.panels, ...target.panels].some(panel => !panel._canUndock)) return null;
+        const rect = target.elementDialog.getBoundingClientRect();
+        const panels = [...target.panels, ...source.panels];
+        const active = source.tabHost?.activeTab?.panel ?? source.panel;
+        source.destroy();
+        target.destroy();
+        const group = new Dialog(active, this, undefined, target.disableResize, panels);
+        group.resize(rect.width, rect.height);
+        group.setPosition(rect.left, rect.top);
+        return group;
+    }
+
+    /** Disable grouping at runtime, splitting floating groups into individual windows. */
+    setTabGroupsEnabled(enabled: boolean) {
+        this.config.enableTabGroups = enabled;
+        if (enabled) return;
+        this.showFloatingGroupTarget(undefined);
+        const clear = (node: DockNode) => {
+            if (node.container instanceof FillDockContainer) node.container.tabHost.clearDragSelection();
+            node.children.forEach(clear);
+        };
+        clear(this.context.model.rootNode);
+        for (const dialog of [...this.context.model.dialogs]) {
+            if (!dialog.tabHost) continue;
+            const rect = dialog.elementDialog.getBoundingClientRect();
+            const panels = [...dialog.panels];
+            dialog.destroy();
+            panels.forEach((panel, index) => {
+                panel.elementPanel.style.display = 'block';
+                panel.elementContentWrapper.style.display = 'block';
+                const single = new Dialog(panel, this, undefined, dialog.disableResize);
+                single.resize(rect.width, rect.height);
+                single.setPosition(rect.left + index * 24, rect.top + index * 24);
+                if (dialog.isHidden) single.hide();
+            });
+        }
     }
 
     /**
@@ -394,7 +478,7 @@ export class DockManager {
 
         //check the dialog do not already exist
         this.context.model.dialogs.forEach((dialog) => {
-            if (container == dialog.panel) {
+            if (dialog.panels.includes(container)) {
                 dialog.show();
                 dialog.setPosition(x, y);
                 retdiag = dialog;
@@ -410,6 +494,8 @@ export class DockManager {
 
         let panel = container;
         Utils.removeNode(panel.elementPanel);
+        panel.elementPanel.style.display = 'block';
+        panel.elementContentWrapper.style.display = 'block';
         panel.isDialog = true;
         let dialog = new Dialog(panel, this, grayoutParent, disableResize);
         dialog.setPosition(x, y);
@@ -417,6 +503,27 @@ export class DockManager {
     }
 
     private _requestDockDialog(referenceNode: DockNode, dialog: Dialog, layoutDockFunction: (referenceNode: DockNode, newNode: DockNode) => void) {
+        if (dialog.tabHost) {
+            const panels = [...dialog.panels];
+            const active = dialog.tabHost.activeTab?.panel ?? panels[0];
+            dialog.destroy();
+            panels.forEach(panel => {
+                panel.prepareForDocking();
+                panel.elementContentContainer.style.zIndex = '';
+            });
+            const first = new DockNode(panels[0]);
+            layoutDockFunction(referenceNode, first);
+            let previous = first;
+            for (const panel of panels.slice(1)) {
+                const node = new DockNode(panel);
+                this.layoutEngine.dockFill(previous, node);
+                previous = node;
+                this.autoHideManager?.onDock(node);
+            }
+            first.parent?.container.setActiveChild(active);
+            this.autoHideManager?.onDock(first);
+            return first;
+        }
         // Get the active dialog that was dragged on to the dock wheel
         let panel = dialog.panel;
         let newNode = new DockNode(panel);
@@ -492,11 +599,37 @@ export class DockManager {
         this.layoutEngine.reorderTabs(node, e.handle, e.state, e.index);
     }
 
+    /** Float tabs from one host together, preserving their order and active member. */
+    requestUndockGroup(panels: PanelContainer[], event?, dragOffset = new Point(0, 0), activePanel = panels[0]): Dialog {
+        if (!this.config.enableTabGroups || !panels.length || !this._undockEnabled || panels.some(panel => !panel?._canUndock)) return null;
+        const host = panels[0].tabPage?.host;
+        if (!host || new Set(panels).size !== panels.length || panels.some(panel => panel.tabPage?.host !== host)) return null;
+        panels = host.pages.filter(page => panels.includes(page.panel)).map(page => page.panel);
+        if (!panels.includes(activePanel)) activePanel = panels[0];
+        const width = host.hostElement.clientWidth;
+        const height = host.hostElement.clientHeight;
+        for (const panel of panels) {
+            if (panel.floatingDialog?.tabHost) panel.floatingDialog.removePanel(panel);
+            else this.layoutEngine.undock(this._findNodeFromContainer(panel));
+        }
+        const dialog = new Dialog(activePanel, this, undefined, false, panels);
+        dialog.resize(width, height);
+        if (event) {
+            dialog.setPosition(event.clientX - Math.min(dragOffset.x, width * 0.75), event.clientY - dragOffset.y);
+            dialog.draggable.onMouseDown(event);
+        }
+        return dialog;
+    }
+
     /**
      * Undocks a panel and converts it into a floating dialog window
      * It is assumed that only leaf nodes (panels) can be undocked
      */
     requestUndockToDialog(container: PanelContainer, event, dragOffset: Point) {
+        if (container.floatingDialog?.tabHost) {
+            container.floatingDialog.removePanel(container);
+            return this.openInDialog(container, event, dragOffset);
+        }
         const autoHideEntry = this.autoHideManager?.isAutoHidden(container)
             ? this.autoHideManager.remove(container) : undefined;
         if (autoHideEntry) {
@@ -815,6 +948,8 @@ export class DockManager {
 
     async loadState(json: string) {
         let deserializer = new DockGraphDeserializer(this);
+        // Release floating tab hosts before reusing their content elements in the restored layout.
+        for (const dialog of [...this.context.model.dialogs]) dialog.destroy();
         const model = await deserializer.deserialize(json);
         this.autoHideManager?.reset();
         Utils.removeNode(this.context.model.rootNode.container.containerElement);
@@ -831,7 +966,7 @@ export class DockManager {
         panels.push(...this.context.model.autoHidePanels.map(entry => entry.panel));
         this.context.model.dialogs.forEach((dialog) => {
             //TODO: check visible
-            panels.push(dialog.panel);
+            panels.push(...dialog.panels);
         });
 
         return panels;
@@ -877,7 +1012,7 @@ export class DockManager {
         });
 
         this.context.model.dialogs.forEach((dialog) => {
-            if (Utils.arrayContains(ids, dialog.panel.elementContent.id)) {
+            if (dialog.panels.some(panel => Utils.arrayContains(ids, panel.elementContent.id))) {
                 dialog.show();
             }
             else {
@@ -897,7 +1032,7 @@ export class DockManager {
         //all visible
         this.context.model.dialogs.forEach((dialog) => {
             if (!dialog.isHidden) {
-                panels.push(dialog.panel);
+                panels.push(...dialog.panels);
             }
         });
 

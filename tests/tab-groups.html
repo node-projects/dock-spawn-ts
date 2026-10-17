@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Tab groups — issue #72</title>
+<link rel="stylesheet" href="../lib/css/dock-manager.css">
+<link rel="stylesheet" href="../lib/css/dock-manager-style.css">
+<style>
+    body { position: relative; font: 14px system-ui, sans-serif; margin: 16px; }
+    #dock { position: relative; width: calc(100vw - 32px); height: 65vh; }
+    button { margin-right: 8px; padding: 6px 12px; }
+    #results { white-space: pre-wrap; max-height: 160px; overflow: auto; }
+    .sample { padding: 20px; box-sizing: border-box; background: #f4f7fb; }
+</style>
+<h1>Move groups of tabs — issue #72</h1>
+<p>Ctrl/Cmd-click tabs, then drag a selected tab up or down to float the selection.
+    Drag empty space after the tabs to float the whole group. Drag a floating group's title bar
+    onto a docking arrow to dock it. Individual tabs can be pulled out again.</p>
+<button id="reset">Reset demo</button><button id="save">Save layout</button><button id="restore">Restore layout</button>
+<button id="lock">Lock/unlock docking</button><button id="run">Run regression tests</button>
+<pre id="results">Ready for manual testing.</pre>
+<div id="dock"></div>
+<script type="module">
+    import { DockManager, PanelContainer, PanelType, Point } from '../lib/js/index.js';
+    const host = document.getElementById('dock');
+    const results = document.getElementById('results');
+    let manager, saved, locked = false, disconnects = 0;
+    customElements.define('group-content', class extends HTMLElement {
+        disconnectedCallback() { disconnects++; }
+    });
+    const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const assert = (condition, message) => { if (!condition) throw Error(message); };
+    const log = message => { results.textContent += message + '\n'; };
+    function panel(id, type = PanelType.document) {
+        const content = document.createElement('group-content');
+        content.id = id;
+        content.className = 'sample';
+        content.dataset.panelCaption = id;
+        content.innerHTML = `<h2>${id}</h2><label>State stays with this tab: <input value="Edit me"></label>`;
+        return new PanelContainer(content, manager, id, type);
+    }
+    async function reset() {
+        // Dispose the previous fixture, including handlers and floating windows.
+        if (manager) {
+            const oldPanels = manager.getPanels();
+            for (const dialog of [...manager.context.model.dialogs]) dialog.destroy();
+            for (const p of oldPanels) p.elementContentContainer.remove();
+            host.replaceChildren();
+        }
+        manager = new DockManager(host, { enableAutoHide: true, enableTabGroups: true });
+        manager.initialize();
+        const root = manager.context.model.documentManagerNode;
+        for (const id of ['Editor A', 'Editor B', 'Editor C', 'Editor D']) manager.dockFill(root, panel(id));
+        const tools = manager.dockLeft(root, panel('Explorer', PanelType.panel), 0.25);
+        manager.dockFill(tools, panel('Properties', PanelType.panel));
+        manager.dockFill(manager.getNodeByElement(document.getElementById('Properties')), panel('Search', PanelType.panel));
+        await manager.resize(host.clientWidth, host.clientHeight);
+        results.textContent = 'Ready for manual testing.\n';
+        locked = false;
+    }
+    document.getElementById('reset').onclick = reset;
+    document.getElementById('save').onclick = () => { saved = manager.saveState(); log('Layout saved.'); };
+    document.getElementById('restore').onclick = async () => { if (saved) { await manager.loadState(saved); await manager.resize(host.clientWidth, host.clientHeight); log('Layout restored.'); } };
+    document.getElementById('lock').onclick = () => { locked = !locked; manager.lockDockState(locked); log(locked ? 'Docking locked.' : 'Docking unlocked.'); };
+    window.addEventListener('resize', () => manager.resize(host.clientWidth, host.clientHeight));
+    document.getElementById('run').onclick = async event => {
+        event.target.disabled = true;
+        try {
+            await reset();
+            results.textContent = '';
+            const docs = manager.context.model.documentManagerNode;
+            let [a, b, c, d] = docs.children.map(node => node.container);
+            const input = b.elementContent.querySelector('input');
+            input.value = 'preserved';
+            const before = disconnects;
+            const select = (p, ctrlKey = false) => {
+                p.tabPage.handle.elementBase.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, buttons: 1, ctrlKey }));
+                window.dispatchEvent(new MouseEvent('mouseup'));
+            };
+            select(a); select(b, true); select(c, true);
+            assert(a.tabPage.host.getDragPanels(b.tabPage).length === 3, 'Ctrl-click selects three tabs');
+            log('PASS Ctrl-click selection');
+            let group = manager.requestUndockGroup([a, b, c], undefined, new Point(0, 0), b);
+            group.setPosition(300, 220);
+            await group.resize(440, 280);
+            await settle();
+            assert(group.panels.map(p => p.title).join() === 'Editor A,Editor B,Editor C', 'Floating order');
+            assert(group.tabHost.activeTab.panel === b, 'Active member preserved');
+            assert(manager.getPanels().includes(c), 'Every floating member stays managed');
+            assert(b.elementContent.querySelector('input') === input && input.value === 'preserved' && disconnects === before, 'Content preserved');
+            let content = b.elementContentContainer.getBoundingClientRect();
+            let slot = group.tabHost.contentElement.getBoundingClientRect();
+            assert(Math.abs(content.left - slot.left) < 2 && Math.abs(content.top - slot.top) < 2, 'Content aligned');
+            log('PASS floating group, active tab, content alignment and DOM preservation');
+            group.hide();
+            assert(group.panels.every(p => p.elementContentContainer.style.display === 'none'), 'Hide all members');
+            group.show();
+            assert(b.elementContentContainer.style.display !== 'none' && a.elementContentContainer.style.display === 'none', 'Show only active member');
+            group.setPosition(350, 250);
+            content = b.elementContentContainer.getBoundingClientRect();
+            slot = group.tabHost.contentElement.getBoundingClientRect();
+            assert(Math.abs(content.left - slot.left) < 2 && Math.abs(content.top - slot.top) < 2, 'Moved content aligned');
+            log('PASS move, hide and show');
+            const json = manager.saveState();
+            manager.dockDialogRight(docs, group);
+            assert(a.tabPage.host === b.tabPage.host && b.tabPage.host === c.tabPage.host, 'Redock as one group');
+            assert(a.tabPage.host.pages.map(p => p.panel.title).join() === 'Editor A,Editor B,Editor C', 'Redock order');
+            log('PASS side docking preserves group order');
+            await manager.loadState(json);
+            await manager.resize(host.clientWidth, host.clientHeight);
+            group = manager.context.model.dialogs[0];
+            [a, b, c] = group.panels;
+            assert(group.panels.length === 3 && group.tabHost.activeTab.panel === b, 'Restore group and active tab');
+            assert(group.elementDialog.clientWidth === 440, 'Restore group width');
+            log('PASS layout round trip');
+            b.closePanelContainerCallback = async () => false;
+            await b.close(); await settle();
+            assert(group.panels.includes(b), 'Close veto respected');
+            b.closePanelContainerCallback = async () => true;
+            await b.close(); await settle();
+            assert(group.panels.length === 2 && !manager.getPanels().includes(b), 'Close only selected tab');
+            log('PASS individual close and asynchronous veto');
+            const single = manager.requestUndockToDialog(c, undefined, new Point(0, 0));
+            assert(group.panels.length === 1 && single.panel === c, 'Extract individual tab');
+            manager.dockDialogFill(manager.context.model.documentManagerNode, single);
+            manager.dockDialogFill(manager.context.model.documentManagerNode, group);
+            assert(manager.context.model.dialogs.length === 0, 'All floating windows cleaned up');
+            log('PASS extraction and center docking');
+            const remaining = manager.context.model.documentManagerNode.children.map(node => node.container);
+            manager.lockDockState(true);
+            assert(manager.requestUndockGroup(remaining) === null, 'Dock lock blocks group move');
+            manager.lockDockState(false);
+            log('PASS dock lock');
+            await reset();
+            const tools = manager.getPanels().filter(p => p.panelType === PanelType.panel);
+            const strip = tools[0].tabPage.host.tabListElement;
+            const bounds = strip.getBoundingClientRect();
+            strip.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, buttons: 1, clientX: bounds.right - 4, clientY: bounds.top + 5 }));
+            window.dispatchEvent(new MouseEvent('mousemove', { buttons: 1, clientX: bounds.right - 4, clientY: bounds.top - 35 }));
+            window.dispatchEvent(new PointerEvent('pointerup'));
+            await settle();
+            group = manager.context.model.dialogs[0];
+            assert(group?.panels.length === 3 && group.panels.every(p => tools.includes(p)), 'Blank strip gesture moves tools together');
+            const dialogCount = document.querySelectorAll('.dialog-floating').length;
+            saved = manager.saveState();
+            await manager.loadState(saved);
+            assert(document.querySelectorAll('.dialog-floating').length === dialogCount, 'Restore disposes previous floating group');
+            log('PASS blank strip drag gesture and replacing floating layout');
+            manager.dockDialogFill(manager.context.model.documentManagerNode, manager.context.model.dialogs[0]);
+            await settle();
+            const all = manager.context.model.documentManagerNode.children.map(node => node.container);
+            select(all[0]); select(all[1], true);
+            const handle = all[0].tabPage.handle.elementBase;
+            const hb = handle.getBoundingClientRect();
+            handle.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, buttons: 1, clientX: hb.left + 10, clientY: hb.top + 5 }));
+            window.dispatchEvent(new MouseEvent('mousemove', { buttons: 1, clientX: hb.left + 10, clientY: hb.top + 40 }));
+            window.dispatchEvent(new PointerEvent('pointerup'));
+            await settle();
+            assert(manager.context.model.dialogs[0]?.panels.length === 2, 'Selected tab gesture floats two members');
+            log('PASS selected tab drag gesture');
+            let dragged = manager.context.model.dialogs[0];
+            const targetPanel = all[2];
+            let target = manager.floatDialog(targetPanel, 100, 180);
+            await target.resize(320, 240);
+            await settle();
+            const targetBounds = target.elementDialog.getBoundingClientRect();
+            const drop = { clientX: targetBounds.left + 100, clientY: targetBounds.top + 100, buttons: 1 };
+            dragged.draggable.onMouseDown(new MouseEvent('mousedown', { clientX: 500, clientY: 150, buttons: 1 }));
+            window.dispatchEvent(new MouseEvent('mousemove', drop));
+            assert(target.elementDialog.classList.contains('dock-tab-group-drop-target'), 'Hover highlights target');
+            window.dispatchEvent(new PointerEvent('pointerup', drop));
+            await settle();
+            group = manager.context.model.dialogs[0];
+            assert(manager.context.model.dialogs.length === 1 && group.panels.length === 3, 'Drop merges windows');
+            assert(group.panels[0] === targetPanel, 'Target tab comes first');
+            assert(!group.elementDialog.classList.contains('dock-tab-group-drop-target'), 'Drop highlight cleared');
+            log('PASS floating window drop target and group merge');
+            manager.config.persistTabGroups = false;
+            const transient = JSON.parse(manager.saveState());
+            assert(transient.dialogsInfo.length === 3 && transient.dialogsInfo.every(info => !info.panels), 'Non-persistent save flattens members');
+            manager.config.persistTabGroups = true;
+            const persistent = manager.saveState();
+            manager.setTabGroupsEnabled(false);
+            await settle();
+            assert(manager.context.model.dialogs.length === 3 && manager.context.model.dialogs.every(dialog => !dialog.tabHost), 'Disabling splits groups');
+            assert(manager.context.model.dialogs.every(dialog => dialog.panel.elementContentWrapper.getBoundingClientRect().width > 0), 'Every split window has visible content');
+            assert(manager.requestUndockGroup(all.slice(0, 2)) === null, 'Disabled feature rejects creation');
+            await manager.loadState(persistent);
+            assert(manager.context.model.dialogs.length === 3 && manager.context.model.dialogs.every(dialog => !dialog.tabHost), 'Disabled feature flattens stored groups');
+            manager.setTabGroupsEnabled(true);
+            manager.config.persistTabGroups = false;
+            await manager.loadState(persistent);
+            assert(manager.context.model.dialogs.length === 3 && manager.context.model.dialogs.every(dialog => !dialog.tabHost), 'Persistence off flattens stored groups');
+            manager.config.persistTabGroups = true;
+            await manager.loadState(persistent);
+            assert(manager.context.model.dialogs.length === 1 && manager.context.model.dialogs[0].panels.length === 3, 'Enabled persistence restores group');
+            log('PASS feature toggle, persistence toggle and lossless restoration');
+            const report = results.textContent;
+            await reset();
+            results.textContent = report;
+            log('ALL TESTS PASSED — demo reset for manual testing.');
+        } catch (error) {
+            log('FAIL ' + error.stack);
+        } finally { event.target.disabled = false; }
+    };
+    window.addEventListener('error', event => log('ERROR ' + event.message));
+    window.addEventListener('unhandledrejection', event => log('ERROR ' + event.reason?.stack));
+    await reset();
+</script>
+</html>

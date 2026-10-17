@@ -431,6 +431,17 @@
 	color: black;
 }
 
+.dockspan-tab-handle-marked {
+    box-shadow: inset 0 -3px 0 #4b9fea;
+    outline: 1px solid #4b9fea;
+    outline-offset: -1px;
+}
+
+.dock-tab-group-drop-target {
+    outline: 3px solid #4b9fea;
+    outline-offset: -3px;
+}
+
 .dockspan-tab-handle-list-container {
 	height: 22px;
 	overflow: hidden;

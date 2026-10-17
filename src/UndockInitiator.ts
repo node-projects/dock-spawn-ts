@@ -22,6 +22,7 @@ export class UndockInitiator {
     element: HTMLElement;
     _undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog;
     touchDownUndockedHandler: EventHandler;
+    canStart?: (event: MouseEvent | TouchEvent) => boolean;
 
     constructor(element: Element, undockededCallback: (e: MouseEvent, dragOffset: Point) => Dialog, thresholdPixels?: number) {
         if (!thresholdPixels) {
@@ -86,6 +87,9 @@ export class UndockInitiator {
     }
 
     onMouseDown(e) {
+        if (this.canStart && !this.canStart(e)) return;
+        if (e.button !== undefined && e.button !== 0) return;
+        if ((e.target as Element)?.closest?.('.dockspan-tab-handle-close-button, .panel-titlebar-button-close')) return;
         e.preventDefault();
 
         // Make sure we dont do this on floating dialogs

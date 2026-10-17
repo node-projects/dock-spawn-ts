@@ -21,6 +21,17 @@ body {
   height: 47px;
 }
 
+.group-controls {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
 .demo-header-title {
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: 16px;

@@ -6,6 +6,7 @@ import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { DockManager } from "./DockManager.js";
 import { PanelContainer } from "./PanelContainer.js";
 import { EventHandler } from './EventHandler.js';
+import { UndockInitiator } from './UndockInitiator.js';
 
 /**
  * Tab Host control contains tabs known as TabPages.
@@ -29,6 +30,8 @@ export class TabHost {
     private tabListWidth: number;
     mouseDownHandler: EventHandler;
     focusHandler: EventHandler;
+    private markedTabs = new Set<TabPage>();
+    groupUndockInitiator: UndockInitiator;
 
     constructor(dockManager: DockManager, tabStripDirection: TabHostDirection, displayCloseButton?: boolean) {
         /**
@@ -77,6 +80,16 @@ export class TabHost {
         this.contentElement.tabIndex = 0;
         this.focusHandler = new EventHandler(this.contentElement, 'focus', this.onFocus.bind(this), true);
         this.mouseDownHandler = new EventHandler(this.contentElement, 'mousedown', this.onMousedown.bind(this), true);
+        this.groupUndockInitiator = new UndockInitiator(this.tabListElement, (event, offset) => {
+            const panels = this.pages.map(page => page.panel);
+            this.groupUndockInitiator.enabled = true;
+            return this.dockManager.requestUndockGroup(panels, event, offset, this.activeTab?.panel);
+        });
+        // A handle owns its own drag gesture. Only blank strip space starts a group drag.
+        this.groupUndockInitiator.canStart = event => event.target === this.tabListElement
+            && this.dockManager.config.enableTabGroups && this.dockManager._undockEnabled && this.pages.length > 0
+            && this.pages.every(page => page.panel?._canUndock);
+        this.groupUndockInitiator.enabled = true;
     }
 
     onFocus() {
@@ -213,6 +226,7 @@ export class TabHost {
         const childSet = new Set(children);
         this.pages = this.pages.filter((tab) => {
             if (!childSet.has(tab.container)) {
+                this.markedTabs?.delete(tab);
                 tab.handle.removeListener(this.tabHandleListener);
                 tab.destroy();
                 return false;
@@ -273,5 +287,41 @@ export class TabHost {
             let selected = (tabPage === page);
             tabPage.setSelected(selected, active);
         });
+    }
+
+    selectForDrag(page: TabPage, toggle: boolean) {
+        this.markedTabs ??= new Set();
+        if (!this.dockManager.config.enableTabGroups) {
+            this.clearDragSelection();
+            return;
+        }
+        if (toggle) {
+            if (!this.markedTabs.size && this.activeTab) this.markedTabs.add(this.activeTab);
+            if (this.markedTabs.has(page)) this.markedTabs.delete(page);
+            else this.markedTabs.add(page);
+        } else if (!this.markedTabs.has(page)) {
+            this.markedTabs.clear();
+            this.markedTabs.add(page);
+        }
+        this.pages.forEach(tab => tab.handle.elementBase?.classList.toggle('dockspan-tab-handle-marked', this.markedTabs.has(tab)));
+    }
+
+    getDragPanels(page: TabPage): PanelContainer[] {
+        if (!this.dockManager.config.enableTabGroups) return [page.panel];
+        return this.pages.filter(tab => tab === page || this.markedTabs?.has(tab)).map(tab => tab.panel);
+    }
+
+    clearDragSelection() {
+        this.markedTabs?.clear();
+        this.pages.forEach(tab => tab.handle.elementBase?.classList.remove('dockspan-tab-handle-marked'));
+    }
+
+    destroy() {
+        this.groupUndockInitiator.enabled = false;
+        this.mouseDownHandler.cancel();
+        this.focusHandler.cancel();
+        this.pages.forEach(page => page.destroy());
+        this.pages = [];
+        this.markedTabs?.clear();
     }
 }

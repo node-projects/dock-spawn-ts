@@ -90,6 +90,37 @@ pinning or unpinning. Locking the dock state also disables the pin controls.
 Run `npm test` for the regression suite. For browser lifecycle checks, run
 `npm start`, open `http://127.0.0.1:8080/tests/auto-hide.html`, and click **Run tests**.
 
+Tab group moving is opt-in:
+
+```javascript
+const dockManager = new DockManager(element, {
+    enableTabGroups: true,   // default: false
+    persistTabGroups: true  // default: true
+});
+```
+
+Move a whole tab group by dragging the empty strip space after its tabs up or down.
+To move a subset, Ctrl-click (Cmd-click on macOS) its tabs, then drag one of the
+marked tabs up or down. The tabs float in one resizable window. Drag the floating
+group's title bar onto a docking arrow to dock them together, or drag an individual
+tab out to separate it. Tab order and the active tab are retained, including when
+saving and restoring floating groups. Dock locking and each panel's `canUndock`
+setting also apply to group moves.
+
+Drop a floating window over another floating window to combine their tabs. The
+target is outlined while dragging. Groups can also be merged this way. Modal
+windows, windows with docking disabled and locked panels are excluded.
+`setTabGroupsEnabled(false)` disables the feature at runtime and separates floating
+groups into individual windows. Re-enable it with `setTabGroupsEnabled(true)`.
+Setting `config.persistTabGroups = false` keeps groups during the current session,
+but saves and restores their members as separate floating windows. Loading grouped
+layouts with grouping disabled also restores separate windows without losing tabs.
+Existing docked tab layouts are retained in both cases.
+
+For a focused demo with document and tool groups, open
+`http://127.0.0.1:8080/tests/tab-groups.html` after building and starting the server.
+It includes save/restore controls and a **Run regression tests** button.
+
 When docking beside an existing pane with a ratio, the new pane takes that fraction
 of the reference pane's space after allowing for the new splitter bar. Other panes
 keep their pixel sizes. Closing or undocking a pane gives its freed space to the

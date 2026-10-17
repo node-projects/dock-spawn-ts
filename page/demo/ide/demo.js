@@ -32,10 +32,42 @@ window.onload = async () => {
 
     let divDockContainer = document.getElementById('dock_div');
     let divDockManager = document.getElementById('my_dock_manager');
-    dockManager = new DockManager(divDockManager, { enableAutoHide: true });
+    let groupSettings;
+    try { groupSettings = JSON.parse(localStorage.getItem('tabGroupSettings') ?? '{}'); }
+    catch { groupSettings = {}; }
+    dockManager = new DockManager(divDockManager, { enableAutoHide: true,
+        enableTabGroups: groupSettings.enableTabGroups ?? true,
+        persistTabGroups: groupSettings.persistTabGroups ?? true });
     //@ts-ignore
     window.dockManager = dockManager;
     dockManager.initialize();
+    const enableGroups = document.getElementById('enable_tab_groups');
+    const persistGroups = document.getElementById('persist_tab_groups');
+    enableGroups.checked = dockManager.config.enableTabGroups;
+    persistGroups.checked = dockManager.config.persistTabGroups;
+    const saveGroupSettings = () => {
+        localStorage.setItem('tabGroupSettings', JSON.stringify({
+            enableTabGroups: enableGroups.checked, persistTabGroups: persistGroups.checked
+        }));
+        localStorage.setItem(storeKey, dockManager.saveState());
+        updateState();
+    };
+    enableGroups.onchange = () => {
+        dockManager.setTabGroupsEnabled(enableGroups.checked);
+        saveGroupSettings();
+    };
+    persistGroups.onchange = () => {
+        dockManager.config.persistTabGroups = persistGroups.checked;
+        saveGroupSettings();
+    };
+    document.getElementById('float_documents').onclick = () => {
+        dockManager.getPanels().filter(panel => panel.panelType === PanelType.document && !panel.isDialog)
+            .slice(0, 2).forEach((panel, index) => {
+                const dialog = dockManager.floatDialog(panel, 160 + index * 380, 160 + index * 40);
+                dialog.resize(340, 260);
+            });
+        saveGroupSettings();
+    };
 
     // Dynamic panels must be recreated by the application when restoring a layout.
     dockManager.getElementCallback = async (state) => {
@@ -127,6 +159,9 @@ window.onload = async () => {
             localStorage.setItem(storeKey, dockManager.saveState());
             updateState();
         },
+        onTabChanged: (dockManager) => {
+            localStorage.setItem(storeKey, dockManager.saveState());
+        },
         onActivePanelChange: (dockManger, panel, previousPanel) => {
             logOutput('onActivePanelChange(previousPanel:' + previousPanel?.title + ', panel:' + panel?.title + ')');
             if (panel && panel.panelType == PanelType.document && panel.elementContent.editor) {
@@ -173,7 +208,15 @@ window.onload = async () => {
         dockManager.dockRight(documentNode, toolbox, 0.20);
         dockManager.dockFill(documentNode, editor1);
         dockManager.dockFill(documentNode, editor2);
-        dockManager.floatDialog(infovisContainer, 50, 50, null, true);
+        dockManager.floatDialog(infovisContainer, 50, 110, null, true);
+    }
+
+    // Add the extra documents to fresh layouts and layouts saved before this demo had them.
+    if (!lastState || !/editor[345]_window/.test(lastState)) {
+        for (const id of ['editor3_window', 'editor4_window', 'editor5_window']) {
+            dockManager.dockFill(dockManager.context.model.documentManagerNode,
+                new PanelContainer(document.getElementById(id), dockManager, null, PanelType.document));
+        }
     }
 
     document.getElementById("dlg").onclick = () => {
@@ -230,6 +273,14 @@ window.onload = async () => {
         }
     });
     editor2_window_div.editor = editor2;
+    for (const [id, value] of [
+        ['editor3_window', '#pragma once\n\nclass Engine {\npublic:\n    void update(float delta);\n};\n'],
+        ['editor4_window', '#include "Engine.h"\n\nvoid Engine::update(float delta) {\n    // Update the simulation.\n}\n'],
+        ['editor5_window', '# Dock Spawn demo\n\nCtrl/Cmd-click tabs to select a group.\nDrag the blank tab strip to move all tabs.\nDrop one floating window over another to group them.\n']
+    ]) {
+        const element = document.getElementById(id);
+        element.editor = CodeMirror(element, { lineNumbers: true, value });
+    }
 
     ////////////////////////////////////////////////////////////////
 

@@ -57,10 +57,12 @@ export class DraggableContainer implements IDockContainer {
     }
 
     get width(): number {
+        if (this.dialog?.tabHost) return this.topLevelElement.clientWidth;
         return this.delegate.width;
     }
 
     get height(): number {
+        if (this.dialog?.tabHost) return this.topLevelElement.clientHeight;
         return this.delegate.height;
     }
 
@@ -73,7 +75,7 @@ export class DraggableContainer implements IDockContainer {
     }
 
     resize(width: number, height: number): Promise<void> {
-        return this.delegate.resize(width, height);
+        return this.dialog?.tabHost ? this.dialog.resizeContent(width, height) : this.delegate.resize(width, height);
     }
 
     performLayout(children: IDockContainer[]) {
@@ -207,6 +209,6 @@ export class DraggableContainer implements IDockContainer {
         this.topLevelElement.style.left = left + 'px';
         this.topLevelElement.style.top = top + 'px';
 
-        this.dialog.panel.setDialogPosition(left, top);
+        this.dialog.updateContentPosition(left, top);
     }
 }

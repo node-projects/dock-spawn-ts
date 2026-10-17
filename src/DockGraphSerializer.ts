@@ -43,6 +43,19 @@ export class DockGraphSerializer {
     _buildDialogsInfo(dialogs: Dialog[]): IPanelInfo[] {
         let dialogsInfo: IPanelInfo[] = [];
         dialogs.forEach((dialog) => {
+            if (dialog.tabHost && dialog.dockManager.config.persistTabGroups === false) {
+                dialog.panels.forEach((panel, index) => {
+                    const state: IState = {};
+                    panel.saveState(state);
+                    state.width = dialog.elementDialog.clientWidth;
+                    state.height = dialog.elementDialog.clientHeight;
+                    const position = dialog.getPosition();
+                    dialogsInfo.push({ containerType: panel.containerType, state,
+                        position: { x: position.x + index * 24, y: position.y + index * 24 },
+                        isHidden: dialog.isHidden, disableResize: dialog.disableResize });
+                });
+                return;
+            }
             let panelState: IState = {};
             let panelContainer = dialog.panel;
             panelContainer.saveState(panelState);
@@ -54,6 +67,16 @@ export class DockGraphSerializer {
             isHidden: dialog.isHidden,
             disableResize: dialog.disableResize
         }
+            if (dialog.tabHost) {
+                panelInfo.panels = dialog.panels.map(panel => {
+                    const state: IState = {};
+                    panel.saveState(state);
+                    return state;
+                });
+                panelInfo.activePanel = dialog.tabHost.activeTab?.panel.elementContent.id;
+                panelInfo.state.width = dialog.elementDialog.clientWidth;
+                panelInfo.state.height = dialog.elementDialog.clientHeight;
+            }
             dialogsInfo.push(panelInfo);
         });
 

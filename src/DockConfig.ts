@@ -6,6 +6,8 @@ export class DockConfig {
         this.moveOnlyWithinDockConatiner = false;
         this.enableBrowserWindows = true;
         this.enableAutoHide = false;
+        this.enableTabGroups = false;
+        this.persistTabGroups = true;
     }
 
     escClosesWindow?: boolean;
@@ -15,4 +17,8 @@ export class DockConfig {
     enableBrowserWindows?: boolean;
     /** Allow tool panels to collapse to edge tabs. Disabled by default. */
     enableAutoHide?: boolean;
+    /** Enable multi-tab dragging and grouping floating windows. Opt-in. */
+    enableTabGroups?: boolean;
+    /** Save floating group membership; false restores members as separate windows. */
+    persistTabGroups?: boolean;
 }

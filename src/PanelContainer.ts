@@ -632,6 +632,11 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
 
                 if (this.isDialog) {
                     if (this.floatingDialog) {
+                        if (this.floatingDialog.tabHost) {
+                            this.floatingDialog.removePanel(this);
+                            this.dockManager.notifyOnClosePanel(this);
+                            return;
+                        }
                         //this.floatingDialog.hide();
                         this.floatingDialog.close(); // fires onClose notification
                     }

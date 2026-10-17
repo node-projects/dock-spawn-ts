@@ -61,7 +61,7 @@ export class FillDockContainer implements IDockContainerWithSize {
     }
 
     destroy() {
-        this.tabHost.pages.forEach(x => x.destroy());
+        this.tabHost.destroy();
         if (Utils.removeNode(this.element))
             delete this.element;
     }

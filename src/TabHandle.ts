@@ -69,7 +69,7 @@ export class TabHandle {
         //this._bringToFront(this.elementBase);
 
         this.undockInitiator = new UndockInitiator(this.elementBase, undockHandler);
-        this.undockInitiator.enabled = true;
+        this.undockInitiator.enabled = panel._canUndock;
         this.mouseDownHandler = new EventHandler(this.elementBase, 'mousedown', this.onMouseDown.bind(this));
         this.touchDownHandler = new EventHandler(this.elementBase, 'touchstart', this.onMouseDown.bind(this), { passive: false });
         this.closeButtonHandler = new EventHandler(this.elementCloseButton, 'click', this.onCloseButtonClicked.bind(this));
@@ -185,8 +185,11 @@ export class TabHandle {
     }
 
     onMouseDown(e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        if (e.target === this.elementCloseButton || this.elementCloseButton.contains?.(e.target)) return;
         e.preventDefault();
 
+        this.parent.host.selectForDrag(this.parent, !!(e.ctrlKey || e.metaKey));
         this.parent.onSelected();
 
         if (this.mouseMoveHandler) {
@@ -323,6 +326,12 @@ export class TabHandle {
             this.undockInitiator.enabled = false;
             this.cancelTabDrag();
             let panel = this.parent.container as PanelContainer;
+            const panels = this.parent.host.getDragPanels(this.parent);
+            if (panels.length > 1) {
+                const dialog = panel.dockManager.requestUndockGroup(panels, e, dragOffset, panel);
+                if (!dialog) this.undockInitiator.enabled = panel._canUndock;
+                return dialog;
+            }
             return panel.performUndockToDialog(e, dragOffset);
         }
         else

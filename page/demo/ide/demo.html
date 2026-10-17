@@ -49,7 +49,13 @@
             <a href="javascript:openSide()" style="text-decoration: none; color: white;">Open Side</a>
         </div>
     </div>
-    <div id="dock_div" style="height: calc(100% - 45px);">
+    <div class="group-controls">
+        <label><input id="enable_tab_groups" type="checkbox" checked> Enable tab groups</label>
+        <label title="When unchecked, saved floating groups restore as separate windows"><input id="persist_tab_groups" type="checkbox" checked> Persist floating groups</label>
+        <button id="float_documents">Float two documents</button>
+        <span>Ctrl/Cmd-click tabs to move together. Drop a floating window over another to group.</span>
+    </div>
+    <div id="dock_div" style="height: calc(100% - 85px);">
         <div id="my_dock_manager" class="my-dock-manager" style="position: relative;"></div>
         <div id="solution_window" data-panel-caption="Solution Explorer" data-panel-icon="test.png"
             class="solution-window" hidden>
@@ -73,6 +79,9 @@
         <div id="state_window" data-panel-caption="State" class="state-window" hidden></div>
         <div id="editor1_window" data-panel-caption="Steering.h" class="editor1-window editor-host" hidden></div>
         <div id="editor2_window" data-panel-caption="Steering.cpp" class="editor2-window editor-host" hidden></div>
+        <div id="editor3_window" data-panel-caption="Engine.h" class="editor1-window editor-host" hidden></div>
+        <div id="editor4_window" data-panel-caption="Engine.cpp" class="editor2-window editor-host" hidden></div>
+        <div id="editor5_window" data-panel-caption="README.md" class="editor1-window editor-host" hidden></div>
         <div id="infovis" data-panel-caption="Dock Tree Visualizer" class="editor2-window editor-host" hidden style="width: 600px; height: 400px; position: absolute;"></div>
         <div id="output_window" data-panel-caption="Output" class="output-window editor-host" hidden></div>
         <div id="outline_window" data-panel-caption="Outline" class="outline-window" hidden></div>

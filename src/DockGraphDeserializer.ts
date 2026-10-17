@@ -113,16 +113,30 @@ export class DockGraphDeserializer {
 
     async _buildDialogs(dialogsInfo: IPanelInfo[]) {
         let dialogs: Dialog[] = [];
+        if (!this.dockManager.config?.enableTabGroups || this.dockManager.config.persistTabGroups === false) {
+            dialogsInfo = dialogsInfo.flatMap(info => info.panels ? info.panels.map((state, index) => ({
+                containerType: info.containerType,
+                state: { ...state, width: info.state.width, height: info.state.height },
+                position: { x: info.position.x + index * 24, y: info.position.y + index * 24 },
+                isHidden: info.isHidden, disableResize: info.disableResize
+            })) : [info]);
+        }
         for (let dialogInfo of dialogsInfo) {
             let containerType = dialogInfo.containerType;
             let containerState = dialogInfo.state;
             let container;
             if (containerType === 'panel') {
-                container = await PanelContainer.loadFromState(containerState, this.dockManager);
+                const members: PanelContainer[] = [];
+                for (const state of dialogInfo.panels ?? [containerState]) {
+                    const member = await PanelContainer.loadFromState(state, this.dockManager);
+                    if (member) members.push(member);
+                }
+                container = (dialogInfo.activePanel && members.find(panel => panel.elementContent.id === dialogInfo.activePanel)) || members[0];
                 if (container?.prepareForDocking) {
                     Utils.removeNode(container.elementPanel);
                     container.isDialog = true;
-                    let dialog = new Dialog(container, this.dockManager, undefined, dialogInfo.disableResize);
+                    let dialog = new Dialog(container, this.dockManager, undefined, dialogInfo.disableResize, members);
+                    if (dialogInfo.panels) await dialog.resize(containerState.width, containerState.height);
                     if (dialogInfo.position.x > document.body.clientWidth ||
                         dialogInfo.position.y > document.body.clientHeight - 70) {
                         dialogInfo.position.x = 20;

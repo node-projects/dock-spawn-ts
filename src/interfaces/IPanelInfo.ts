@@ -9,4 +9,7 @@ export interface IPanelInfo {
     isHidden: boolean;
     /** Omitted in older layouts, where dialogs are resizable by default. */
     disableResize?: boolean;
+    /** Ordered member states for a floating tab group. */
+    panels?: IState[];
+    activePanel?: string;
 }
