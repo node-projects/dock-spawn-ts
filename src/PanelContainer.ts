@@ -467,7 +467,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
             this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
     }
 
-    resize(width: number, height: number) {
+    async resize(width: number, height: number): Promise<void> {
         // if (this._cachedWidth === width && this._cachedHeight === height)
         // {
         //     // Already in the desired size
@@ -475,9 +475,10 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         // }
         this.panelDocked();
         this.setVisible(true);
-        this._setPanelDimensions(width, height);
+        const resized = this._setPanelDimensions(width, height);
         this._cachedWidth = width;
         this._cachedHeight = height;
+        await resized;
         try {
             if (this.elementContent != undefined && (typeof this.elementContent.resizeHandler == 'function'))
                 this.elementContent.resizeHandler(width, height - this.elementTitle.clientHeight);
@@ -486,7 +487,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         }
     }
 
-    _setPanelDimensions(width: number, height: number) {
+    async _setPanelDimensions(width: number, height: number): Promise<void> {
         this.elementTitle.style.width = width + 'px';
         this.elementContentHost.style.width = width + 'px';
         this.elementContentContainer.style.width = width + 'px';
@@ -500,14 +501,13 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
 
         //if (this.elementContentContainer.parentElement != this.dockManager.config.dialogRootElement)
         //    this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
-        requestAnimationFrame(() => {
-            const rect = this.elementContentWrapper.getBoundingClientRect();
-            const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
-            this.elementContentContainer.style.left = (rect.x - rootRect.x) + 'px';
-            this.elementContentContainer.style.top = (rect.y - rootRect.y) + 'px';
-            this.elementContentContainer.style.width = rect.width + 'px';
-            this.elementContentContainer.style.height = rect.height + 'px';
-        });
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+        const rect = this.elementContentWrapper.getBoundingClientRect();
+        const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
+        this.elementContentContainer.style.left = (rect.x - rootRect.x) + 'px';
+        this.elementContentContainer.style.top = (rect.y - rootRect.y) + 'px';
+        this.elementContentContainer.style.width = rect.width + 'px';
+        this.elementContentContainer.style.height = rect.height + 'px';
     }
 
     setDialogPosition(x: number, y: number) {

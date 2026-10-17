@@ -188,7 +188,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
     }
 
     resize() {
-        this.dockManager.resize(this.clientWidth, this.clientHeight);
+        return this.dockManager.resize(this.clientWidth, this.clientHeight);
     }
 
     getDockNodeForElement(elementOrContainer: HTMLElement | PanelContainer): DockNode {

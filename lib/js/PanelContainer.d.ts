@@ -100,8 +100,8 @@ export declare class PanelContainer implements IDockContainerWithSize, IContextM
     set height(value: number);
     get resolvedElementContent(): HTMLElement;
     private panelDocked;
-    resize(width: number, height: number): void;
-    _setPanelDimensions(width: number, height: number): void;
+    resize(width: number, height: number): Promise<void>;
+    _setPanelDimensions(width: number, height: number): Promise<void>;
     setDialogPosition(x: number, y: number): void;
     setVisible(isVisible: boolean): void;
     get isAutoHidden(): boolean;

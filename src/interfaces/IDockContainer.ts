@@ -5,7 +5,8 @@ import { TabPage } from '../TabPage.js';
 
 export interface IDockContainer {
     readonly dockManager: DockManager;
-    resize(_width: number, _height: number): void;
+    /** Resolves when this container and its descendants have finished resizing. */
+    resize(_width: number, _height: number): Promise<void>;
     performLayout(children: IDockContainer[], relayoutEvenIfEqual : boolean): void;
     destroy(): void;
     setActiveChild(child: IDockContainer): void;

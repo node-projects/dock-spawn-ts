@@ -37,6 +37,18 @@ Usage Example is in page/demo/demo_simple_es5.html
 
 # how to use:
 
+Resize operations return a `Promise<void>` that resolves after descendant containers
+and deferred animation-frame layout work finish. Sizes are assigned immediately;
+await the result before measuring content or performing work that depends on the
+completed layout:
+
+```javascript
+await dockManager.resize(width, height);
+// Content positions and tab widths are now updated.
+```
+
+The web component's `resize()` and `dockManager.invalidate()` can also be awaited.
+
 Auto-hide is disabled by default. Enable it when creating the manager:
 
 ```javascript

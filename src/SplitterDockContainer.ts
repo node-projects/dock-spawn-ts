@@ -32,14 +32,15 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
         this.minimumAllowedChildNodes = 2;
     }
 
-    resize(width: number, height: number) {
+    resize(width: number, height: number): Promise<void> {
         //    if (_cachedWidth === _cachedWidth && _cachedHeight === _height) {
         //      // No need to resize
         //      return;
         //    }
-        this.splitterPanel.resize(width, height);
+        const resized = this.splitterPanel.resize(width, height);
         this._cachedWidth = width;
         this._cachedHeight = height;
+        return resized;
     }
 
     performLayout(childContainers: IDockContainer[], relayoutEvenIfEqual: boolean = false) {
@@ -58,8 +59,10 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
      * The percentage is specified in [ratio] and is between 0..1
      */
     setContainerRatio(container: IDockContainer, ratio: number) {
-        this.splitterPanel.setContainerRatio(container, ratio);
-        this.resize(this.width, this.height);
+        return Promise.all([
+            this.splitterPanel.setContainerRatio(container, ratio),
+            this.resize(this.width, this.height)
+        ]).then(() => {});
     }
 
     getRatios(): number[] {
@@ -67,13 +70,17 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
     }
 
     setRatios(ratios: number[]) {
-        this.splitterPanel.setRatios(ratios);
-        this.resize(this.width, this.height);
+        return Promise.all([
+            this.splitterPanel.setRatios(ratios),
+            this.resize(this.width, this.height)
+        ]).then(() => {});
     }
 
     setSizes(sizes: number[]) {
-        this.splitterPanel.setSizes(sizes);
-        this.resize(this.width, this.height);
+        return Promise.all([
+            this.splitterPanel.setSizes(sizes),
+            this.resize(this.width, this.height)
+        ]).then(() => {});
     }
 
     saveState(state: IState) {

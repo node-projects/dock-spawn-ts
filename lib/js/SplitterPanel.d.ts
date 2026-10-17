@@ -21,12 +21,12 @@ export declare class SplitterPanel {
      * Sets the percentage of space the specified [container] takes in the split panel
      * The percentage is specified in [ratio] and is between 0..1
      */
-    setContainerRatio(container: IDockContainer, ratio: number): void;
+    setContainerRatio(container: IDockContainer, ratio: number): Promise<void>;
     getRatios(): number[];
-    setRatios(ratios: number[]): void;
+    setRatios(ratios: number[]): Promise<void>;
     /** Apply pixel sizes without converting unchanged panes through fractional ratios. */
-    setSizes(sizes: number[]): void;
-    resize(width: number, height: number): void;
+    setSizes(sizes: number[]): Promise<void>;
+    resize(width: number, height: number): Promise<void>;
     private resizeProportionally;
     private hasElasticChild;
     private getElasticChildIndex;

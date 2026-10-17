@@ -130,8 +130,8 @@ export class Dialog implements IContextMenuProvider {
         }
     }
 
-    resize(width: number, height: number) {
-        this.resizable.resize(width, height);
+    resize(width: number, height: number): Promise<void> {
+        return this.resizable.resize(width, height);
     }
 
     setTitle(title: string) {

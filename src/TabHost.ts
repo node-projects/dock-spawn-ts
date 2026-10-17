@@ -25,6 +25,7 @@ export class TabHost {
     pages: TabPage[];
     activeTab: TabPage;
     _resizeRequested: boolean;
+    private tabListResize: Promise<void>;
     private tabListWidth: number;
     mouseDownHandler: EventHandler;
     focusHandler: EventHandler;
@@ -160,21 +161,32 @@ export class TabHost {
         }
     }
 
-    resize(width: number, height: number) {
+    async resize(width: number, height: number): Promise<void> {
         this.hostElement.style.width = width + 'px';
         this.hostElement.style.height = height + 'px';
 
         let tabHeight = this.tabListElement.clientHeight;
         this.tabListWidth = width;
-        if (!this._resizeRequested)
-            requestAnimationFrame(() => this.resizeTabListElement(this.tabListWidth));
+        if (!this._resizeRequested) {
+            this.tabListResize = new Promise<void>((resolve, reject) => {
+                requestAnimationFrame(() => {
+                    try {
+                        this.resizeTabListElement(this.tabListWidth);
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    } finally {
+                        this._resizeRequested = false;
+                    }
+                });
+            });
+        }
         this._resizeRequested = true;
         let separatorHeight = this.separatorElement.clientHeight;
         let contentHeight = height - tabHeight - separatorHeight;
         this.contentElement.style.height = contentHeight + 'px';
 
-        if (this.activeTab)
-            this.activeTab.resize(width, contentHeight);
+        await Promise.all([this.tabListResize, this.activeTab?.resize(width, contentHeight)]);
     }
 
     resizeTabListElement(width: number, height?: number) {

@@ -17,7 +17,7 @@ export declare abstract class SplitterDockContainer implements IDockContainerWit
     state: ISize;
     containerType: ContainerType;
     constructor(name: string, dockManager: DockManager, childContainers: IDockContainer[], stackedVertical: boolean);
-    resize(width: number, height: number): void;
+    resize(width: number, height: number): Promise<void>;
     performLayout(childContainers: IDockContainer[], relayoutEvenIfEqual?: boolean): void;
     setActiveChild(): void;
     destroy(): void;
@@ -25,10 +25,10 @@ export declare abstract class SplitterDockContainer implements IDockContainerWit
      * Sets the percentage of space the specified [container] takes in the split panel
      * The percentage is specified in [ratio] and is between 0..1
      */
-    setContainerRatio(container: IDockContainer, ratio: number): void;
+    setContainerRatio(container: IDockContainer, ratio: number): Promise<void>;
     getRatios(): number[];
-    setRatios(ratios: number[]): void;
-    setSizes(sizes: number[]): void;
+    setRatios(ratios: number[]): Promise<void>;
+    setSizes(sizes: number[]): Promise<void>;
     saveState(state: IState): void;
     loadState(state: IState): void;
     get width(): number;

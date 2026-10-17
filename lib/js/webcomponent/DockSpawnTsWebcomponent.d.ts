@@ -19,7 +19,7 @@ export declare class DockSpawnTsWebcomponent extends HTMLElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     private windowResized;
-    resize(): void;
+    resize(): Promise<void>;
     getDockNodeForElement(elementOrContainer: HTMLElement | PanelContainer): DockNode;
     dockFill(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, title?: string, hideCloseButton?: boolean): DockNode;
     dockLeft(element: HTMLElement, panelType?: PanelType, dockNode?: DockNode, ratio?: number, title?: string, hideCloseButton?: boolean): DockNode;

@@ -24,6 +24,7 @@ export declare class TabHost {
     pages: TabPage[];
     activeTab: TabPage;
     _resizeRequested: boolean;
+    private tabListResize;
     private tabListWidth;
     mouseDownHandler: EventHandler;
     focusHandler: EventHandler;
@@ -39,7 +40,7 @@ export declare class TabHost {
     change(host: TabHost, handle: TabHandle, state: any, index: any): void;
     _createDefaultTabPage(tabHost: TabHost, container: IDockContainer): TabPage;
     setActiveTab(container: IDockContainer): void;
-    resize(width: number, height: number): void;
+    resize(width: number, height: number): Promise<void>;
     resizeTabListElement(width: number, height?: number): void;
     performLayout(children: IDockContainer[]): void;
     _setTabHandlesVisible(visible: boolean): void;

@@ -35,7 +35,7 @@ export declare class ResizableContainer implements IDockContainer {
     get height(): number;
     get name(): string;
     set name(value: string);
-    resize(width: number, height: number): void;
+    resize(width: number, height: number): Promise<void>;
     _adjustResizeHandles(width: number, height: number): void;
     performLayout(children: any): void;
     destroy(): void;

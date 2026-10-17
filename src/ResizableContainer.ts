@@ -140,9 +140,10 @@ export class ResizableContainer implements IDockContainer {
             this.delegate.name = value;
     }
 
-    resize(width: number, height: number) {
-        this.delegate.resize(width, height);
+    async resize(width: number, height: number): Promise<void> {
+        const resized = this.delegate.resize(width, height);
         this._adjustResizeHandles(width, height);
+        await resized;
         document.dispatchEvent(this.dockSpawnResizedEvent);
     }
 

@@ -21,7 +21,7 @@ export declare class FillDockContainer implements IDockContainerWithSize {
     state: ISize;
     constructor(dockManager: DockManager, tabStripDirection?: TabHostDirection);
     setActiveChild(child: IDockContainer): void;
-    resize(width: number, height: number): void;
+    resize(width: number, height: number): Promise<void>;
     performLayout(children: IDockContainer[]): void;
     destroy(): void;
     saveState(state: IState): void;

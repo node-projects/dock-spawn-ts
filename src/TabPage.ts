@@ -102,7 +102,7 @@ export class TabPage {
         }
     }
 
-    resize(width: number, height: number) {
-        this.container.resize(width, height);
+    resize(width: number, height: number): Promise<void> {
+        return this.container.resize(width, height);
     }
 }

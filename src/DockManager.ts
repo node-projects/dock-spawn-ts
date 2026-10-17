@@ -202,12 +202,12 @@ export class DockManager {
     }
 
     invalidate() {
-        this.resize(this.element.clientWidth, this.element.clientHeight);
+        return this.resize(this.element.clientWidth, this.element.clientHeight);
     }
 
-    resize(width: number, height: number) {
-        if (this.autoHideManager) this.autoHideManager.resize(width, height);
-        else this.context.model.rootNode.container.resize(width, height);
+    resize(width: number, height: number): Promise<void> {
+        const resized = this.autoHideManager ? this.autoHideManager.resize(width, height)
+            : this.context.model.rootNode.container.resize(width, height);
         this.getPanels().forEach(panel => panel.updateAutoHideButton());
 
         let offsetX = 0, offsetY = 0;
@@ -220,6 +220,7 @@ export class DockManager {
                 offsetY += 100;
             }
         }
+        return resized;
     }
 
     /**

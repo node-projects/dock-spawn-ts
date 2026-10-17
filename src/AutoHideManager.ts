@@ -381,7 +381,7 @@ export class AutoHideManager {
         this.manager.invalidate();
     }
 
-    resize(width: number, height: number) {
+    async resize(width: number, height: number): Promise<void> {
         const inset = (side: AutoHideSide) => this.entries.some(entry => entry.side === side) ? this.stripSize : 0;
         const left = inset('left'), right = inset('right'), top = inset('top'), bottom = inset('bottom');
         for (const [side, rail] of this.rails) {
@@ -398,11 +398,13 @@ export class AutoHideManager {
         root.containerElement.style.position = 'relative';
         root.containerElement.style.left = left + 'px';
         root.containerElement.style.top = top + 'px';
-        root.resize(Math.max(0, width - left - right), Math.max(0, height - top - bottom));
-        this.layoutOverlay();
+        await Promise.all([
+            root.resize(Math.max(0, width - left - right), Math.max(0, height - top - bottom)),
+            this.layoutOverlay()
+        ]);
     }
 
-    private layoutOverlay() {
+    private async layoutOverlay(): Promise<void> {
         const entry = this.entries.find(entry => entry.panel === this.openPanel);
         if (!entry) return;
         const root = this.manager.context.model.rootNode.container;
@@ -413,7 +415,7 @@ export class AutoHideManager {
         const height = Math.max(0, Math.min(root.height, vertical ? root.height : entry.height));
         entry.panel.elementPanel.style.left = (entry.side === 'right' ? left + root.width - width : left) + 'px';
         entry.panel.elementPanel.style.top = (entry.side === 'bottom' ? top + root.height - height : top) + 'px';
-        entry.panel.resize(width, height);
+        const resized = entry.panel.resize(width, height);
         const x = parseFloat(entry.panel.elementPanel.style.left);
         const y = parseFloat(entry.panel.elementPanel.style.top);
         const grip = Math.min(6, vertical ? width : height);
@@ -425,6 +427,7 @@ export class AutoHideManager {
             width: (vertical ? grip : width) + 'px',
             height: (vertical ? height : grip) + 'px'
         });
+        await resized;
     }
 
     private onResizeStart = (event: PointerEvent) => {

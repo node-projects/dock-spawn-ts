@@ -72,8 +72,8 @@ export class DraggableContainer implements IDockContainer {
             this.delegate.name = value;
     }
 
-    resize(width: number, height: number) {
-        this.delegate.resize(width, height);
+    resize(width: number, height: number): Promise<void> {
+        return this.delegate.resize(width, height);
     }
 
     performLayout(children: IDockContainer[]) {

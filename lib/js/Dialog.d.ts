@@ -33,7 +33,7 @@ export declare class Dialog implements IContextMenuProvider {
     onFocus(): void;
     onMouseDown(e: PointerEvent): void;
     destroy(): void;
-    resize(width: number, height: number): void;
+    resize(width: number, height: number): Promise<void>;
     setTitle(title: string): void;
     setTitleIcon(iconName: string): void;
     bringToFront(): void;

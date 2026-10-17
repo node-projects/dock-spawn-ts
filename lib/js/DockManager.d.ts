@@ -55,8 +55,8 @@ export declare class DockManager {
     checkYBounds(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeNorth: boolean, resizeSouth: boolean): number;
     checkYBoundsWithinDockContainer(container: HTMLElement, currentMousePosition: Point, previousMousePosition: Point, resizeNorth: boolean, resizeSouth: boolean): number;
     rebuildLayout(node: DockNode): void;
-    invalidate(): void;
-    resize(width: number, height: number): void;
+    invalidate(): Promise<void>;
+    resize(width: number, height: number): Promise<void>;
     /**
      * Reset the dock model . This happens when the state is loaded from json
      */

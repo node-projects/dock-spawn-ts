@@ -64,7 +64,7 @@ export declare class AutoHideManager {
     /** Discard old edge UI before restoring a model. */
     reset(): void;
     restore(): void;
-    resize(width: number, height: number): void;
+    resize(width: number, height: number): Promise<void>;
     private layoutOverlay;
     private onResizeStart;
     private onResizeMove;
