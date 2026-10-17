@@ -8,7 +8,9 @@
     "test": "npm run tsc && node --test tests/*.test.js",
     "tsc": "tsc",
     "start": "http-server",
-    "prepublishOnly": "npm run tsc && npm run bundle && npm run bundle2",
+    "clean": "node -e \"require('node:fs').rmSync('lib/js', { recursive: true, force: true })\"",
+    "build": "npm run clean && npm run tsc && npm run bundle && npm run bundle2",
+    "prepack": "npm run build",
     "bundle": "esbuild ./lib/js/index.js --format=esm --minify --platform=neutral --bundle --outfile=./lib/js/index-min.js",
     "bundle2": "esbuild ./lib/js/index-webcomponent.js --format=esm --loader:.css=copy --minify --platform=neutral --bundle --outfile=./lib/js/index-webcomponent-min.js"
   },
@@ -25,6 +27,10 @@
     "webpack-cli": "^7.0.2"
   },
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/node-projects/dock-spawn-ts.git"
+  },
   "main": "./lib/js/index-webcomponent.js",
   "files": [
     "lib/**/*",

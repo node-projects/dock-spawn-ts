@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - run: npm ci
+      - name: Read release version
+        id: release
+        run: node scripts/release-version.mjs
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+      - name: Set package version from release tag
+        run: npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version --ignore-scripts
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+      - run: npm test
+      - run: npm run build
+      - name: Pack and verify
+        id: package
+        run: |
+          npm pack --ignore-scripts --json > pack.json
+          node scripts/check-package.mjs
+          echo "filename=$(node -p 'JSON.parse(require("fs").readFileSync("pack.json", "utf8"))[0].filename')" >> "$GITHUB_OUTPUT"
+      - name: Attach npm package to GitHub release
+        run: gh release upload "$RELEASE_TAG" "$TARBALL" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          TARBALL: ${{ steps.package.outputs.filename }}
+      - name: Publish the same package to npm
+        run: npm publish "$TARBALL" --ignore-scripts --access public --tag "$DIST_TAG"
+        env:
+          TARBALL: ${{ steps.package.outputs.filename }}
+          DIST_TAG: ${{ steps.release.outputs.dist_tag }}

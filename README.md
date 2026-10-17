@@ -13,8 +13,9 @@ Dock Spawn TS is a Typescript Docking Framework to create a Visual Studio like I
 
 # es5 version
 
-There is an ES5 Version in the lib/es5 directory
-Usage Example is in page/demo/demo_simple_es5.html
+The optional legacy ES5 build is generated locally in `lib/es5` by
+`build-es5.bat` on Windows, after compiling TypeScript. It is separate from the
+standard npm release build. Its usage example is `page/demo/demo_simple_es5.html`.
 
 # differences to original dockspawn
  - typescript
@@ -30,10 +31,12 @@ Usage Example is in page/demo/demo_simple_es5.html
 
 # testing
  - download the project
- - install node packages ("npm i")
- - compile typescript ("npm run tsc") (compiled version is included in repo for live demo)
+ - install node packages ("npm ci")
+ - build JavaScript and browser bundles ("npm run build")
  - run ("npm start")
  - browse to: http://127.0.0.1:8080/page/demo/ide/demo.html
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for build, pull request and release instructions.
 
 # how to use:
 

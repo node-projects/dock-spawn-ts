@@ -1,1 +1,0 @@
-{"version":3,"file":"DockModel.js","sourceRoot":"","sources":["../../src/DockModel.ts"],"names":[],"mappings":"AAIA,MAAM,OAAO,SAAS;IAClB,QAAQ,CAAW;IACnB,mBAAmB,CAAW;IAC9B,OAAO,CAAU;IACjB,cAAc,GAAoB,EAAE,CAAC;IACrC,cAAc,CAAoC;IAElD;QACI,IAAI,CAAC,QAAQ,GAAG,IAAI,CAAC,mBAAmB,GAAG,SAAS,CAAC;IACzD,CAAC;CACJ"}
