@@ -12,11 +12,11 @@
 	color:#aaa;
 }
 
-.panel-titlebar-button-close {
+.panel-titlebar-button-close, .panel-titlebar-button-auto-hide {
 	color:#aaa;
 }
 
-.panel-titlebar-button-close:hover {
+.panel-titlebar-button-close:hover, .panel-titlebar-button-auto-hide:hover {
 	color:red;
 }
 

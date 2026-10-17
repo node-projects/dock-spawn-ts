@@ -5,6 +5,8 @@ export type GetLocalizerParameters<K extends TranslationKey> = K extends keyof L
     : [];
 
 export const Defaults = {
+    'AutoHide': 'Auto hide',
+    'PinPanel': 'Pin panel',
     'CloseDialog': 'Close dialog',
     'CloseAll': 'Close all documents',
     'CloseAllButThis': 'Close all documents but this',

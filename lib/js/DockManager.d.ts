@@ -1,4 +1,5 @@
 import { Dialog } from "./Dialog.js";
+import { AutoHideManager } from './AutoHideManager.js';
 import { DockConfig } from "./DockConfig.js";
 import { DockLayoutEngine } from "./DockLayoutEngine.js";
 import { DockManagerContext } from "./DockManagerContext.js";
@@ -19,6 +20,7 @@ import { TabPage } from "./TabPage.js";
  * Initially the document manager takes up the central space and acts as the root node
  */
 export declare class DockManager {
+    autoHideManager: AutoHideManager;
     element: HTMLElement;
     context: DockManagerContext;
     dockWheel: DockWheel;
@@ -146,6 +148,8 @@ export declare class DockManager {
     loadState(json: string): Promise<void>;
     getPanels(): PanelContainer[];
     undockEnabled(state: boolean): void;
+    /** Toggle auto-hide at runtime. Disabling it re-pins all collapsed panels. */
+    setAutoHideEnabled(enabled: boolean): void;
     lockDockState(state: boolean): void;
     hideCloseButton(state: boolean): void;
     updatePanels(ids: string[]): PanelContainer[];

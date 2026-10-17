@@ -37,6 +37,46 @@ Usage Example is in page/demo/demo_simple_es5.html
 
 # how to use:
 
+Auto-hide is disabled by default. Enable it when creating the manager:
+
+```javascript
+const dockManager = new DockManager(element, { enableAutoHide: true });
+```
+
+Use `dockManager.setAutoHideEnabled(true)` or `false` to change it at runtime.
+Disabling auto-hide re-pins collapsed panels and hides the pin controls. Loading
+a saved layout while it is disabled also re-pins its collapsed panels.
+
+When enabled, tool panels have a pin button in their title bar. Click it to collapse the panel
+to a tab on its dock edge (left, right, top, or bottom). Click the edge tab to open
+the panel over the layout; clicking or focusing outside it, or pressing Escape,
+collapses it again. Click the pin button in the overlay to dock it again. Pinning
+restores the previous nested dock position, tab order and pane sizes where the
+surrounding panels still exist, including when a whole group is unpinned and
+then pinned back in a different order. This shared layout history is saved with
+the layout. If a neighboring panel was closed, it uses the
+nearest surviving branch of the old layout, falling back to the saved edge.
+Drag the overlay's title bar to turn it into a floating dialog at its last docked
+size and dock it elsewhere. Panel content stays in the DOM throughout these transitions.
+Document tabs and floating dialogs do not have an auto-hide button.
+
+The same behavior is available through `panel.setAutoHide(true)` and
+`panel.setAutoHide(false)`. Pass an optional edge, such as
+`panel.setAutoHide(true, 'right')`, to override the inferred dock edge.
+`panel.isAutoHidden` reports whether the panel is collapsed to an edge tab.
+`dockManager.autoHideManager.show(panel)` opens its overlay.
+`saveState()` / `loadState()` preserve collapsed panels, their edges and sizes.
+Use the `onAutoHideChanged(dockManager, panel)` layout listener to save state after
+pinning or unpinning. Locking the dock state also disables the pin controls.
+
+Run `npm test` for the regression suite. For browser lifecycle checks, run
+`npm start`, open `http://127.0.0.1:8080/tests/auto-hide.html`, and click **Run tests**.
+
+When docking beside an existing pane with a ratio, the new pane takes that fraction
+of the reference pane's space after allowing for the new splitter bar. Other panes
+keep their pixel sizes. Closing or undocking a pane gives its freed space to the
+elastic document area while preserving the remaining tool panels.
+
 ```html
    dockspawn div container needs position absolute or relative 
 
@@ -112,7 +152,7 @@ Usage Example is in page/demo/demo_simple_es5.html
 
 | Url                                            | Licence         | Touch support | Dialogs | Keep Content in DOM | Autocolapsing Panels | Dialogs in new Browserwindows | Dock Back from extra Browserwindow |
 |------------------------------------------------|-----------------|---------------|---------|---------------------|----------------------|-------------------------------|------------------------------------|
-| dock-spawn-ts                                  | MIT             | Yes           | Yes     | Yes                 | No                   | Yes                           | No                                 |
+| dock-spawn-ts                                  | MIT             | Yes           | Yes     | Yes                 | Yes                  | Yes                           | No                                 |
 | https://github.com/golden-layout/golden-layout | MIT             | No            | No      |                     |                      | Yes                           |                                    |
 | https://github.com/WebCabin/wcDocker           | MIT             | Yes           | Yes     |                     |                      | No                            |                                    |
 | https://jspanel.de                             | MIT             | Yes           | Yes     |                     |                      | No                            |                                    |

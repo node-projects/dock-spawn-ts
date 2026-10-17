@@ -24,6 +24,8 @@ export declare class SplitterPanel {
     setContainerRatio(container: IDockContainer, ratio: number): void;
     getRatios(): number[];
     setRatios(ratios: number[]): void;
+    /** Apply pixel sizes without converting unchanged panes through fractional ratios. */
+    setSizes(sizes: number[]): void;
     resize(width: number, height: number): void;
     private resizeProportionally;
     private hasElasticChild;

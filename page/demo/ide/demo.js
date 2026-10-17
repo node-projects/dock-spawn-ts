@@ -32,7 +32,7 @@ window.onload = async () => {
 
     let divDockContainer = document.getElementById('dock_div');
     let divDockManager = document.getElementById('my_dock_manager');
-    dockManager = new DockManager(divDockManager);
+    dockManager = new DockManager(divDockManager, { enableAutoHide: true });
     //@ts-ignore
     window.dockManager = dockManager;
     dockManager.initialize();

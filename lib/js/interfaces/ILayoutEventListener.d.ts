@@ -5,6 +5,7 @@ import { TabPage } from "../TabPage.js";
 import { IDockContainer } from "./IDockContainer.js";
 import { PanelContainer } from "../PanelContainer.js";
 export interface ILayoutEventListener {
+    onAutoHideChanged?(dockManager: DockManager, panel: PanelContainer): void;
     onDock?(dockManager: DockManager, dockNode: DockNode): void;
     onTabsReorder?(dockManager: DockManager, dockNode: DockNode): void;
     onUndock?(dockManager: DockManager, dockNode: DockNode): void;

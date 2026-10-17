@@ -50,8 +50,15 @@ export class SplitterPanel {
         let containersEqual = Utils.arrayEqual(this.childContainers, children);
         if (!containersEqual || relayoutEvenIfEqual) {
             if (!relayoutEvenIfEqual) {
+                const onlyRemovedChildren = !containersEqual && children.every(child => this.childContainers.includes(child));
                 this.preferredChildSizes = new WeakMap<IDockContainer, number>();
-                this.preserveNonElasticSizes = false;
+                // Closing or floating a panel gives its space to the elastic area,
+                // without scaling unrelated tools or restoring stale splitter sizes.
+                if (onlyRemovedChildren) {
+                    for (const child of children)
+                        this.preferredChildSizes.set(child, this.getChildSize(child));
+                }
+                this.preserveNonElasticSizes = onlyRemovedChildren;
             }
 
             this.childContainers.forEach((container) => {
@@ -156,13 +163,22 @@ export class SplitterPanel {
         let barSize = this.stackedVertical ? this.spiltterBars[0].barElement.clientHeight : this.spiltterBars[0].barElement.clientWidth;
         let splitPanelSize = (this.stackedVertical ? this.panelElement.clientHeight : this.panelElement.clientWidth) - barSize * this.spiltterBars.length;
         let updatedTotalSize = 0;
+        const sizes: number[] = [];
         for (let i = 0; i < this.childContainers.length; i++) {
-            let child = this.childContainers[i];
             let size = Math.floor(splitPanelSize * ratios[i]);
             updatedTotalSize += size;
             // Fix rounding error on last child so panels fill the available space exactly
             if (i === this.childContainers.length - 1)
                 size += splitPanelSize - updatedTotalSize;
+            sizes.push(size);
+        }
+        this.setSizes(sizes);
+    }
+
+    /** Apply pixel sizes without converting unchanged panes through fractional ratios. */
+    setSizes(sizes: number[]) {
+        for (let i = 0; i < this.childContainers.length; i++) {
+            const child = this.childContainers[i], size = sizes[i];
             if (this.stackedVertical)
                 child.resize(child.width, size);
             else

@@ -1,4 +1,62 @@
 /************* Panel with title bar ************/
+.panel-titlebar-button-auto-hide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    position: absolute;
+    right: 18px;
+    top: 0;
+    width: 18px;
+    height: 25px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    pointer-events: auto;
+}
+.panel-titlebar-can-auto-hide .panel-titlebar-button-close { width: 18px; }
+.panel-titlebar-can-auto-hide .panel-titlebar-text { width: calc(100% - 46px); }
+.panel-titlebar-button-auto-hide svg {
+    display: block;
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+}
+.panel-titlebar-button-auto-hide[aria-pressed="true"] svg { transform: rotate(90deg); }
+.panel-titlebar-button-auto-hide:hover { color: black; }
+.dock-auto-hide-rail {
+    position: absolute;
+    z-index: 9001;
+    gap: 2px;
+    overflow: auto;
+    background: #eee;
+    pointer-events: auto;
+}
+.dock-auto-hide-left, .dock-auto-hide-right { width: 26px; flex-direction: column; }
+.dock-auto-hide-top, .dock-auto-hide-bottom { height: 26px; flex-direction: row; }
+.dock-auto-hide-left { left: 0; }
+.dock-auto-hide-right { right: 0; }
+.dock-auto-hide-top { top: 0; }
+.dock-auto-hide-bottom { bottom: 0; }
+.dock-auto-hide-tab {
+    flex-shrink: 0;
+    border: 1px solid #aaa;
+    background: #eee;
+    color: #222;
+    font: inherit;
+    cursor: pointer;
+}
+.dock-auto-hide-left .dock-auto-hide-tab, .dock-auto-hide-right .dock-auto-hide-tab {
+    writing-mode: vertical-rl;
+    padding: 8px 2px;
+}
+.dock-auto-hide-tab[aria-expanded="true"] { background: #cce4ff; }
+.dock-auto-hide-overlay { box-shadow: 0 2px 8px #0005; }
+
 .panel-base {
 	pointer-events: none;
 }
