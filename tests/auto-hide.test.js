@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import { AutoHideManager } from '../lib/js/AutoHideManager.js';
 import { DockNode } from '../lib/js/DockNode.js';
 import { DockModel } from '../lib/js/DockModel.js';
@@ -21,6 +23,9 @@ class Element {
         this.parentElement = null;
     }
     setAttribute(name, value) { this.attributes[name] = value; }
+    setPointerCapture(id) { this.capturedPointer = id; }
+    hasPointerCapture(id) { return this.capturedPointer === id; }
+    releasePointerCapture() { this.capturedPointer = undefined; }
     focus() {}
 }
 
@@ -60,7 +65,95 @@ function setup(t, side) {
     return { manager, panel, root, tool, documentNode, contentRoot, listeners, getDocked: () => docked };
 }
 
+test('IDE demo persists the completed auto-hide transition after its intermediate undock event', t => {
+    const { manager, panel } = setup(t, 'right');
+    const demo = readFileSync(new URL('../page/demo/ide/demo.js', import.meta.url), 'utf8');
+    const listenerStart = demo.indexOf('dockManager.addLayoutListener(') + 'dockManager.addLayoutListener('.length;
+    const listenerEnd = demo.indexOf('\n    });', listenerStart);
+    const saved = new Map();
+    // Exercise the demo's actual listener registration so a missing save handler
+    // cannot pass by testing the library's serializer alone.
+    const listener = runInNewContext('(' + demo.slice(listenerStart, listenerEnd + 6) + ')', {
+        localStorage: { setItem(key, value) { saved.set(key, value); } },
+        storeKey: 'lastState', logOutput() {}, updateState() {}
+    });
+    manager.layoutEventListeners = [listener];
+    manager.saveState = () => JSON.stringify(manager.context.model.autoHidePanels.map(entry => ({
+        element: entry.panel.elementContent.id, side: entry.side, width: entry.width, height: entry.height
+    })));
+    const undock = manager.layoutEngine.undock;
+    manager.layoutEngine.undock = node => {
+        undock(node);
+        listener.onUndock(manager, node);
+        assert.deepEqual(JSON.parse(saved.get('lastState')), [], 'intermediate undock has no auto-hide entry yet');
+    };
+    manager.autoHideManager.setAutoHide(panel, true);
+    assert.deepEqual(JSON.parse(saved.get('lastState')), [
+        { element: 'right', side: 'right', width: 200, height: 180 }
+    ]);
+    manager.autoHideManager.setAutoHide(panel, false);
+    assert.deepEqual(JSON.parse(saved.get('lastState')), [], 'pinning saves the removal of the edge entry');
+});
+
 for (const side of ['left', 'right', 'top', 'bottom']) {
+    test(`auto-hide ${side}: resize inward edge on its axis, retain size and clean up dragging`, t => {
+        const { manager, panel, root, listeners } = setup(t, side);
+        const autoHide = manager.autoHideManager;
+        autoHide.setAutoHide(panel, true);
+        autoHide.show(panel);
+        const handle = manager.element.children.find(el => el.className === 'dock-auto-hide-resize-handle');
+        const horizontal = side === 'left' || side === 'right';
+        const direction = side === 'right' || side === 'bottom' ? -1 : 1;
+        const initial = horizontal ? panel.width : panel.height;
+        const crossSize = horizontal ? panel.height : panel.width;
+        const event = (x, y, pointerId = 1) => ({ button: 0, pointerId, clientX: x, clientY: y,
+            preventDefault() {}, stopPropagation() {} });
+        assert.equal(handle.style.cursor, horizontal ? 'ew-resize' : 'ns-resize');
+        const anchoredPosition = () => horizontal
+            ? parseFloat(panel.elementPanel.style.left) + (side === 'right' ? panel.width : 0)
+            : parseFloat(panel.elementPanel.style.top) + (side === 'bottom' ? panel.height : 0);
+        const anchor = anchoredPosition();
+        listeners.get('pointerdown')({ composedPath: () => [handle] });
+        assert.equal(autoHide.isOpen(panel), true);
+        handle.onpointerdown(event(300, 300));
+        handle.onpointermove(event(400, 400, 2));
+        assert.equal(horizontal ? panel.width : panel.height, initial);
+        handle.onpointermove(event(300 + (horizontal ? direction * 80 : 999),
+            300 + (horizontal ? 999 : direction * 80)));
+        assert.equal(horizontal ? panel.width : panel.height, initial + 80);
+        assert.equal(horizontal ? panel.height : panel.width, crossSize);
+        assert.equal(anchoredPosition(), anchor);
+        handle.onpointerup(event(300, 300));
+        assert.equal(handle.capturedPointer, undefined);
+        autoHide.hide();
+        autoHide.show(panel);
+        assert.equal(horizontal ? panel.width : panel.height, initial + 80);
+        const saved = manager.context.model.autoHidePanels[0];
+        assert.equal(horizontal ? saved.width : saved.height, initial + 80);
+        root.container.saveState = () => {};
+        manager.context.model.documentManagerNode.container.saveState = () => {};
+        panel.saveState = state => Object.assign(state, { width: panel.width, height: panel.height });
+        const serialized = JSON.parse(new DockGraphSerializer().serialize(manager.context.model));
+        assert.equal(serialized.autoHidePanels[0].state[horizontal ? 'width' : 'height'], initial + 80);
+        handle.onpointerdown(event(300, 300));
+        handle.onpointermove(event(300 - direction * 10000, 300 - direction * 10000));
+        assert.equal(horizontal ? panel.width : panel.height, 50);
+        handle.onpointermove(event(300 + direction * 10000, 300 + direction * 10000));
+        assert.equal(horizontal ? panel.width : panel.height, horizontal ? root.container.width : root.container.height);
+        handle.onpointercancel(event(300, 300));
+        assert.equal(handle.capturedPointer, undefined);
+        // Shrinking the host below the minimum must still keep the overlay inside it.
+        autoHide.resize(40, 40);
+        handle.onpointerdown(event(300, 300));
+        handle.onpointermove(event(400, 400));
+        assert.ok(panel.width <= root.container.width && panel.height <= root.container.height);
+        autoHide.reset();
+        assert.equal(handle.capturedPointer, undefined);
+        assert.equal(handle.style.display, 'none');
+        handle.onpointermove(event(500, 500));
+        assert.equal(listeners.size, 0);
+    });
+
     test(`auto-hide ${side}: edge detection, overlay, dismissal, pinning and DOM preservation`, t => {
         const { manager, panel, root, contentRoot, listeners, getDocked } = setup(t, side);
         const autoHide = manager.autoHideManager;

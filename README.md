@@ -56,6 +56,9 @@ surrounding panels still exist, including when a whole group is unpinned and
 then pinned back in a different order. This shared layout history is saved with
 the layout. If a neighboring panel was closed, it uses the
 nearest surviving branch of the old layout, falling back to the saved edge.
+Drag the overlay edge facing the document area to resize it: left/right panels
+change width, and top/bottom panels change height. The overlay size is remembered
+when reopened and saved with the layout.
 Drag the overlay's title bar to turn it into a floating dialog at its last docked
 size and dock it elsewhere. Panel content stays in the DOM throughout these transitions.
 Document tabs and floating dialogs do not have an auto-hide button.

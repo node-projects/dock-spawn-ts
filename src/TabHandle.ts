@@ -89,7 +89,7 @@ export class TabHandle {
     }
 
     removeListener(listener) {
-        this.eventListeners.splice(this.eventListeners.indexOf(listener), 1);
+        Utils.arrayRemove(this.eventListeners, listener);
     }
 
     undockEnabled(state: boolean) {
@@ -280,6 +280,8 @@ export class TabHandle {
     }
 
     destroy() {
+        this.closeContextMenu();
+        this.undockInitiator.enabled = false;
         let panel = this.parent.container as PanelContainer;
         panel.removeListener(this.undockListener);
 

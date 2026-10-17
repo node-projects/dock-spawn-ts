@@ -5,9 +5,9 @@
     justify-content: center;
     box-sizing: border-box;
     position: absolute;
-    right: 18px;
+    right: 25px;
     top: 0;
-    width: 18px;
+    width: 25px;
     height: 25px;
     padding: 0;
     border: 0;
@@ -16,8 +16,8 @@
     cursor: pointer;
     pointer-events: auto;
 }
-.panel-titlebar-can-auto-hide .panel-titlebar-button-close { width: 18px; }
-.panel-titlebar-can-auto-hide .panel-titlebar-text { width: calc(100% - 46px); }
+.panel-titlebar-can-auto-hide .panel-titlebar-button-close { width: 25px; }
+.panel-titlebar-can-auto-hide .panel-titlebar-text { width: calc(100% - 60px); }
 .panel-titlebar-button-auto-hide svg {
     display: block;
     width: 12px;
@@ -56,6 +56,13 @@
 }
 .dock-auto-hide-tab[aria-expanded="true"] { background: #cce4ff; }
 .dock-auto-hide-overlay { box-shadow: 0 2px 8px #0005; }
+.dock-auto-hide-resize-handle {
+    position: absolute;
+    z-index: 9002;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+}
 
 .panel-base {
 	pointer-events: none;
@@ -92,6 +99,7 @@
 }
 
 .panel-titlebar-button-close {
+	cursor: pointer;
 	display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -103,15 +111,16 @@
 }
 
 .panel-titlebar-button-close::after {
-	float: right;
-	cursor: pointer;
-	padding-right: 8px;
-	content: 'x';
-	font-weight: normal;
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	display: flex;
-	height: 100%;
-	align-items: center;
+	content: '';
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	background: linear-gradient(45deg, transparent 44%, currentColor 46%, currentColor 54%, transparent 56%),
+		linear-gradient(-45deg, transparent 44%, currentColor 46%, currentColor 54%, transparent 56%);
+	pointer-events: none;
 }
 
 .panel-titlebar-button-close:hover {
@@ -396,20 +405,26 @@
 	vertical-align: top;
 }
 
-.dockspan-tab-handle-close-button {}
+.dockspan-tab-handle-close-button {
+	position: absolute;
+	right: 1px;
+	top: 2px;
+	width: 18px;
+	height: 18px;
+	cursor: pointer;
+}
 
 .dockspan-tab-handle-close-button::after {
-	margin-right: 5px;
-	float: right;
 	position: absolute;
-	right: 0;
-	content: 'x';
-	font-weight: normal;
-	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	cursor: pointer;
-	display: flex;
-	height: 100%;
-	align-items: center;
+	content: '';
+	width: 10px;
+	height: 10px;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	background: linear-gradient(45deg, transparent 44%, currentColor 46%, currentColor 54%, transparent 56%),
+		linear-gradient(-45deg, transparent 44%, currentColor 46%, currentColor 54%, transparent 56%);
+	pointer-events: none;
 }
 
 .dockspan-tab-handle-close-button:hover {

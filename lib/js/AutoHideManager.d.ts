@@ -34,6 +34,8 @@ export declare class AutoHideManager {
     private openPanel?;
     private restoringPanel?;
     private readonly stripSize;
+    private resizeHandle;
+    private resizeDrag?;
     constructor(manager: DockManager);
     private get entries();
     getSide(panel: PanelContainer): AutoHideSide | undefined;
@@ -64,4 +66,8 @@ export declare class AutoHideManager {
     restore(): void;
     resize(width: number, height: number): void;
     private layoutOverlay;
+    private onResizeStart;
+    private onResizeMove;
+    private onResizeEnd;
+    private stopResize;
 }

@@ -673,7 +673,7 @@ export class DockManager {
     }
 
     removeLayoutListener(listener: ILayoutEventListener) {
-        this.layoutEventListeners.splice(this.layoutEventListeners.indexOf(listener), 1);
+        Utils.arrayRemove(this.layoutEventListeners, listener);
     }
 
     suspendLayout(panel: IDockContainer) {
