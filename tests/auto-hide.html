@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Auto-hide browser regression tests</title>
+<link rel="stylesheet" href="../lib/css/dock-manager.css">
+<link rel="stylesheet" href="../lib/css/dock-manager-style.css">
+<style>
+    body { position: relative; font: 14px sans-serif; margin: 16px; }
+    #dock { position: relative; width: 900px; height: 500px; }
+    #results { white-space: pre-wrap; }
+</style>
+<h1>Auto-hide browser regression tests</h1>
+<p>Run after <code>npm run tsc</code> and <code>npm start</code>.</p>
+<button id="run">Run tests</button>
+<pre id="results"></pre>
+<div id="dock"></div>
+<script type="module">
+    import { DockManager, PanelContainer, PanelType } from '../lib/js/index.js';
+    const results = document.getElementById('results');
+    const host = document.getElementById('dock');
+    const manager = new DockManager(host, { enableAutoHide: true });
+    manager.initialize();
+    const frame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    function assert(condition, message) { if (!condition) throw new Error(message); }
+    let disconnects = 0;
+    customElements.define('stable-content', class extends HTMLElement {
+        disconnectedCallback() { disconnects++; }
+    });
+    function panel(id) {
+        const content = document.createElement('stable-content');
+        content.id = id;
+        content.dataset.panelCaption = id;
+        content.textContent = id;
+        return new PanelContainer(content, manager, id);
+    }
+    document.getElementById('run').onclick = async event => {
+        event.target.disabled = true;
+        try {
+            const doc = manager.context.model.documentManagerNode;
+            const editor = panel('editor');
+            editor.elementContent.tabIndex = 0;
+            editor.panelType = PanelType.document;
+            manager.dockFill(doc, editor);
+            for (const side of ['left', 'right', 'top', 'bottom']) {
+                const tool = panel('tool-' + side);
+                manager[{ left: 'dockLeft', right: 'dockRight', top: 'dockUp', bottom: 'dockDown' }[side]](doc, tool, 0.25);
+                const originalParent = tool.elementContent.parentElement;
+                const before = disconnects;
+                tool.elementButtonAutoHide.click();
+                await frame();
+                assert(tool.isAutoHidden, side + ': titlebar button collapses panel');
+                assert(manager.getPanels().includes(tool), side + ': collapsed panel remains managed');
+                assert(!manager.getVisiblePanels().includes(tool), side + ': collapsed content is hidden');
+                const tab = host.querySelector('.dock-auto-hide-' + side + ' button');
+                tab.click();
+                await frame();
+                const overlay = tool.elementPanel.getBoundingClientRect();
+                const content = tool.elementContentContainer.getBoundingClientRect();
+                assert(content.width > 0 && content.height > 0, side + ': overlay content has positive size');
+                assert(Math.abs(content.left - overlay.left) < 2, side + ': content follows overlay');
+                assert(tab.getAttribute('aria-expanded') === 'true', side + ': edge tab opens overlay');
+                tool.elementContent.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }));
+                assert(tab.getAttribute('aria-expanded') === 'true', side + ': content interaction keeps overlay open');
+                tool.elementPanel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+                assert(tab.getAttribute('aria-expanded') === 'false', side + ': Escape collapses overlay');
+                tab.click();
+                editor.elementContent.focus();
+                assert(tab.getAttribute('aria-expanded') === 'false', side + ': focus outside collapses overlay');
+                tab.click();
+                tool.elementButtonAutoHide.click();
+                await frame();
+                assert(!tool.isAutoHidden && manager.getNodeByElement(tool.elementContent), side + ': pin restores docked panel');
+                assert(editor.elementContent.getBoundingClientRect().right <= host.getBoundingClientRect().right + 1,
+                    side + ': former root has no leftover edge-strip offset');
+                assert(disconnects === before && tool.elementContent.parentElement === originalParent,
+                    side + ': content never disconnected or reparented');
+                tool.setAutoHide(true);
+                await tool.close();
+                await frame();
+                assert(!manager.getPanels().includes(tool) && !host.querySelector('.dock-auto-hide-' + side + ' button'),
+                    side + ': closing removes edge tab');
+                results.textContent += 'PASS ' + side + ' lifecycle and DOM preservation\n';
+            }
+            const first = panel('group-first'), second = panel('group-second');
+            const firstNode = manager.dockLeft(doc, first, 0.2);
+            manager.dockFill(firstNode, second);
+            second.setAutoHide(true);
+            const state = manager.saveState();
+            second.setAutoHide(false);
+            assert(manager.getNodeByElement(first.elementContent).parent === manager.getNodeByElement(second.elementContent).parent,
+                'pin restores tool tab membership');
+            await manager.loadState(state);
+            const restored = manager.getPanels().find(p => p.elementContent.id === 'group-second');
+            assert(restored.isAutoHidden, 'saved edge state restored');
+            manager.autoHideManager.show(restored);
+            manager.resize(600, 300);
+            await frame();
+            assert(restored.width <= 600 && restored.height <= 300, 'overlay stays within resized manager');
+            restored.setAutoHide(false);
+            assert(manager.getNodeByElementId('group-first').parent === manager.getNodeByElementId('group-second').parent,
+                'saved tab group restored on pin');
+            assert(host.querySelectorAll('.panel-titlebar-button-auto-hide').length === 2,
+                'restoration removes the previous dock tree');
+            results.textContent += 'PASS tab group restoration, persistence and resize\n';
+            manager.invalidate();
+            let nested = panel('nested-bottom');
+            manager.dockDown(manager.getNodeByElementId('group-first'), nested, 0.35);
+            const opposite = panel('opposite-tool');
+            manager.dockRight(manager.context.model.documentManagerNode, opposite, 0.2);
+            await frame();
+            const tree = node => ({ type: node.container.containerType,
+                id: node.container.elementContent?.id,
+                children: node.children.map(tree) });
+            // Inactive tab pages intentionally retain their last visible cached dimensions.
+            const geometry = node => [...(node.container.containerType === 'panel' && node.parent?.container.containerType === 'fill'
+                ? [] : [{ id: node.container.elementContent?.id, width: node.container.width, height: node.container.height }]),
+                ...node.children.flatMap(geometry)];
+            const originalTree = JSON.stringify(tree(manager.context.model.rootNode));
+            const originalSizes = geometry(manager.context.model.rootNode);
+            for (const id of ['nested-bottom', 'group-first', 'opposite-tool']) {
+                const tool = manager.getPanels().find(p => p.elementContent.id === id);
+                tool.setAutoHide(true);
+                tool.setAutoHide(false);
+                await frame();
+                assert(JSON.stringify(tree(manager.context.model.rootNode)) === originalTree,
+                    id + ': pin restores original nested tree and tab order');
+                const sizes = geometry(manager.context.model.rootNode);
+                assert(sizes.every((size, index) => Math.abs(size.width - originalSizes[index].width) <= 1
+                    && Math.abs(size.height - originalSizes[index].height) <= 1),
+                    id + ': pin restores previous pane sizes: ' + JSON.stringify({ expected: originalSizes, actual: sizes }));
+            }
+            results.textContent += 'PASS nested splitters, tab order and pane sizes\n';
+            const orders = [
+                ['group-first', 'group-second', 'nested-bottom'],
+                ['group-first', 'nested-bottom', 'group-second'],
+                ['group-second', 'group-first', 'nested-bottom'],
+                ['group-second', 'nested-bottom', 'group-first'],
+                ['nested-bottom', 'group-first', 'group-second'],
+                ['nested-bottom', 'group-second', 'group-first']
+            ];
+            for (const hideOrder of orders) for (const pinOrder of orders) {
+                const tools = new Map(manager.getPanels().map(p => [p.elementContent.id, p]));
+                for (const id of hideOrder) tools.get(id).setAutoHide(true);
+                assert(manager.context.model.autoHidePanels.length === 3, 'whole left group unpinned');
+                for (const id of pinOrder) tools.get(id).setAutoHide(false);
+                await frame();
+                const context = 'hide ' + hideOrder.join(',') + '; pin ' + pinOrder.join(',');
+                assert(JSON.stringify(tree(manager.context.model.rootNode)) === originalTree,
+                    'different pin order restores original tree: ' + context);
+                const sizes = geometry(manager.context.model.rootNode);
+                assert(sizes.every((size, index) => Math.abs(size.width - originalSizes[index].width) <= 1
+                    && Math.abs(size.height - originalSizes[index].height) <= 1),
+                    'different pin order restores sizes: ' + context + ' ' + JSON.stringify({ expected: originalSizes, actual: sizes }));
+            }
+            results.textContent += 'PASS all 36 unpin/pin order combinations\n';
+            for (const id of orders[0]) manager.getPanels().find(p => p.elementContent.id === id).setAutoHide(true);
+            const hiddenGroupState = manager.saveState();
+            await manager.loadState(hiddenGroupState);
+            for (const id of orders[5]) manager.getPanels().find(p => p.elementContent.id === id).setAutoHide(false);
+            await frame();
+            assert(JSON.stringify(tree(manager.context.model.rootNode)) === originalTree,
+                'pinning a saved hidden group in reverse order restores the original layout');
+            nested = manager.getPanels().find(p => p.elementContent.id === 'nested-bottom');
+            results.textContent += 'PASS reverse-order pinning after reload\n';
+            nested.setAutoHide(true);
+            const collapsedState = manager.saveState();
+            manager.setAutoHideEnabled(false);
+            assert(!nested.isAutoHidden && nested.elementButtonAutoHide.style.display === 'none', 'disabling re-pins and hides controls');
+            nested.setAutoHide(true);
+            assert(!nested.isAutoHidden, 'disabled feature rejects API unpin');
+            await manager.loadState(collapsedState);
+            assert(manager.context.model.autoHidePanels.length === 0, 'disabled feature re-pins restored edge panels');
+            assert(JSON.stringify(tree(manager.context.model.rootNode)) === originalTree, 'disabled restoration preserves nested tree');
+            manager.setAutoHideEnabled(true);
+            results.textContent += 'PASS configuration and disabled-state restoration\n';
+            const draggable = manager.getPanels().find(p => p.elementContent.id === 'nested-bottom');
+            const lastDockedSize = { width: draggable.width, height: draggable.height };
+            draggable.lastDialogSize = { width: 700, height: 400 };
+            draggable.setAutoHide(true);
+            manager.autoHideManager.show(draggable);
+            await frame();
+            const treeBeforeDrag = JSON.stringify(tree(manager.context.model.rootNode));
+            const beforeDragDisconnects = disconnects;
+            const rect = draggable.elementTitle.getBoundingClientRect();
+            draggable.elementTitle.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0,
+                buttons: 1, clientX: rect.x + 40, clientY: rect.y + 10 }));
+            window.dispatchEvent(new MouseEvent('mousemove', { buttons: 1, clientX: rect.x + 40, clientY: rect.y + 40 }));
+            assert(!draggable.isAutoHidden && draggable.isDialog && draggable.floatingDialog,
+                'dragging an unpinned title creates a floating dialog');
+            assert(draggable.width === lastDockedSize.width && draggable.height === lastDockedSize.height,
+                'overlay drag uses last docked size instead of overlay or older dialog size');
+            window.dispatchEvent(new PointerEvent('pointerup', { clientX: -20, clientY: -20 }));
+            await frame();
+            assert(JSON.stringify(tree(manager.context.model.rootNode)) === treeBeforeDrag, 'overlay drag does not re-pin or disturb dock layout');
+            assert(disconnects === beforeDragDisconnects, 'overlay drag preserves live content');
+            results.textContent += 'PASS dragging an unpinned panel\n';
+            const orphan = panel('orphan-bottom');
+            manager.dockDown(manager.getNodeByElementId('group-first'), orphan, 0.3);
+            orphan.setAutoHide(true);
+            for (const id of ['group-first', 'group-second'])
+                await manager.getPanels().find(p => p.elementContent.id === id).close();
+            orphan.setAutoHide(false);
+            assert(manager.getNodeByElement(orphan.elementContent) && manager.autoHideManager.getSide(orphan) === 'left',
+                'pin falls back to a surviving ancestor when original neighbors close');
+            results.textContent += 'PASS restoration after neighbors close\n';
+            orphan.setAutoHide(true);
+            const bounds = host.getBoundingClientRect();
+            const floating = draggable.floatingDialog;
+            const atLeft = { clientX: bounds.left + 10, clientY: bounds.top + bounds.height / 2, buttons: 1 };
+            floating.draggable.onMouseDown(new PointerEvent('pointerdown', atLeft));
+            window.dispatchEvent(new MouseEvent('mousemove', atLeft));
+            const outerLeft = manager.dockWheel.wheelItems['left-s'].element;
+            assert(outerLeft.isConnected && manager.dockWheel.activeNode, 'outer guide stays available over left strip');
+            outerLeft.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, ...atLeft }));
+            window.dispatchEvent(new PointerEvent('pointerup', atLeft));
+            await frame();
+            assert(!draggable.isDialog && manager.getNodeByElement(draggable.elementContent),
+                'outer-left drop succeeds with every left panel auto-hidden');
+            assert(orphan.isAutoHidden, 'outer docking leaves edge tabs available');
+            results.textContent += 'PASS outer-left docking with all left panels unpinned\nALL TESTS PASSED';
+            manager.invalidate();
+            await frame();
+            const button = draggable.elementButtonAutoHide.getBoundingClientRect();
+            const pin = draggable.elementButtonAutoHide.querySelector('svg').getBoundingClientRect();
+            const close = draggable.elementButtonClose.getBoundingClientRect();
+            const centerY = rect => rect.top + rect.height / 2;
+            assert(Math.abs(centerY(pin) - centerY(close)) <= 0.5, 'pin icon is vertically centered with close button');
+            assert(Math.abs(button.right - close.left) <= 0.5, 'pin button sits directly beside close button');
+            results.textContent = results.textContent.replace('ALL TESTS PASSED', 'PASS pin/close alignment\nALL TESTS PASSED');
+            manager.invalidate();
+            await frame();
+        } catch (error) {
+            results.textContent += 'FAIL ' + error.stack;
+            console.error(error);
+        }
+    };
+</script>
+</html>

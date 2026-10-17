@@ -1,4 +1,5 @@
 import { moveElementToNewBrowserWindow } from "./BrowserDialogHelper.js";
+import { AutoHideSide } from './AutoHideManager.js';
 import { ContainerType } from "./ContainerType.js";
 import { Dialog } from "./Dialog.js";
 import { DockManager } from "./DockManager.js";
@@ -43,6 +44,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     eventListeners: any[];
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
+    elementButtonAutoHide: HTMLButtonElement;
     closeButtonClickedHandler: EventHandler;
     closeButtonTouchedHandler: EventHandler;
     mouseDownHandler: EventHandler;
@@ -126,6 +128,18 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this.elementPanel.appendChild(this.elementTitle);
         this.elementTitle.appendChild(this.elementTitleText);
         this.elementTitle.appendChild(this.elementButtonClose);
+        this.elementButtonAutoHide = document.createElement('button');
+        this.elementButtonAutoHide.type = 'button';
+        this.elementButtonAutoHide.className = 'panel-titlebar-button-auto-hide';
+        this.elementButtonAutoHide.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2h6M6 2v4L4 8v2h8V8l-2-2V2M8 10v4"/></svg>';
+        this.elementButtonAutoHide.style.display = 'none';
+        for (const event of ['mousedown', 'touchstart'])
+            this.elementButtonAutoHide.addEventListener(event, e => e.stopPropagation());
+        this.elementButtonAutoHide.onclick = e => {
+            e.stopPropagation();
+            this.setAutoHide(!this.isAutoHidden);
+        };
+        this.elementTitle.appendChild(this.elementButtonAutoHide);
         this.elementButtonClose.classList.add('panel-titlebar-button-close');
         this.elementButtonClose.style.display = this._hideCloseButton ? 'none' : 'block';
 
@@ -240,6 +254,8 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     canUndock(state: boolean) {
         this._canUndock = state;
         this.undockInitiator.enabled = state;
+        if (this.isAutoHidden) this.undockInitiator.enabled = state && this.dockManager.autoHideManager.isOpen(this);
+        this.updateAutoHideButton();
         this.eventListeners.forEach((listener) => {
             if (listener.onDockEnabled) {
                 listener.onDockEnabled({ self: this, state: state });
@@ -350,6 +366,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     destroy() {
+        if (this.isAutoHidden) this.dockManager.autoHideManager.remove(this);
         if (this.mouseDownHandler) {
             this.mouseDownHandler.cancel();
             delete this.mouseDownHandler;
@@ -406,6 +423,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     };
 
     prepareForDocking() {
+        if (this.isAutoHidden) this.dockManager.autoHideManager.remove(this);
         this.isDialog = false;
         this.undockInitiator.enabled = this._canUndock;
         if (this.elementContentContainer.parentElement != this.dockManager.config.dialogRootElement)
@@ -500,6 +518,27 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
 
     setVisible(isVisible: boolean) {
         this.elementContentContainer.style.display = isVisible ? '' : 'none';
+    }
+
+    get isAutoHidden(): boolean {
+        return this.dockManager.autoHideManager?.isAutoHidden(this) ?? false;
+    }
+
+    /** Collapse a tool panel to an edge tab, or pin it back into the layout. */
+    setAutoHide(enabled: boolean, side?: AutoHideSide) {
+        this.dockManager.autoHideManager?.setAutoHide(this, enabled, side);
+    }
+
+    updateAutoHideButton() {
+        if (!this.elementButtonAutoHide) return;
+        const manager = this.dockManager.autoHideManager;
+        const visible = manager && this.dockManager.config.enableAutoHide && this._canUndock && this.dockManager._undockEnabled && manager.getSide(this);
+        this.elementButtonAutoHide.style.display = visible ? '' : 'none';
+        this.elementTitle.classList.toggle('panel-titlebar-can-auto-hide', !!visible);
+        const title = Localizer.getString(this.isAutoHidden ? 'PinPanel' : 'AutoHide');
+        this.elementButtonAutoHide.title = title;
+        this.elementButtonAutoHide.setAttribute('aria-label', title);
+        this.elementButtonAutoHide.setAttribute('aria-pressed', String(this.isAutoHidden));
     }
 
     setTitle(title: string) {

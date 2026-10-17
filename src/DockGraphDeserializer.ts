@@ -30,6 +30,14 @@ export class DockGraphDeserializer {
         model.rootNode = await this._buildGraph(info.graphInfo);
         model.dialogs = await this._buildDialogs(info.dialogsInfo);
         model.documentManagerNode = this.documentManagerNode;
+        model.autoHideLayout = info.autoHideLayout;
+        for (const entry of info.autoHidePanels ?? []) {
+            if (!['left', 'right', 'top', 'bottom'].includes(entry.side)) continue;
+            const panel = await PanelContainer.loadFromState(entry.state, this.dockManager);
+            if (panel) model.autoHidePanels.push({ panel, side: entry.side,
+                width: entry.state.width, height: entry.state.height, tabGroupElement: entry.tabGroupElement,
+                restoreLocations: entry.restoreLocations });
+        }
         return model;
     }
 

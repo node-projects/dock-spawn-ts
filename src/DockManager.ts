@@ -1,4 +1,5 @@
 import { Dialog } from "./Dialog.js";
+import { AutoHideManager } from './AutoHideManager.js';
 import { DockConfig } from "./DockConfig.js";
 import { DockGraphDeserializer } from "./DockGraphDeserializer.js";
 import { DockGraphSerializer } from "./DockGraphSerializer.js";
@@ -27,6 +28,7 @@ import { Utils } from "./Utils.js";
  * Initially the document manager takes up the central space and acts as the root node
  */
 export class DockManager {
+    public autoHideManager: AutoHideManager;
 
     public element: HTMLElement;
     public context: DockManagerContext;
@@ -95,6 +97,7 @@ export class DockManager {
 
         this.onKeyPressBound = this.onKeyPress.bind(this);
         this.element.addEventListener('keydown', this.onKeyPressBound);
+        this.autoHideManager = new AutoHideManager(this);
     }
 
     onKeyPress(e: KeyboardEvent) {
@@ -203,7 +206,9 @@ export class DockManager {
     }
 
     resize(width: number, height: number) {
-        this.context.model.rootNode.container.resize(width, height);
+        if (this.autoHideManager) this.autoHideManager.resize(width, height);
+        else this.context.model.rootNode.container.resize(width, height);
+        this.getPanels().forEach(panel => panel.updateAutoHideButton());
 
         let offsetX = 0, offsetY = 0;
         for (let dialog of this.context.model.dialogs) {
@@ -243,6 +248,12 @@ export class DockManager {
 
 
     setRootNode(node: DockNode) {
+        // Edge-strip offsets belong to the root, never to a former root nested by docking.
+        const previousRoot = this.context.model.rootNode;
+        if (previousRoot && previousRoot !== node && this.autoHideManager) {
+            previousRoot.container.containerElement.style.left = '';
+            previousRoot.container.containerElement.style.top = '';
+        }
         // if (this.context.model.rootNode)
         // {
         //     // detach it from the dock manager's base element
@@ -316,6 +327,13 @@ export class DockManager {
                 // Keep looking future down
                 [].push.apply(stack, topNode.children);
             }
+        }
+        // Edge tabs occupy space inside the manager but outside the resized dock tree.
+        // Keep the outer dock guides available while dragging across those strips.
+        if (!bestMatch) {
+            const bounds = this.element.getBoundingClientRect();
+            if (x >= bounds.left && x < bounds.right && y >= bounds.top && y < bounds.bottom)
+                return this.context.model.rootNode;
         }
         return bestMatch;
     }
@@ -406,6 +424,7 @@ export class DockManager {
         dialog.destroy();
         layoutDockFunction(referenceNode, newNode);
         // this.invalidate();
+        this.autoHideManager?.onDock(newNode);
         return newNode;
     }
 
@@ -463,6 +482,7 @@ export class DockManager {
 
         this._checkShowBackgroundContext();
 
+        this.autoHideManager?.onDock(newNode);
         return newNode;
     }
 
@@ -476,16 +496,23 @@ export class DockManager {
      * It is assumed that only leaf nodes (panels) can be undocked
      */
     requestUndockToDialog(container: PanelContainer, event, dragOffset: Point) {
-        let node = this._findNodeFromContainer(container);
-        this.layoutEngine.undock(node);
-
-        let panelContainer = (<PanelContainer>node.container);
+        const autoHideEntry = this.autoHideManager?.isAutoHidden(container)
+            ? this.autoHideManager.remove(container) : undefined;
+        if (autoHideEntry) {
+            // Transfer the overlay directly into a dialog without re-pinning or changing the dock tree.
+            container.resize(autoHideEntry.width, autoHideEntry.height);
+        } else {
+            const node = this._findNodeFromContainer(container);
+            this.layoutEngine.undock(node);
+        }
+        let panelContainer = container;
         panelContainer.elementPanel.style.display = 'block';
 
         // Create a new dialog window for the undocked panel
         let dialog = new Dialog(panelContainer, this, null);
+        panelContainer.updateAutoHideButton();
 
-        if (panelContainer.lastDialogSize)
+        if (panelContainer.lastDialogSize && !autoHideEntry)
             dialog.resize(panelContainer.lastDialogSize.width, panelContainer.lastDialogSize.height);
 
         if (event !== undefined) {
@@ -505,6 +532,10 @@ export class DockManager {
     * closes a Panel
     */
     requestClose(container: PanelContainer) {
+        if (this.autoHideManager?.isAutoHidden(container)) {
+            this.autoHideManager.remove(container);
+            return;
+        }
         let node = this._findNodeFromContainer(container);
         this.layoutEngine.close(node);
         if (this.activePanel == container)
@@ -541,6 +572,10 @@ export class DockManager {
      * It is assumed that only leaf nodes (panels) can be undocked
      */
     requestUndock(container: PanelContainer) {
+        if (this.autoHideManager?.isAutoHidden(container)) {
+            this.autoHideManager.remove(container);
+            return;
+        }
         let node = this._findNodeFromContainer(container);
         this.layoutEngine.undock(node);
     }
@@ -779,8 +814,11 @@ export class DockManager {
 
     async loadState(json: string) {
         let deserializer = new DockGraphDeserializer(this);
-        this.context.model = await deserializer.deserialize(json);
-        this.setModel(this.context.model);
+        const model = await deserializer.deserialize(json);
+        this.autoHideManager?.reset();
+        Utils.removeNode(this.context.model.rootNode.container.containerElement);
+        this.setModel(model);
+        this.autoHideManager?.restore();
     }
 
     getPanels() {
@@ -789,6 +827,7 @@ export class DockManager {
         this._allPanels(this.context.model.rootNode, panels);
 
         //all visible or not dialogs
+        panels.push(...this.context.model.autoHidePanels.map(entry => entry.panel));
         this.context.model.dialogs.forEach((dialog) => {
             //TODO: check visible
             panels.push(dialog.panel);
@@ -802,6 +841,15 @@ export class DockManager {
         this.getPanels().forEach((panel) => {
             panel.canUndock(state);
         });
+    }
+
+    /** Toggle auto-hide at runtime. Disabling it re-pins all collapsed panels. */
+    setAutoHideEnabled(enabled: boolean) {
+        this.config.enableAutoHide = enabled;
+        if (!enabled)
+            for (const entry of [...this.context.model.autoHidePanels])
+                this.autoHideManager.setAutoHide(entry.panel, false);
+        this.getPanels().forEach(panel => panel.updateAutoHideButton());
     }
 
     lockDockState(state: boolean) {
@@ -819,6 +867,7 @@ export class DockManager {
         let panels: PanelContainer[] = [];
         //all visible nodes
         this._allPanels(this.context.model.rootNode, panels);
+        panels.push(...this.context.model.autoHidePanels.map(entry => entry.panel));
         //only remove
         panels.forEach((panel) => {
             if (!Utils.arrayContains(ids, panel.elementContent.id)) {
@@ -841,6 +890,8 @@ export class DockManager {
         let panels: PanelContainer[] = [];
         //all visible nodes
         this._allPanels(this.context.model.rootNode, panels);
+        panels.push(...this.context.model.autoHidePanels.filter(entry =>
+            entry.panel.elementPanel.style.display !== 'none').map(entry => entry.panel));
 
         //all visible
         this.context.model.dialogs.forEach((dialog) => {

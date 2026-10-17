@@ -1,3 +1,4 @@
+import { AutoHideSide } from './AutoHideManager.js';
 import { ContainerType } from "./ContainerType.js";
 import { Dialog } from "./Dialog.js";
 import { DockManager } from "./DockManager.js";
@@ -40,6 +41,7 @@ export declare class PanelContainer implements IDockContainerWithSize, IContextM
     eventListeners: any[];
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
+    elementButtonAutoHide: HTMLButtonElement;
     closeButtonClickedHandler: EventHandler;
     closeButtonTouchedHandler: EventHandler;
     mouseDownHandler: EventHandler;
@@ -102,6 +104,10 @@ export declare class PanelContainer implements IDockContainerWithSize, IContextM
     _setPanelDimensions(width: number, height: number): void;
     setDialogPosition(x: number, y: number): void;
     setVisible(isVisible: boolean): void;
+    get isAutoHidden(): boolean;
+    /** Collapse a tool panel to an edge tab, or pin it back into the layout. */
+    setAutoHide(enabled: boolean, side?: AutoHideSide): void;
+    updateAutoHideButton(): void;
     setTitle(title: string): void;
     setTitleIcon(icon: string): void;
     setHasChanges(changes: boolean): void;

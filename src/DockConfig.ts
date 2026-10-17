@@ -5,6 +5,7 @@ export class DockConfig {
         this.dialogRootElement = document.body;
         this.moveOnlyWithinDockConatiner = false;
         this.enableBrowserWindows = true;
+        this.enableAutoHide = false;
     }
 
     escClosesWindow?: boolean;
@@ -12,4 +13,6 @@ export class DockConfig {
     dialogRootElement: HTMLElement;
     moveOnlyWithinDockConatiner?: boolean;
     enableBrowserWindows?: boolean;
+    /** Allow tool panels to collapse to edge tabs. Disabled by default. */
+    enableAutoHide?: boolean;
 }

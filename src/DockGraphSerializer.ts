@@ -13,7 +13,14 @@ export class DockGraphSerializer {
     serialize(model: DockModel) {
         let graphInfo = this._buildGraphInfo(model.rootNode);
         let dialogs = this._buildDialogsInfo(model.dialogs.sort((x,y)=><number><any>x.elementDialog.style.zIndex-<number><any>y.elementDialog.style.zIndex));
-        return JSON.stringify({ graphInfo: graphInfo, dialogsInfo: dialogs });
+        const autoHidePanels = model.autoHidePanels.map(entry => {
+            const state: IState = {};
+            entry.panel.saveState(state);
+            state.width = entry.width;
+            state.height = entry.height;
+            return { state, side: entry.side, tabGroupElement: entry.tabGroupElement, restoreLocations: entry.restoreLocations };
+        });
+        return JSON.stringify({ graphInfo: graphInfo, dialogsInfo: dialogs, autoHidePanels, autoHideLayout: model.autoHideLayout });
     }
 
     _buildGraphInfo(node: DockNode): INodeInfo {
