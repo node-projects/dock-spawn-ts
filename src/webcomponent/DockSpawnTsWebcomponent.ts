@@ -49,7 +49,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         super();
 
         const shadowRoot = this.attachShadow({ mode: 'open' });
-        shadowRoot.adoptedStyleSheets = [DockSpawnTsWebcomponent.style, style1, style2];
+        shadowRoot.adoptedStyleSheets = [DockSpawnTsWebcomponent.style, style2, style1];
 
         this.windowResizedBound = this.windowResized.bind(this);
         this.slotElementMap = new WeakMap();

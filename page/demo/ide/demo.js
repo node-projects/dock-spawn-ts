@@ -15,7 +15,7 @@ function createTestDialogContent(id) {
     const el = document.createElement("div");
     el.id = id;
     el.dataset.panelCaption = 'Test Dlg';
-    el.style.background = 'lightgreen';
+    el.style.background = '#ffffff';
     el.textContent = "TestDialog";
     return el;
 }

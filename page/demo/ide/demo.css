@@ -4,9 +4,9 @@ html {
 }
 
 body {
-  background-color: #F8F8F8;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
+  background-color: #eeeef2;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 12px;
   font-weight: normal;
   line-height: 1.2em;
   margin: 0px;
@@ -15,22 +15,22 @@ body {
 }
 
 .demo-header {
-  background-color: #000;
-  color: #888;
+  background-color: #eeeef2;
+  color: #444;
   width: 100%;
   height: 47px;
 }
 
 .demo-header-title {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 22px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
   padding: 15px;
   float: left;
   position:relative;
 }
 
 .demo-header-description {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   font-size: 12px;
   float: left;
   padding: 15px;
@@ -38,7 +38,7 @@ body {
 }
 
 .my-dock-manager {
-  background-color: #F8F8F8;
+  background-color: #eeeef2;
   clear: both;
   height: 100%;
 }
@@ -58,7 +58,7 @@ body {
 .properties-window {
 	width: 300px;
 	height: 200px;
-	background-color: #aac;
+	background-color: #f5f5f5;
 }
 
 .toolbox-window {
@@ -82,13 +82,13 @@ body {
 .outline-window {
 	width: 300px;
 	height: 200px;
-	background-color: #ddd;
+	background-color: #f5f5f5;
 }
 
 .state-window {
 	width: 300px;
 	height: 200px;
-	background-color: #edd;
+	background-color: #f5f5f5;
 }
 
 .editor-host {
@@ -97,3 +97,6 @@ body {
 }
 
 .activeline {background: #e8f2ff !important;}
+
+.demo-header a { color: #005a9e !important; }
+.demo-header a:hover { text-decoration: underline !important; }
