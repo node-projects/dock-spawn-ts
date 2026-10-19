@@ -1,6 +1,6 @@
 import { DockManager } from "./DockManager.js";
 import { SplitterPanel } from "./SplitterPanel.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { IDockContainer, ResizeContext } from "./interfaces/IDockContainer.js";
 import { ContainerType } from "./ContainerType.js";
 import { ISize } from "./interfaces/ISize.js";
 import { IDockContainerWithSize } from "./interfaces/IDockContainerWithSize.js";
@@ -32,12 +32,12 @@ export abstract class SplitterDockContainer implements IDockContainerWithSize {
         this.minimumAllowedChildNodes = 2;
     }
 
-    resize(width: number, height: number): Promise<void> {
+    resize(width: number, height: number, context?: ResizeContext): Promise<void> {
         //    if (_cachedWidth === _cachedWidth && _cachedHeight === _height) {
         //      // No need to resize
         //      return;
         //    }
-        const resized = this.splitterPanel.resize(width, height);
+        const resized = this.splitterPanel.resize(width, height, context);
         this._cachedWidth = width;
         this._cachedHeight = height;
         return resized;

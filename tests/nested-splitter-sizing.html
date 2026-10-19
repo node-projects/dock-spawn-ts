@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Nested splitter resizing — issue #116</title>
+<link rel="stylesheet" href="../lib/css/dock-manager.css">
+<link rel="stylesheet" href="../lib/css/dock-manager-style.css">
+<style>
+    body { position: relative; margin: 16px; font: 14px system-ui, sans-serif; }
+    #dock { position: relative; width: 1000px; height: 600px; }
+    #results { white-space: pre-wrap; }
+    .sample { background: #e6f3ff; padding: 12px; box-sizing: border-box; }
+</style>
+<h1>Nested splitter resizing — issue #116</h1>
+<p>Run after <code>npm run tsc</code> and <code>npm start</code>.</p>
+<p>Adjust List/Detail, then drag the splitter beside Pivot. Nested panels should retain their proportions.</p>
+<button id="run">Run regression tests</button>
+<button id="reset">Reset vertical example</button>
+<pre id="results">Ready.</pre>
+<div id="dock"></div>
+<script type="module">
+    import { DockManager, PanelContainer, PanelType } from '../lib/js/index.js';
+    const host = document.getElementById('dock'), results = document.getElementById('results');
+    const assert = (condition, message) => { if (!condition) throw Error(message); };
+    const log = message => { results.textContent += message + '\n'; };
+    const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    let manager;
+    async function layout() {
+        await manager.resize(host.clientWidth, host.clientHeight);
+        await settle();
+    }
+    async function reset(vertical = true, groupFirst = true, nested = true) {
+        if (manager) {
+            const panels = manager.getPanels();
+            for (const p of panels) p.elementContentContainer.remove();
+            host.replaceChildren();
+        }
+        manager = new DockManager(host);
+        manager.config.dialogRootElement = host;
+        manager.initialize();
+        const panel = (name, type) => {
+            const content = document.createElement('div');
+            content.className = 'sample';
+            content.textContent = name;
+            return new PanelContainer(content, manager, name, type);
+        };
+        const list = panel('List', PanelType.document), detail = panel('Detail'), pivot = panel('Pivot');
+        const doc = manager.context.model.documentManagerNode;
+        manager.dockFill(doc, list);
+        await layout();
+        const method = vertical ? 'dockDown' : 'dockRight';
+        manager[method](doc, detail, 0.3);
+        await layout();
+        const reference = nested ? manager.context.model.rootNode : manager.getNodeByElement(detail.elementContent);
+        const outerMethod = groupFirst ? method : vertical ? 'dockUp' : 'dockLeft';
+        manager[outerMethod](reference, pivot, 0.25);
+        await layout();
+        const outer = manager.context.model.rootNode.container;
+        const inner = nested ? outer.splitterPanel.childContainers[groupFirst ? 0 : 1] : null;
+        const axis = vertical ? 'height' : 'width';
+        // Exposed for real mouse automation and manual inspection.
+        window.fixture = { manager, list, detail, pivot, outer, inner, axis, vertical, groupFirst };
+        return window.fixture;
+    }
+    const drag = (bar, delta, vertical) => bar._performDrag(vertical ? 0 : delta, vertical ? delta : 0);
+    document.getElementById('reset').onclick = () => reset();
+    document.getElementById('run').onclick = async event => {
+        event.target.disabled = true;
+        results.textContent = '';
+        try {
+            for (const vertical of [true, false]) {
+                for (const groupFirst of [true, false]) {
+                    const { inner, outer, detail, pivot, axis } = await reset(vertical, groupFirst);
+                    assert(inner.splitterPanel && inner.containerType === outer.containerType, 'Nested splitters share an axis');
+                    const list = inner.splitterPanel.childContainers[0];
+                    const initial = detail[axis];
+                    drag(inner.splitterPanel.spiltterBars[0], 40, vertical);
+                    await layout();
+                    assert(detail[axis] === initial - 40, 'Inner drag and layout retain the adjusted Detail size');
+                    for (const delta of [-60, 40, -30, 50]) {
+                        const available = inner[axis] - 5, before = list[axis];
+                        const expectedTotal = available + (groupFirst ? delta : -delta);
+                        drag(outer.splitterPanel.spiltterBars[0], delta, vertical);
+                        await settle();
+                        assert(Math.abs(list[axis] - before * expectedTotal / available) <= 1, 'Outer drag scales the current inner ratio');
+                        assert(list[axis] + detail[axis] === expectedTotal, 'Nested panes fill the resized group');
+                        const sizes = [list[axis], detail[axis], pivot[axis]].join();
+                        await layout();
+                        assert([list[axis], detail[axis], pivot[axis]].join() === sizes, 'Layout does not restore stale preferred sizes');
+                    }
+                    log('PASS ' + (vertical ? 'vertical' : 'horizontal') + ': nested group ' + (groupFirst ? 'before' : 'after') + ' Pivot, repeated inner/outer drags');
+                }
+                const { outer, detail, pivot, axis } = await reset(vertical, true, false);
+                assert(outer.splitterPanel.childContainers.length === 3, 'Panel-relative docking produces a flat splitter');
+                const pivotSize = pivot[axis], detailSize = detail[axis];
+                drag(outer.splitterPanel.spiltterBars[0], 30, vertical);
+                await layout();
+                assert(pivot[axis] === pivotSize && detail[axis] === detailSize - 30, 'Flat drag changes only adjacent panes');
+                log('PASS ' + (vertical ? 'vertical' : 'horizontal') + ': flat comparison and later layout');
+            }
+            await reset();
+            log('ALL TESTS PASSED — vertical example ready for real mouse dragging.');
+        } catch (error) {
+            log('FAIL ' + error.stack);
+        } finally { event.target.disabled = false; }
+    };
+    await reset();
+</script>
+</html>

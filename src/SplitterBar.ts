@@ -1,4 +1,4 @@
-import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { IDockContainer, ResizeContext } from "./interfaces/IDockContainer.js";
 import { EventHandler } from "./EventHandler.js";
 import { Utils } from "./Utils.js";
 import { IMouseOrTouchEvent } from "./interfaces/IMouseOrTouchEvent.js";
@@ -17,8 +17,9 @@ export class SplitterBar {
     pointerUpHandler: EventHandler;
 
     private iframeEventHandlers: EventHandler[];
+    private resizeContext?: ResizeContext;
 
-    constructor(previousContainer: IDockContainer, nextContainer: IDockContainer, stackedVertical: boolean) {
+    constructor(previousContainer: IDockContainer, nextContainer: IDockContainer, stackedVertical: boolean, private onResize?: () => void) {
         // The panel to the left/top side of the bar, depending on the bar orientation
         this.previousContainer = previousContainer;
         // The panel to the right/bottom side of the bar, depending on the bar orientation
@@ -98,21 +99,23 @@ export class SplitterBar {
                 return;
         }
 
+        const context = this.resizeContext ?? { proportionalSizes: new WeakMap() };
         if (this.stackedVertical) {
-            this.previousContainer.resize(previousWidth, newPreviousPanelSize);
-            this.nextContainer.resize(nextWidth, newNextPanelSize);
+            this.previousContainer.resize(previousWidth, newPreviousPanelSize, context);
+            this.nextContainer.resize(nextWidth, newNextPanelSize, context);
         }
         else {
             if (deltaMovement < 0) {
-                this.previousContainer.resize(newPreviousPanelSize, previousHeight);
-                this.nextContainer.resize(newNextPanelSize, nextHeight);
+                this.previousContainer.resize(newPreviousPanelSize, previousHeight, context);
+                this.nextContainer.resize(newNextPanelSize, nextHeight, context);
             } else {
-                this.nextContainer.resize(newNextPanelSize, nextHeight);
-                this.previousContainer.resize(newPreviousPanelSize, previousHeight);
-                this.nextContainer.resize(newNextPanelSize, nextHeight);
+                this.nextContainer.resize(newNextPanelSize, nextHeight, context);
+                this.previousContainer.resize(newPreviousPanelSize, previousHeight, context);
+                this.nextContainer.resize(newNextPanelSize, nextHeight, context);
             }
         }
 
+        this.onResize?.();
         document.dispatchEvent(this.dockSpawnResizedEvent);
     }
 
@@ -125,6 +128,7 @@ export class SplitterBar {
     }
 
     _startDragging(e: IMouseOrTouchEvent) {
+        this.resizeContext = { proportionalSizes: new WeakMap() };
         Utils.disableGlobalTextSelection(this.previousContainer.dockManager.config.dialogRootElement);
         if (this.pointerMovedHandler) {
             this.pointerMovedHandler.cancel();
@@ -149,6 +153,7 @@ export class SplitterBar {
     }
 
     _stopDragging() {
+        this.resizeContext = undefined;
         Utils.enableGlobalTextSelection(this.previousContainer.dockManager.config.dialogRootElement);
         if (this.pointerMovedHandler) {
             this.pointerMovedHandler.cancel();

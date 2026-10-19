@@ -1,7 +1,7 @@
 import { SplitterBar } from "./SplitterBar.js";
 import { Utils } from "./Utils.js";
 import { ContainerType } from "./ContainerType.js";
-import { IDockContainer } from "./interfaces/IDockContainer.js";
+import { IDockContainer, ResizeContext } from "./interfaces/IDockContainer.js";
 
 /**
  * A splitter panel manages the child containers inside it with splitter bars.
@@ -32,7 +32,11 @@ export class SplitterPanel {
         for (let i = 0; i < this.childContainers.length - 1; i++) {
             let previousContainer = this.childContainers[i];
             let nextContainer = this.childContainers[i + 1];
-            let splitterBar = new SplitterBar(previousContainer, nextContainer, this.stackedVertical);
+            let splitterBar = new SplitterBar(previousContainer, nextContainer, this.stackedVertical, () => {
+                // An explicit drag replaces the preferred sizes of its two adjacent panes.
+                this.preferredChildSizes.set(previousContainer, this.getChildSize(previousContainer));
+                this.preferredChildSizes.set(nextContainer, this.getChildSize(nextContainer));
+            });
             this.spiltterBars.push(splitterBar);
 
             // Add the container and split bar to the panel's base div element
@@ -192,7 +196,7 @@ export class SplitterPanel {
         return Promise.all(pending).then(() => {});
     }
 
-    resize(width: number, height: number): Promise<void> {
+    resize(width: number, height: number, context?: ResizeContext): Promise<void> {
         const pending: Promise<void>[] = [];
         if (this.childContainers.length <= 1)
             return Promise.resolve();
@@ -214,8 +218,8 @@ export class SplitterPanel {
         let targetTotalChildPanelSize = this.stackedVertical ? height : width;
         targetTotalChildPanelSize -= barSize * this.spiltterBars.length;
 
-        if (!this.preserveNonElasticSizes || !this.hasElasticChild()) {
-            return this.resizeProportionally(width, height, targetTotalChildPanelSize);
+        if (context || !this.preserveNonElasticSizes || !this.hasElasticChild()) {
+            return this.resizeProportionally(width, height, targetTotalChildPanelSize, context);
         }
 
         let resizeIndex = this.getElasticChildIndex();
@@ -267,19 +271,28 @@ export class SplitterPanel {
         return Promise.all(pending).then(() => {});
     }
 
-    private resizeProportionally(width: number, height: number, targetTotalChildPanelSize: number): Promise<void> {
+    private resizeProportionally(width: number, height: number, targetTotalChildPanelSize: number, context?: ResizeContext): Promise<void> {
         const pending: Promise<void>[] = [];
+        // Capture the complete sibling group before any descendant is resized.
+        // Reuse these sizes throughout the gesture to avoid cumulative pixel rounding.
+        if (context) {
+            for (const child of this.childContainers) {
+                if (!context.proportionalSizes.has(child))
+                    context.proportionalSizes.set(child, { width: child.width || width, height: child.height || height });
+            }
+        }
         for (let i = 0; i < this.childContainers.length; i++) {
             let childContainer = this.childContainers[i];
             if (this.stackedVertical)
-                pending.push(childContainer.resize(width, !childContainer.height ? height : childContainer.height));
+                pending.push(childContainer.resize(width, !childContainer.height ? height : childContainer.height, context));
             else
-                pending.push(childContainer.resize(!childContainer.width ? width : childContainer.width, height));
+                pending.push(childContainer.resize(!childContainer.width ? width : childContainer.width, height, context));
         }
 
         let totalChildPanelSize = 0;
         this.childContainers.forEach((container) => {
-            let size = this.stackedVertical ? container.height : container.width;
+            const original = context?.proportionalSizes.get(container) ?? container;
+            let size = this.stackedVertical ? original.height : original.width;
             totalChildPanelSize += size;
         });
         totalChildPanelSize = Math.max(totalChildPanelSize, 1);
@@ -290,7 +303,9 @@ export class SplitterPanel {
             let child = this.childContainers[i];
             if (child.containerElement.style.display == 'none')
                 child.containerElement.style.display = 'block';
-            let original = this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth;
+            const initial = context?.proportionalSizes.get(child);
+            let original = initial ? (this.stackedVertical ? initial.height : initial.width)
+                : (this.stackedVertical ? child.containerElement.clientHeight : child.containerElement.clientWidth);
             let newSize = Math.floor(original * scaleMultiplier);
             updatedTotalChildPanelSize += newSize;
 
@@ -298,9 +313,9 @@ export class SplitterPanel {
                 newSize += targetTotalChildPanelSize - updatedTotalChildPanelSize;
 
             if (this.stackedVertical)
-                pending.push(child.resize(child.width, newSize));
+                pending.push(child.resize(child.width, newSize, context));
             else
-                pending.push(child.resize(newSize, child.height));
+                pending.push(child.resize(newSize, child.height, context));
             this.preferredChildSizes.set(child, newSize);
         }
         return Promise.all(pending).then(() => {});
