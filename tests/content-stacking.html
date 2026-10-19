@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Panel content stacking — issue #115</title>
+<link rel="stylesheet" href="../lib/css/dock-manager.css">
+<link rel="stylesheet" href="../lib/css/dock-manager-style.css">
+<style>
+    body { position: relative; margin: 16px; font: 14px system-ui, sans-serif; }
+    #dock { position: relative; width: 1000px; height: 600px; }
+    #results { white-space: pre-wrap; }
+    .sample { background: #e6f3ff; }
+    /* Grid toolbars can create their own stacking contexts. */
+    .sample button { position: relative; transform: translate(0); margin: 10px; }
+</style>
+<h1>Panel content stacking — issue #115</h1>
+<p>Run after <code>npm run tsc</code> and <code>npm start</code>.</p>
+<p>Run the checks, then click the panel buttons and drag the splitter manually.</p>
+<button id="run">Run regression tests</button>
+<pre id="results">Ready.</pre>
+<div id="dock"></div>
+<script type="module">
+    import { DockManager, PanelContainer, PanelType, WheelTypes } from '../lib/js/index.js';
+    const host = document.getElementById('dock');
+    const results = document.getElementById('results');
+    const assert = (condition, message) => { if (!condition) throw Error(message); };
+    const log = message => { results.textContent += message + '\n'; };
+    const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    let manager, grid, tools = [], clicks = 0;
+
+    function panel(title, type = PanelType.panel) {
+        const content = document.createElement('div');
+        content.className = 'sample';
+        const button = document.createElement('button');
+        button.textContent = title + ' action';
+        button.onclick = () => { button.textContent = title + ' clicked ' + ++clicks; };
+        content.append(button);
+        return new PanelContainer(content, manager, title, type);
+    }
+    function topElement(element) {
+        const r = element.getBoundingClientRect();
+        assert(r.width > 0 && r.height > 0, 'Element has visible bounds');
+        return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    }
+    function checkContent(p, stage) {
+        const button = p.elementContent.querySelector('button');
+        assert(topElement(button) === button, stage + ': content must receive pointer events');
+        const before = clicks;
+        topElement(button).click();
+        assert(clicks === before + 1, stage + ': button handler must run');
+    }
+    async function resize() {
+        await manager.resize(host.clientWidth, host.clientHeight);
+        await settle();
+    }
+    async function reset(root = 'dock') {
+        if (manager) {
+            const panels = manager.getPanels();
+            for (const dialog of [...manager.context.model.dialogs]) dialog.destroy();
+            for (const p of panels) p.elementContentContainer.remove();
+            host.replaceChildren();
+        }
+        manager = new DockManager(host);
+        manager.config.dialogRootElement = root === 'dock' ? host : document.body;
+        manager.initialize();
+        grid = panel('Grid', PanelType.document);
+        tools = [];
+        manager.dockFill(manager.context.model.documentManagerNode, grid);
+        await resize();
+    }
+    async function dock(method) {
+        const tool = panel(method);
+        tools.push(tool);
+        manager[method](manager.context.model.documentManagerNode, tool, 0.2);
+        await resize();
+        return tool;
+    }
+    document.getElementById('run').onclick = async event => {
+        event.target.disabled = true;
+        results.textContent = '';
+        try {
+            for (const root of ['dock', 'body']) {
+                await reset(root);
+                checkContent(grid, root + ': initial layout');
+                for (const method of ['dockLeft', 'dockRight', 'dockUp', 'dockDown']) {
+                    await dock(method);
+                    if (root === 'dock') {
+                        const children = [...host.children];
+                        assert(children.indexOf(manager.context.model.rootNode.container.containerElement)
+                            > children.indexOf(grid.elementContentContainer), 'Reproduce layout root after content');
+                    }
+                    checkContent(grid, root + ': ' + method);
+                    for (const p of tools) checkContent(p, root + ': tool after ' + method);
+                    for (const bar of host.querySelectorAll('.splitbar-horizontal, .splitbar-vertical'))
+                        assert(topElement(bar) === bar, 'Splitter remains above adjacent content');
+                }
+                log('PASS ' + root + ': content and splitters after all four docking directions');
+
+                const secondGrid = panel('Second grid', PanelType.document);
+                manager.dockFill(manager.context.model.documentManagerNode, secondGrid);
+                await resize();
+                checkContent(secondGrid, root + ': dockFill document');
+                assert(grid.elementContentContainer.style.display === 'none', 'Inactive document stays hidden');
+                grid.tabPage.host.setActiveTab(grid);
+                await resize();
+                checkContent(grid, root + ': select original document');
+                assert(secondGrid.elementContentContainer.style.display === 'none', 'Other document stays hidden');
+                const secondTool = panel('Second tool');
+                manager.dockFill(manager.getNodeByElement(tools[0].elementContent), secondTool);
+                await resize();
+                checkContent(secondTool, root + ': dockFill tool');
+                assert(tools[0].elementContentContainer.style.display === 'none', 'Inactive tool stays hidden');
+                tools[0].tabPage.host.setActiveTab(tools[0]);
+                await resize();
+                checkContent(tools[0], root + ': select original tool');
+                assert(secondTool.elementContentContainer.style.display === 'none', 'Other tool stays hidden');
+                log('PASS ' + root + ': dockFill and tab switching for documents and tools');
+
+                const tool = tools[0];
+                const rect = grid.elementContentContainer.getBoundingClientRect();
+                const dialog = manager.floatDialog(tool, rect.left + 20, rect.top + 20);
+                await dialog.resize(240, 180);
+                await resize();
+                checkContent(tool, root + ': floating panel over docked content');
+                const titleHit = topElement(tool.elementTitle);
+                assert(tool.elementTitle.contains(titleHit), 'Floating title stays interactive');
+                for (const handle of dialog.elementDialog.querySelectorAll('.resize-handle'))
+                    assert(topElement(handle) === handle, 'Floating resize handles stay interactive');
+                log('PASS ' + root + ': floating content, title and resize handles');
+
+                const wheel = manager.dockWheel;
+                wheel.activeNode = manager.context.model.documentManagerNode;
+                wheel.activeDialog = dialog;
+                wheel.showWheel();
+                const fill = wheel.wheelItems[WheelTypes.fill];
+                assert(topElement(fill.element) === fill.element, 'Dock wheel stays above content');
+                wheel.onMouseOver(fill);
+                assert(topElement(wheel.elementPanelPreview) === fill.element, 'Dock preview stays above content and below wheel');
+                wheel.hideWheel();
+                wheel.activeDialog = undefined;
+                manager.dockDialogLeft(manager.context.model.documentManagerNode, dialog);
+                await resize();
+                assert(tool.elementContentContainer.style.zIndex === '', 'Redocking clears floating stacking level');
+                checkContent(grid, root + ': after redocking');
+                checkContent(tool, root + ': redocked tool');
+                log('PASS ' + root + ': dock wheel, preview and redocking');
+            }
+            await reset();
+            await dock('dockLeft');
+            log('ALL TESTS PASSED — ready for manual click and splitter checks.');
+        } catch (error) {
+            log('FAIL ' + error.stack);
+        } finally { event.target.disabled = false; }
+    };
+    await reset();
+    await dock('dockLeft');
+</script>
+</html>

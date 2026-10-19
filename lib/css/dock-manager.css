@@ -1,4 +1,9 @@
 /************* Panel with title bar ************/
+.panel-element-content-container {
+	/* Content lives outside the layout tree, which docking can append after it. */
+	z-index: 1;
+}
+
 .panel-titlebar-button-auto-hide {
     display: flex;
     align-items: center;
