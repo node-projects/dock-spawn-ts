@@ -157,6 +157,11 @@ The default, `'proportional'`, retains the existing size distribution based on
 the panels' previous sizes. Explicit ratios passed to `dockLeft`, `dockRight`,
 `dockUp` or `dockDown` continue to take precedence. Tab docking is unchanged.
 
+Try the cream-and-green **Fieldwork Workspace** demo at
+`http://127.0.0.1:8080/page/demo/demo_reference_sizing.html` after building and
+starting the server. Drag Pivot below Detail, or use **Stack panels**, to see
+List retain its height. **Reset layout** restores the starting arrangement.
+
 ```html
    dockspawn div container needs position absolute or relative 
 

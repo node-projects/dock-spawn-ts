@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fieldwork · Dock Spawn TS</title>
+    <link rel="stylesheet" href="../../lib/css/dock-manager.css">
+    <link rel="stylesheet" href="../../lib/css/dock-manager-style.css">
+    <link rel="stylesheet" href="./reference-sizing.css">
+</head>
+<body>
+    <header class="masthead">
+        <a class="brand" href="../../index.html"><span class="brand-mark">F</span> FIELDWORK <span class="brand-note">/ a docking study</span></a>
+        <a class="back-link" href="../../index.html#demos">All demos ↗</a>
+    </header>
+    <main>
+        <section class="intro">
+            <div><p class="eyebrow">DOCK SPAWN TS / INTERACTIVE DEMO</p><h1>A little room to rearrange.</h1>
+                <p class="lede">Move one panel. Keep the rest of your workspace in place.</p></div>
+            <span class="strategy-badge"><span></span> Split reference enabled</span>
+        </section>
+        <section class="workspace" aria-label="Interactive docking workspace">
+            <div class="workspace-toolbar"><span><span class="workspace-dot"></span> Coastal field notes <span class="muted">/ Workspace 01</span></span>
+                <div class="actions"><button id="reset" type="button">Reset layout</button><button id="stack" type="button" class="primary">Stack panels ↓</button></div>
+            </div>
+            <div id="dock-area"><div id="dock-manager"></div></div>
+            <div class="workspace-footer"><span id="layout-status" role="status">Preparing workspace…</span><span>Drag title bars · Resize dividers</span></div>
+        </section>
+        <section class="guide" aria-label="How to use this demo">
+            <div><span class="step">01</span><h2>Pick up Pivot</h2><p>Drag the green panel by its title bar, then hover over Detail.</p></div>
+            <div><span class="step">02</span><h2>Drop below Detail</h2><p>Use the bottom docking indicator. Or select <strong>Stack panels</strong> to try the same move.</p></div>
+            <div><span class="step">03</span><h2>Watch List stay put</h2><p>Detail shares its space with Pivot. List keeps its height, leaving your notes in view.</p></div>
+        </section>
+        <footer class="page-footer"><span>Built with Dock Spawn TS</span><code>dockingSizeStrategy: 'split-reference'</code></footer>
+    </main>
+    <section id="pivot" class="sheet pivot-sheet" data-panel-caption="Pivot">
+        <div class="sheet-heading"><span class="eyebrow">01 / PIVOT</span><span class="pill">Field guide</span></div>
+        <h2>Along the<br>waterline.</h2><p class="sheet-description">A collection of observations from the edge of land and sea.</p>
+        <div class="landscape" aria-hidden="true"><span class="sun"></span><span class="ridge ridge-back"></span><span class="ridge ridge-front"></span><span class="waterline"></span></div>
+        <div class="location"><span>North coast transect</span><span>54° N / 08° E</span></div>
+        <div class="pivot-note"><span>↗</span><p><strong>Make this space your own.</strong><br>Drag this panel below Detail. The notes above it will keep their room.</p></div>
+    </section>
+    <section id="list" class="sheet list-sheet" data-panel-caption="List">
+        <div class="sheet-heading"><span class="eyebrow">02 / LIST</span><span class="pill">3 observations</span></div>
+        <h2>Field notes</h2>
+        <div class="note-row selected"><span class="note-number">001</span><div><h3>The morning tide</h3><p>Water patterns · North shore</p></div><span class="note-time">08:40</span></div>
+        <div class="note-row"><span class="note-number">002</span><div><h3>A quieter estuary</h3><p>Bird activity · Salt marsh</p></div><span class="note-time">10:15</span></div>
+        <div class="note-row"><span class="note-number">003</span><div><h3>Traces in the sand</h3><p>Surface study · Dune path</p></div><span class="note-time">11:30</span></div>
+    </section>
+    <section id="detail" class="sheet detail-sheet" data-panel-caption="Detail">
+        <div class="sheet-heading"><span class="eyebrow">03 / DETAIL</span><span class="pill">Observation 001</span></div>
+        <h2>The morning tide</h2><p class="detail-meta">NORTH SHORE / 08:40 / CLEAR SKIES</p>
+        <p class="detail-copy">The shore is still at this hour. Shallow channels catch the light as the water moves back across the sand.</p>
+        <div class="readings"><div><span>Water</span><strong>14.2°<small>C</small></strong></div><div><span>Wind</span><strong>12<small>km/h</small></strong></div><div><span>Tide</span><strong>Rising</strong></div></div>
+    </section>
+    <script type="module" src="./reference-sizing.js"></script>
+</body>
+</html>
