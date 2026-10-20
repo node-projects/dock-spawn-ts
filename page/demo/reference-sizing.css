@@ -25,7 +25,7 @@ button.primary:hover { background: #3c624a; }
 button:disabled { opacity: .5; cursor: default; }
 button:focus-visible, a:focus-visible { outline: 2px solid #b57a37; outline-offset: 3px; }
 #dock-area { position: relative; height: clamp(440px, 56vh, 660px); background: #dce1d3; }
-#dock-manager { position: relative; }
+#dock-manager { position: relative; width: 100%; height: 100%; }
 .workspace-footer { display: flex; gap: 12px; justify-content: space-between; padding: 11px 18px; background: #eef0e6; font-size: 11px; color: #6c7866; }
 .guide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; padding: 28px 0; }
 .guide > div { position: relative; padding-left: 34px; }
@@ -42,6 +42,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid #b57a37; outline-offs
 .dockspan-panel-titlebar-text-active, .dockspan-tab-handle-active:hover { color: #294e3d; background: #d7e2ce; }
 .dockspan-tab-handle-content-seperator, .dockspan-tab-handle-content-seperator-active { background: #9fb18d; }
 .panel-element-content-container, .dockspan-tab-content { background: #fffdf7; }
+.panel-element-content-container { overflow: hidden; }
+.panel-base { overflow: hidden; }
 .splitbar-horizontal, .splitbar-vertical, .dock-container, .document-manager { background: #dce1d3; }
 .splitbar-horizontal:hover, .splitbar-vertical:hover { background: #8eaa7d; }
 .dock-wheel-panel-preview { background: #719a6655; outline-color: #52754b; }

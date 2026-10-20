@@ -161,6 +161,10 @@ Try the cream-and-green **Fieldwork Workspace** demo at
 `http://127.0.0.1:8080/page/demo/demo_reference_sizing.html` after building and
 starting the server. Drag Pivot below Detail, or use **Stack panels**, to see
 List retain its height. **Reset layout** restores the starting arrangement.
+The demo's docking host has an explicit width and height so replacing the root
+layout during docking cannot collapse it. Browser regression checks for moving
+document tabs into splits and resetting floating panels are available at
+`http://127.0.0.1:8080/tests/repeated-docking.html`.
 
 ```html
    dockspawn div container needs position absolute or relative 

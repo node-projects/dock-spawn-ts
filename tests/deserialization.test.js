@@ -4,6 +4,40 @@ import { DockGraphDeserializer } from '../lib/js/DockGraphDeserializer.js';
 import { PanelContainer } from '../lib/js/PanelContainer.js';
 import { DockGraphSerializer } from '../lib/js/DockGraphSerializer.js';
 import { Dialog } from '../lib/js/Dialog.js';
+import { DockManager } from '../lib/js/DockManager.js';
+import { FillDockContainer } from '../lib/js/FillDockContainer.js';
+
+test('restoring a layout releases old docked and floating content layers and tab hosts', async t => {
+    const events = [];
+    function element(name) {
+        const node = { parentNode: { removeChild(child) {
+            events.push('remove ' + name);
+            child.parentNode = null;
+        } } };
+        return node;
+    }
+    const panels = ['docked', 'floating'].map(name => ({
+        elementContentContainer: element(name),
+        destroy() { events.push('destroy ' + name); }
+    }));
+    const root = { children: [], container: Object.assign(Object.create(FillDockContainer.prototype), {
+        containerElement: element('root'), tabHost: { destroy() { events.push('release tabs'); } }
+    }) };
+    const model = {};
+    t.mock.method(DockGraphDeserializer.prototype, 'deserialize', async () => {
+        events.push('restore content');
+        return model;
+    });
+    const manager = Object.assign(Object.create(DockManager.prototype), {
+        context: { model: { rootNode: root, dialogs: [{ destroy() { events.push('destroy dialog'); } }] } },
+        getPanels: () => panels,
+        setModel(restored) { assert.equal(restored, model); events.push('set model'); }
+    });
+    await manager.loadState('{}');
+    assert.deepEqual(events, ['destroy dialog', 'restore content', 'release tabs',
+        'destroy docked', 'remove docked', 'destroy floating', 'remove floating', 'remove root', 'set model']);
+    assert.ok(panels.every(panel => panel.elementContentContainer.parentNode === null));
+});
 
 for (const disableResize of [true, false, undefined]) {
     test(`dialog resize behavior survives JSON round trip (disableResize: ${disableResize})`, async t => {

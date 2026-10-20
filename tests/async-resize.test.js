@@ -44,6 +44,29 @@ function host(activePanel) {
     });
 }
 
+test('a discarded panel cannot measure detached content or run resize callbacks after its queued frame', async t => {
+    const flush = framesFor(t);
+    const content = panel();
+    content.elementContentWrapper.getBoundingClientRect = () => assert.fail('Disposed panel must not measure its old frame');
+    content.elementContent.resizeHandler = () => assert.fail('Disposed panel must not notify its old content');
+    const pending = content.resize(300, 200);
+    content.destroyed = true;
+    flush();
+    await pending;
+    content.panelDocked = () => assert.fail('Disposed panel must not reattach its old content layer');
+    await content.resize(400, 250);
+});
+
+test('a panel shorter than its title bar clears the previous content height', async t => {
+    const flush = framesFor(t);
+    const content = panel();
+    const pending = content.resize(300, 10);
+    assert.equal(content.elementContentHost.style.height, '0px');
+    assert.equal(content.elementContentContainer.style.height, '0px');
+    flush();
+    await pending;
+});
+
 test('manager resize waits through splitter, fill, tab page and panel deferred layout', async t => {
     const flush = framesFor(t);
     const content = panel();

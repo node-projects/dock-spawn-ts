@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Fieldwork docking and reset regression</title>
+<style>
+    body { margin: 20px; font: 14px system-ui, sans-serif; }
+    iframe { width: 1100px; height: 900px; border: 1px solid #ccc; display: block; margin-top: 16px; }
+    #results { white-space: pre-wrap; }
+</style>
+<h1>Fieldwork docking and reset regression</h1>
+<p>Run after <code>npm run tsc</code> and <code>npm start</code>.</p>
+<button id="run">Run regression tests</button>
+<pre id="results">Ready.</pre>
+<script type="module">
+const results = document.getElementById('results');
+const assert = (ok, message) => { if (!ok) throw Error(message); };
+const log = message => { results.textContent += message + '\n'; };
+let frame;
+document.getElementById('run').onclick = async event => {
+    event.target.disabled = true;
+    results.textContent = '';
+    frame?.remove();
+    frame = document.createElement('iframe');
+    frame.title = 'Fieldwork workspace under test';
+    frame.src = '../page/demo/demo_reference_sizing.html';
+    await new Promise(resolve => { frame.onload = resolve; document.body.append(frame); });
+    const doc = frame.contentDocument;
+    const settle = () => new Promise(resolve => frame.contentWindow.requestAnimationFrame(() =>
+        frame.contentWindow.requestAnimationFrame(resolve)));
+    const panel = id => doc.getElementById(id)._dockSpawnPanelContainer;
+    try {
+        for (let i = 0; i < 60 && !panel('detail'); i++) await settle();
+        assert(panel('detail'), 'Demo initializes');
+        await settle();
+        const manager = panel('pivot').dockManager;
+        const ids = ['pivot', 'list', 'detail'];
+        function checkTree(node) {
+            const c = node.container;
+            assert(Number.isFinite(c.width) && c.width >= 0 && Number.isFinite(c.height) && c.height >= 0,
+                `${c.name}: invalid dimensions ${c.width} x ${c.height}`);
+            if (c.splitterPanel) {
+                const axis = c.stackedVertical ? 'height' : 'width';
+                const total = node.children.reduce((sum, child) => sum + child.container[axis], 0);
+                assert(Math.abs(total + 5 * (node.children.length - 1) - c[axis]) <= 1,
+                    `${c.name}: child sizes must fill the splitter`);
+            }
+            node.children.forEach(checkTree);
+        }
+        function check() {
+            const root = manager.context.model.rootNode.container;
+            const area = doc.getElementById('dock-area');
+            assert(root.width === area.clientWidth && root.height === area.clientHeight, 'Root fills the workspace');
+            checkTree(manager.context.model.rootNode);
+            assert(doc.querySelectorAll('.panel-element-content-container').length === 3, 'Only three live content layers remain');
+            for (const id of ids) {
+                const p = panel(id);
+                if (p.tabPage && !p.tabPage.selected) {
+                    assert(p.elementContentContainer.style.display === 'none', `${id}: inactive tab stays hidden`);
+                    continue;
+                }
+                const r = p.elementContentContainer.getBoundingClientRect();
+                const w = p.elementContentWrapper.getBoundingClientRect();
+                // A pane smaller than its title bar has no content area.
+                // It must collapse to zero rather than keep a stale larger size.
+                if (w.width === 0 || w.height === 0) {
+                    assert(r.width === 0 || r.height === 0, `${id}: collapsed content has no stale area`);
+                    continue;
+                }
+                assert(r.width > 0 && r.height > 0, `${id}: visible content has usable dimensions`);
+                assert(Math.abs(r.x - w.x) <= 1 && Math.abs(r.y - w.y) <= 1 &&
+                    Math.abs(r.width - w.width) <= 1 && Math.abs(r.height - w.height) <= 1,
+                    `${id}: content matches its frame`);
+                const hit = doc.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+                assert(p.elementContentContainer.contains(hit), `${id}: content receives pointer events; bounds ${r.x},${r.y},${r.width},${r.height}; hit ${hit?.className}`);
+            }
+        }
+        async function reset() {
+            doc.getElementById('reset').click();
+            for (let i = 0; i < 60 && doc.getElementById('reset').disabled; i++) await settle();
+            assert(!doc.getElementById('reset').disabled, 'Reset finishes');
+            await settle();
+            assert(manager.context.model.dialogs.length === 0, 'Reset removes floating dialogs');
+            check();
+        }
+        async function dock(id, target, method) {
+            const p = panel(id);
+            p.tabPage?.host.setActiveTab(p);
+            const dialog = p.performUndockToDialog(undefined);
+            await settle();
+            manager['dockDialog' + method](manager.getNodeByElement(panel(target).elementContent), dialog);
+            // No explicit resize: docking must leave a correct layout by itself.
+            await settle();
+            check();
+        }
+        for (const source of ids) {
+            await reset();
+            await dock('pivot', 'list', 'Fill');
+            await dock('detail', 'list', 'Fill');
+            const target = source === 'list' ? 'detail' : 'list';
+            await dock(source, target, 'Left');
+            log(`PASS: all document tabs, then ${source} docked left`);
+        }
+        for (const source of ids) {
+            await reset();
+            panel(source).performUndockToDialog(undefined);
+            await settle();
+            assert(manager.context.model.dialogs.length === 1, 'Panel is floating');
+            await reset();
+            log(`PASS: float ${source}, then reset`);
+        }
+        let seed = 117;
+        const random = n => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed % n; };
+        for (let step = 0; step < 180; step++) {
+            // Start a fresh arrangement periodically: repeatedly halving a pane
+            // eventually leaves less than one pixel, regardless of correctness.
+            if (step % 15 === 0) await reset();
+            const source = random(3);
+            let target = random(2);
+            if (target >= source) target++;
+            const method = ['Left', 'Right', 'Up', 'Down', 'Fill'][random(5)];
+            try { await dock(ids[source], ids[target], method); }
+            catch (error) { throw Error(`Move ${step}: ${ids[source]} ${method} of ${ids[target]}: ${error.message}`); }
+        }
+        log('PASS: 180 mixed docking moves without corrective resizing');
+        await reset();
+        log('PASS: final reset');
+    } catch (error) { log('FAIL: ' + error.stack); }
+    event.target.disabled = false;
+};
+</script>
+</html>

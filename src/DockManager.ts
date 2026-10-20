@@ -962,9 +962,21 @@ export class DockManager {
 
     async loadState(json: string) {
         let deserializer = new DockGraphDeserializer(this);
+        const previousPanels = this.getPanels();
         // Release floating tab hosts before reusing their content elements in the restored layout.
         for (const dialog of [...this.context.model.dialogs]) dialog.destroy();
         const model = await deserializer.deserialize(json);
+        // Content layers live outside the layout tree. Removing only its root
+        // leaves empty floating layers above the restored workspace.
+        const releaseTabs = (node: DockNode) => {
+            if (node.container instanceof FillDockContainer) node.container.tabHost.destroy();
+            node.children.forEach(releaseTabs);
+        };
+        releaseTabs(this.context.model.rootNode);
+        for (const panel of previousPanels) {
+            panel.destroy();
+            Utils.removeNode(panel.elementContentContainer);
+        }
         this.autoHideManager?.reset();
         Utils.removeNode(this.context.model.rootNode.container.containerElement);
         this.setModel(model);

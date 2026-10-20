@@ -61,6 +61,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     _cachedWidth: number;
     _cachedHeight: number;
     _hideCloseButton: boolean;
+    private destroyed = false;
     _grayOut: HTMLDivElement;
     _ctxMenu: HTMLDivElement;
     private _contextMenuProvider: IContextMenuProvider;
@@ -366,6 +367,8 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     destroy() {
+        this.destroyed = true;
+        this.undockInitiator.enabled = false;
         if (this.isAutoHidden) this.dockManager.autoHideManager.remove(this);
         if (this.mouseDownHandler) {
             this.mouseDownHandler.cancel();
@@ -468,6 +471,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     async resize(width: number, height: number): Promise<void> {
+        if (this.destroyed) return;
         // if (this._cachedWidth === width && this._cachedHeight === height)
         // {
         //     // Already in the desired size
@@ -479,6 +483,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this._cachedWidth = width;
         this._cachedHeight = height;
         await resized;
+        if (this.destroyed) return;
         try {
             if (this.elementContent != undefined && (typeof this.elementContent.resizeHandler == 'function'))
                 this.elementContent.resizeHandler(width, height - this.elementTitle.clientHeight);
@@ -494,7 +499,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this.elementPanel.style.width = width + 'px';
 
         let titleBarHeight = this.elementTitle.clientHeight;
-        let contentHeight = height - titleBarHeight;
+        let contentHeight = Math.max(0, height - titleBarHeight);
         this.elementContentHost.style.height = contentHeight + 'px';
         this.elementContentContainer.style.height = contentHeight + 'px';
         this.elementPanel.style.height = height + 'px';
@@ -502,6 +507,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         //if (this.elementContentContainer.parentElement != this.dockManager.config.dialogRootElement)
         //    this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
         await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+        if (this.destroyed) return;
         const rect = this.elementContentWrapper.getBoundingClientRect();
         const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
         this.elementContentContainer.style.left = (rect.x - rootRect.x) + 'px';
