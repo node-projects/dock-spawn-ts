@@ -1,4 +1,5 @@
 export type TabStripMode = 'scroll' | 'wrap';
+export type DockingSizeStrategy = 'proportional' | 'split-reference';
 
 export class DockConfig {
     public constructor() {
@@ -11,6 +12,7 @@ export class DockConfig {
         this.enableTabGroups = false;
         this.persistTabGroups = true;
         this.tabStripMode = 'scroll';
+        this.dockingSizeStrategy = 'proportional';
     }
 
     escClosesWindow?: boolean;
@@ -26,4 +28,6 @@ export class DockConfig {
     persistTabGroups?: boolean;
     /** Single scrollable row (default), or multiple rows of tabs. */
     tabStripMode?: TabStripMode;
+    /** In an existing splitter, optionally divide only the target pane when docking beside it. */
+    dockingSizeStrategy?: DockingSizeStrategy;
 }

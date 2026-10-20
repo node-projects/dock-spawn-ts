@@ -2,6 +2,10 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { HorizontalDockContainer } from '../lib/js/HorizontalDockContainer.js';
 import { VerticalDockContainer } from '../lib/js/VerticalDockContainer.js';
+import { DockLayoutEngine } from '../lib/js/DockLayoutEngine.js';
+import { DockManager } from '../lib/js/DockManager.js';
+import { DockNode } from '../lib/js/DockNode.js';
+import { DockConfig } from '../lib/js/DockConfig.js';
 
 // Keep DOM measurements synchronous, as in a browser, while using the real
 // splitter containers, bars and preferred-size bookkeeping.
@@ -54,7 +58,49 @@ function fixture(t, vertical) {
         return container;
     }
     const drag = (bar, delta) => bar._performDrag(vertical ? 0 : delta, vertical ? delta : 0);
-    return { axis, leaf, split, resize, drag };
+    return { axis, leaf, split, resize, drag, manager };
+}
+
+for (const vertical of [false, true]) for (const before of [false, true]) for (const strategy of [undefined, 'proportional', 'split-reference']) {
+    test(`${strategy ?? 'default'} docking ${before ? 'before' : 'after'} a ${vertical ? 'vertical' : 'horizontal'} target from a floating dialog`, async t => {
+        const { axis, leaf, split, resize, manager } = fixture(t, vertical);
+        assert.equal(new DockConfig().dockingSizeStrategy, 'proportional');
+        manager.config.dockingSizeStrategy = strategy;
+        const list = leaf('fill', 300), detail = leaf('panel', 295), neighbor = leaf('panel', 195);
+        const splitter = await split([list, detail, neighbor], [300, 295, 195]);
+        const root = new DockNode(splitter);
+        [list, detail, neighbor].forEach(container => root.addChild(new DockNode(container)));
+        const target = root.children[1];
+        const pivot = leaf('panel', 700);
+        pivot.prepareForDocking = () => {};
+        pivot.elementContentContainer = { style: {} };
+        const dialog = { panel: pivot, destroy() {} };
+        Object.assign(manager, {
+            context: { model: { rootNode: root } },
+            element: { getBoundingClientRect: () => ({ left: 10, top: 20 }) },
+            invalidate() { resize(splitter, 800); },
+            notifyOnDock() {}
+        });
+        detail.containerElement.getBoundingClientRect = () => ({ left: 10, top: 20 });
+        splitter.containerElement.getBoundingClientRect = () => ({ left: 10, top: 20 });
+        const engine = new DockLayoutEngine(manager);
+        const direction = vertical ? 'vertical' : 'horizontal';
+        const preview = engine.getDockBounds(target, pivot, direction, before);
+        const dock = vertical ? (before ? engine.dockUp : engine.dockDown) : (before ? engine.dockLeft : engine.dockRight);
+        DockManager.prototype._requestDockDialog.call(manager, target, dialog, dock.bind(engine));
+        if (strategy === 'split-reference') {
+            assert.deepEqual([list[axis], detail[axis], neighbor[axis], pivot[axis]], [300, 145, 195, 145]);
+            assert.equal(preview[axis], pivot[axis], 'Preview matches the docked pane size');
+            assert.equal(vertical ? preview.y : preview.x, before ? 0 : 150);
+            await resize(splitter, 800);
+            assert.deepEqual([list[axis], detail[axis], neighbor[axis], pivot[axis]], [300, 145, 195, 145],
+                'A later layout pass retains the allocated sizes');
+        } else {
+            assert.notEqual(list[axis], 300, 'Default and explicit proportional mode retain the existing allocation');
+            assert.ok(pivot[axis] > detail[axis], 'Proportional mode uses the floating pane size');
+        }
+        assert.equal(root.children.reduce((sum, child) => sum + child.container[axis], 0), 785);
+    });
 }
 
 for (const vertical of [false, true]) for (const groupFirst of [false, true]) {

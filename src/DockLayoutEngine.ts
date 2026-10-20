@@ -7,6 +7,7 @@ import { FillDockContainer } from "./FillDockContainer.js";
 import { IRectangle } from "./interfaces/IRectangle.js";
 import { IDockContainer } from "./interfaces/IDockContainer.js";
 import { TabHandle } from "./TabHandle.js";
+import { SplitterDockContainer } from "./SplitterDockContainer.js";
 
 export class DockLayoutEngine {
 
@@ -250,11 +251,25 @@ export class DockLayoutEngine {
         else {
             // Add as a sibling, since the parent of the reference node is of the right composite type
             referenceParent = referenceNode.parent;
+            const splitter = referenceParent.container as SplitterDockContainer;
+            const sizes = this.dockManager.config.dockingSizeStrategy === 'split-reference'
+                ? new Map(splitter.splitterPanel.childContainers.map(child =>
+                    [child, this._getVaringDimension(child, direction)])) : null;
             if (insertBeforeReference)
                 referenceParent.addChildBefore(referenceNode, newNode);
             else
                 referenceParent.addChildAfter(referenceNode, newNode);
             referenceParent.performLayout(false);
+            if (sizes) {
+                const bar = splitter.splitterPanel.spiltterBars[0].barElement;
+                const barSize = direction === 'vertical' ? bar.clientHeight : bar.clientWidth;
+                // The new splitter bar and pane share only the reference pane's space.
+                // A floating pane's previous size must not shrink unrelated siblings.
+                const available = Math.max(0, sizes.get(referenceNode.container) - barSize);
+                const newSize = Math.floor(available / 2);
+                splitter.setSizes(referenceParent.children.map(child => child === newNode ? newSize
+                    : child === referenceNode ? available - newSize : sizes.get(child.container)));
+            }
             referenceParent.container.setActiveChild(newNode.container);
         }
 
@@ -307,6 +322,23 @@ export class DockLayoutEngine {
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')
             // Ignore the fill container's child and move one level up
             referenceNode = referenceNode.parent;
+
+        if (this.dockManager.config.dockingSizeStrategy === 'split-reference' && referenceNode.parent?.container.containerType === direction) {
+            const splitter = referenceNode.parent.container as SplitterDockContainer;
+            const bar = splitter.splitterPanel.spiltterBars[0].barElement;
+            const barSize = direction === 'vertical' ? bar.clientHeight : bar.clientWidth;
+            const available = Math.max(0, this._getVaringDimension(referenceNode.container, direction) - barSize);
+            const size = Math.floor(available / 2);
+            const outerRect = this.dockManager.element.getBoundingClientRect();
+            const rect = referenceNode.container.containerElement.getBoundingClientRect();
+            const offset = insertBeforeReference ? 0 : available - size + barSize;
+            return {
+                x: rect.left - outerRect.left + (direction === 'horizontal' ? offset : 0),
+                y: rect.top - outerRect.top + (direction === 'vertical' ? offset : 0),
+                width: direction === 'horizontal' ? size : referenceNode.container.width,
+                height: direction === 'vertical' ? size : referenceNode.container.height
+            };
+        }
 
         // Flag to indicate of the renference node was replaced with a new composite node with 2 children
         let hierarchyModified = false;

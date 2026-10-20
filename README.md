@@ -144,6 +144,19 @@ of the reference pane's space after allowing for the new splitter bar. Other pan
 keep their pixel sizes. Closing or undocking a pane gives its freed space to the
 elastic document area while preserving the remaining tool panels.
 
+To keep unrelated panes at their current sizes when dropping a floating panel
+beside a pane in an existing splitter with the same orientation, opt in with:
+
+```js
+dockManager.config.dockingSizeStrategy = 'split-reference';
+```
+
+This divides the target pane's space equally between the target and the new pane,
+allowing for the new splitter bar. The docking preview reflects this allocation.
+The default, `'proportional'`, retains the existing size distribution based on
+the panels' previous sizes. Explicit ratios passed to `dockLeft`, `dockRight`,
+`dockUp` or `dockDown` continue to take precedence. Tab docking is unchanged.
+
 ```html
    dockspawn div container needs position absolute or relative 
 
