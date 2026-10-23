@@ -1,4 +1,45 @@
 /************* Panel with title bar ************/
+.dock-fullscreen-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    pointer-events: auto;
+}
+.dock-fullscreen-button svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+}
+.dock-fullscreen-button:hover { background: #c9def5; }
+.dock-fullscreen-button:focus-visible { outline: 1px solid #007acc; outline-offset: -2px; }
+.panel-titlebar-button-fullscreen { position: absolute; right: 25px; top: 0; }
+.dockspan-tab-handle-fullscreen-button { position: absolute; right: 19px; top: 2px; width: 18px; height: 18px; }
+.dockspan-tab-handle.dockspan-tab-can-fullscreen { padding-right: 36px; }
+.panel-titlebar-can-fullscreen .panel-titlebar-text { width: calc(100% - 60px); }
+.panel-titlebar-can-fullscreen .panel-titlebar-button-auto-hide { right: 50px; }
+.panel-titlebar-can-fullscreen.panel-titlebar-can-auto-hide .panel-titlebar-text { width: calc(100% - 85px); }
+.dock-fullscreen-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2147483647;
+    overflow: hidden;
+    background: white;
+    color: #444;
+    pointer-events: auto;
+    font: 12px "Segoe UI", Arial, sans-serif;
+}
+.dock-fullscreen-header { position: relative; }
+.dock-fullscreen-header .panel-titlebar-button-fullscreen { right: 0; }
 .panel-element-content-container {
 	/* Content lives outside the layout tree, which docking can append after it. */
 	z-index: 1;

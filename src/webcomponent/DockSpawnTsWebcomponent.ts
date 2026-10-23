@@ -66,6 +66,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         this.shadowRoot.appendChild(dockSpawnDiv);
 
         this.dockManager = new DockManager(dockSpawnDiv);
+        this.dockManager.config.enableFullscreen = this.hasAttribute('dock-spawn-enable-fullscreen');
 
         const dialogDiv = document.createElement('div');
         dialogDiv.id = "dialogDiv";
@@ -127,6 +128,7 @@ export class DockSpawnTsWebcomponent extends HTMLElement {
         let hideCloseButton = element.hasAttribute('dock-spawn-hide-close-button');
         let dockSpawnTitle = element.getAttribute('dock-spawn-title');
         let container = new PanelContainer(slot, this.dockManager, dockSpawnTitle ?? element.title, dockPanelType, hideCloseButton);
+        container.hideFullscreenButton(element.hasAttribute('dock-spawn-hide-fullscreen-button'));
         element.slot = slotName;
         this.slotElementMap.set(slot, (<HTMLElement>element));
         this.elementContainerMap.set(element, container);

@@ -29,6 +29,14 @@ import { Utils } from "./Utils.js";
  */
 export class DockManager {
     public autoHideManager: AutoHideManager;
+    public fullscreenPanel?: PanelContainer;
+
+    /** Toggle container fullscreen controls for existing and future panels. */
+    setFullscreenEnabled(enabled: boolean) {
+        this.config.enableFullscreen = enabled;
+        if (!enabled) this.fullscreenPanel?.setFullscreen(false);
+        this.getPanels().forEach(panel => panel.updateFullscreenButton());
+    }
 
     public element: HTMLElement;
     public context: DockManagerContext;
@@ -115,6 +123,12 @@ export class DockManager {
     }
 
     onKeyPress(e: KeyboardEvent) {
+        if (e.key === 'Escape' && this.fullscreenPanel) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.fullscreenPanel.setFullscreen(false);
+            return;
+        }
         if (e.key == "Escape" && this.activePanel && !this.activePanel._hideCloseButton) {
             if ((this.activePanel.isDialog && this._config.escClosesDialog) || (!this.activePanel.isDialog && this._config.escClosesWindow)) {
                 let panel = this.activePanel;
@@ -961,6 +975,7 @@ export class DockManager {
     }
 
     async loadState(json: string) {
+        this.fullscreenPanel?.setFullscreen(false);
         let deserializer = new DockGraphDeserializer(this);
         const previousPanels = this.getPanels();
         // Release floating tab hosts before reusing their content elements in the restored layout.

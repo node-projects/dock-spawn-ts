@@ -52,6 +52,30 @@ await dockManager.resize(width, height);
 
 The web component's `resize()` and `dockManager.invalidate()` can also be awaited.
 
+Panel fullscreen (maximize) is opt-in and fills only the DockSpawn container:
+
+```javascript
+const dockManager = new DockManager(element, { enableFullscreen: true }); // default: false
+dockManager.setFullscreenEnabled(false); // update existing controls and future panels
+dockManager.setFullscreenEnabled(true);
+panel.hideFullscreenButton(true); // disable for this panel; false enables it again
+panel.setFullscreen(true); // requires global opt-in and a visible fullscreen button
+panel.setFullscreen(false); // restore; also available through the restore button or Escape
+```
+
+The square button appears in panel title bars and tab handles, including document
+tabs and floating groups. Maximizing preserves the dock layout and the content DOM.
+The restore button stays visible above the content. Container resizing also resizes
+the maximized content. Escape restores the panel before the usual close behavior.
+Only one panel per manager can be maximized at a time. Disabling the feature restores
+it. Per-panel button visibility is saved with the layout; the temporary fullscreen
+state is not. The browser Fullscreen API is not used.
+
+For the web component, add `dock-spawn-enable-fullscreen` to `<dock-spawn-ts>`
+and optionally `dock-spawn-hide-fullscreen-button` to individual child elements.
+After initialization, the same runtime methods are available through `dockManager`.
+Open `tests/fullscreen.html` after building for the interactive regression checks.
+
 Tab strips keep readable tab widths and scroll horizontally when they overflow.
 Use the dropdown at the end of each strip to select any tab, including hidden tabs.
 The selected tab scrolls into view. Click the row button beside the dropdown to

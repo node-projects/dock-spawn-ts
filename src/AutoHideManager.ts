@@ -314,7 +314,7 @@ export class AutoHideManager {
 
     private onOutside = (event: Event) => {
         const panel = this.openPanel;
-        if (!panel || this.resizeDrag) return;
+        if (!panel || panel.isFullscreen || this.resizeDrag) return;
         const path = event.composedPath();
         if (path.includes(this.resizeHandle)) return;
         if (path.includes(panel.elementPanel) || path.includes(panel.elementContentContainer) || path.includes(this.tabs.get(panel))) return;
@@ -322,6 +322,7 @@ export class AutoHideManager {
     };
 
     private onKeyDown = (event: KeyboardEvent) => {
+        if (this.manager.fullscreenPanel) return;
         if (event.key === 'Escape') {
             event.preventDefault();
             event.stopPropagation();

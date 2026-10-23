@@ -9,6 +9,7 @@ export class DockConfig {
         this.moveOnlyWithinDockConatiner = false;
         this.enableBrowserWindows = true;
         this.enableAutoHide = false;
+        this.enableFullscreen = false;
         this.enableTabGroups = false;
         this.persistTabGroups = true;
         this.tabStripMode = 'scroll';
@@ -22,6 +23,8 @@ export class DockConfig {
     enableBrowserWindows?: boolean;
     /** Allow tool panels to collapse to edge tabs. Disabled by default. */
     enableAutoHide?: boolean;
+    /** Allow panels to fill the DockSpawn container. Disabled by default. */
+    enableFullscreen?: boolean;
     /** Enable multi-tab dragging and grouping floating windows. Opt-in. */
     enableTabGroups?: boolean;
     /** Save floating group membership; false restores members as separate windows. */

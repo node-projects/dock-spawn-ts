@@ -15,6 +15,7 @@ export class TabHandle {
     elementBase: HTMLDivElement;
     elementText: HTMLDivElement;
     elementCloseButton: HTMLDivElement;
+    elementFullscreenButton: HTMLButtonElement;
     undockInitiator: UndockInitiator;
     mouseDownHandler: EventHandler;
     touchDownHandler: EventHandler;
@@ -29,7 +30,7 @@ export class TabHandle {
     stargDragPosition: any;
     dragged: boolean;
     eventListeners: any[];
-    undockListener: { onDockEnabled: (e: any) => void; onHideCloseButton: (e: any) => void; };
+    undockListener: { onDockEnabled: (e: any) => void; onHideCloseButton: (e: any) => void; onFullscreenButtonChanged: (visible: boolean) => void; };
 
     prev: number;
     current: number;
@@ -55,10 +56,19 @@ export class TabHandle {
         this.parent.host.tabListElement.appendChild(this.elementBase);
 
         let panel = parent.container as PanelContainer;
+        this.elementFullscreenButton = panel.createFullscreenButton();
+        this.elementFullscreenButton.classList.add('dockspan-tab-handle-fullscreen-button');
+        this.elementBase.insertBefore(this.elementFullscreenButton, this.elementCloseButton.parentElement ? this.elementCloseButton : null);
+        this.elementBase.classList.toggle('dockspan-tab-can-fullscreen', this.elementFullscreenButton.style.display !== 'none');
         let title = panel.getRawTitle();
         this.undockListener = {
             onDockEnabled: (e) => { this.undockEnabled(e.state); },
-            onHideCloseButton: (e) => { this.hideCloseButton(e.state); }
+            onHideCloseButton: (e) => { this.hideCloseButton(e.state); },
+            onFullscreenButtonChanged: visible => {
+                this.elementFullscreenButton.style.display = visible ? '' : 'none';
+                this.elementBase.classList.toggle('dockspan-tab-can-fullscreen', visible);
+                this.parent.host.refreshTabs();
+            }
         };
         this.eventListeners = [];
         panel.addListener(this.undockListener);

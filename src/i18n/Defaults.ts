@@ -5,6 +5,8 @@ export type GetLocalizerParameters<K extends TranslationKey> = K extends keyof L
     : [];
 
 export const Defaults = {
+    'Fullscreen': 'Maximize panel',
+    'RestorePanel': 'Restore panel',
     'AutoHide': 'Auto hide',
     'PinPanel': 'Pin panel',
     'TabGroup': 'Tab group — drag to dock',

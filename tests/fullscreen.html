@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Container fullscreen regression checks</title>
+<link rel="stylesheet" href="../lib/css/dock-manager.css">
+<link rel="stylesheet" href="../lib/css/dock-manager-style.css">
+<style>
+body { font: 14px system-ui; margin: 0; padding: 24px; }
+#dock { width: 750px; height: 450px; }
+#results { white-space: pre-wrap; height: 100px; overflow: auto; }
+</style>
+<h1>Container fullscreen</h1>
+<p>Use a square button to maximize a panel, then restore it with the overlapping squares or Escape.</p>
+<button id="run">Run regression checks</button>
+<button id="toggle">Toggle global fullscreen controls</button>
+<pre id="results">Ready.</pre>
+<div id="dock"></div>
+<script type="module">
+import { DockManager, PanelContainer, PanelType } from '../lib/js/index.js';
+const dock = document.getElementById('dock');
+const results = document.getElementById('results');
+const manager = new DockManager(dock, { enableAutoHide: true, enableTabGroups: true });
+manager.initialize();
+let count = 0;
+function panel(title, type = PanelType.panel) {
+    const content = document.createElement('div');
+    content.id = 'fullscreen-' + ++count;
+    content.innerHTML = '<input value="Edit me"><p>Panel content</p>';
+    return new PanelContainer(content, manager, title, type);
+}
+const root = manager.context.model.documentManagerNode;
+const doc = panel('Document', PanelType.document);
+manager.dockFill(root, doc);
+const second = panel('Second document', PanelType.document);
+manager.dockFill(root, second);
+const tool = panel('Explorer');
+manager.dockLeft(root, tool, .3);
+const frame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+const assert = (condition, message) => {
+    if (!condition) throw Error(message);
+    results.textContent += 'PASS ' + message + '\n';
+};
+const equalRect = (a, b) => ['x', 'y', 'width', 'height'].every(key => Math.abs(a[key] - b[key]) < 1);
+async function checkPanel(p) {
+    await frame();
+    const input = p.elementContent.querySelector('input');
+    input.value = 'retained';
+    const originalParent = p.elementContentContainer.parentElement;
+    const originalRect = p.elementContentContainer.getBoundingClientRect();
+    const floatingFrame = p.floatingDialog?.elementDialog;
+    const originalFrameVisibility = floatingFrame?.style.visibility;
+    const state = manager.saveState();
+    const sizes = [];
+    p.elementContent.resizeHandler = (w, h) => sizes.push([w, h]);
+    p.setFullscreen(true);
+    await frame();
+    const overlay = dock.querySelector('.dock-fullscreen-overlay');
+    assert(p.isFullscreen && equalRect(overlay.getBoundingClientRect(), dock.getBoundingClientRect()), p.title + ' fills just the dock container');
+    if (floatingFrame) {
+        assert(getComputedStyle(floatingFrame).visibility === 'hidden', 'Floating source frame is hidden outside the dock container');
+        assert(p.floatingDialog.panels.filter(member => member !== p).every(member => getComputedStyle(member.elementContentContainer).visibility === 'hidden'), 'Other source group content is hidden');
+    }
+    assert(p.elementContentContainer.parentElement === overlay, 'Content is inside the clipped fullscreen overlay');
+    assert(p.elementContentContainer.clientWidth === dock.clientWidth && p.elementContentContainer.clientHeight === dock.clientHeight - 25, 'Content fills space below restore bar');
+    assert(p.elementContent.querySelector('input') === input && input.value === 'retained', 'Input and its value survive maximize');
+    assert(manager.saveState() === state, 'Maximize leaves saved layout unchanged');
+    dock.style.width = '680px';
+    await manager.resize(680, 450);
+    await frame();
+    assert(sizes.at(-1)[0] === 680 && p.elementContentContainer.clientWidth === 680, 'Maximized content tracks container resizing');
+    dock.style.width = '750px';
+    await manager.resize(750, 450);
+    overlay.querySelector('button').click();
+    await frame();
+    assert(!p.isFullscreen && p.elementContentContainer.parentElement === originalParent, 'Restore returns content to original parent');
+    if (floatingFrame) assert(floatingFrame.style.visibility === originalFrameVisibility, 'Restore returns source frame visibility');
+    assert(equalRect(p.elementContentContainer.getBoundingClientRect(), originalRect), 'Restore returns original content bounds');
+    assert(p.elementContent.querySelector('input') === input && input.value === 'retained', 'Restore retains edited content');
+    delete p.elementContent.resizeHandler;
+}
+window.runFullscreenChecks = async () => {
+    document.getElementById('run').disabled = true;
+    manager.setFullscreenEnabled(false);
+    results.textContent = '';
+    doc.setFullscreen(true);
+    assert(!doc.isFullscreen && doc.elementButtonFullscreen.style.display === 'none', 'Fullscreen defaults off');
+    manager.setFullscreenEnabled(true);
+    doc.tabPage.onSelected();
+    await checkPanel(doc);
+    await checkPanel(tool);
+    tool.setAutoHide(true, 'left');
+    manager.autoHideManager.show(tool);
+    await checkPanel(tool);
+    tool.setAutoHide(false);
+    const floating = panel('Floating');
+    const dialog = manager.floatDialog(floating, 100, 120);
+    await dialog.resize(300, 220);
+    await frame();
+    await checkPanel(floating);
+    const groupMember = panel('Floating group member');
+    const otherDialog = manager.floatDialog(groupMember, 150, 150);
+    manager.mergeDialogs(otherDialog, dialog);
+    await frame();
+    await checkPanel(groupMember);
+    floating.tabPage.onSelected();
+    floating.setFullscreen(true);
+    dock.querySelector('.dock-fullscreen-overlay button').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert(!floating.isFullscreen && manager.getPanels().includes(floating), 'Escape restores without closing');
+    doc.hideFullscreenButton(true);
+    doc.setFullscreen(true);
+    assert(!doc.isFullscreen && doc.tabPage.handle.elementFullscreenButton.style.display === 'none', 'Panel opt-out hides tab and title controls');
+    doc.hideFullscreenButton(false);
+    doc.setFullscreen(true);
+    tool.setFullscreen(true);
+    assert(!doc.isFullscreen && tool.isFullscreen && dock.querySelectorAll('.dock-fullscreen-overlay').length === 1, 'Only one panel is maximized per manager');
+    manager.setFullscreenEnabled(false);
+    assert(!tool.isFullscreen && !dock.querySelector('.dock-fullscreen-overlay'), 'Global disabling restores active panel');
+    manager.setFullscreenEnabled(true);
+    floating.setFullscreen(true);
+    floating.closePanelContainerCallback = async () => false;
+    await floating.close();
+    assert(floating.isFullscreen, 'Rejected close retains fullscreen');
+    floating.closePanelContainerCallback = async () => true;
+    await floating.close();
+    assert(!floating.isFullscreen && !dock.querySelector('.dock-fullscreen-overlay'), 'Closing maximized floating panel removes overlay');
+    doc.setFullscreen(true);
+    second.hideFullscreenButton(true);
+    const saved = manager.saveState();
+    await manager.loadState(saved);
+    assert(!dock.querySelector('.dock-fullscreen-overlay') && !manager.fullscreenPanel, 'Loading layout clears fullscreen');
+    assert(manager.getPanels().find(p => p.elementContent === second.elementContent)._hideFullscreenButton, 'Layout retains per-panel opt-out');
+    await import('../lib/js/index-webcomponent.js');
+    const web = document.createElement('dock-spawn-ts');
+    web.style.cssText = 'display:block;position:relative;width:400px;height:240px';
+    web.setAttribute('dock-spawn-enable-fullscreen', '');
+    web.innerHTML = '<div title="Slotted content"><input value="Web component"></div><div title="Opt out" dock-spawn-hide-fullscreen-button>Hidden control</div>';
+    document.body.appendChild(web);
+    while (!web.dockManager?.autoHideManager) await frame();
+    await web.resize();
+    const panels = web.dockManager.getPanels();
+    assert(web.dockManager.config.enableFullscreen && panels.find(p => p.title === 'Opt out')._hideFullscreenButton, 'Web component honors global and panel attributes');
+    const slotted = panels.find(p => p.title === 'Slotted content');
+    const webInput = web.querySelector('input');
+    slotted.setFullscreen(true);
+    const mainPanel = manager.getPanels().find(p => !p._hideFullscreenButton);
+    mainPanel.setFullscreen(true);
+    await frame();
+    assert(slotted.isFullscreen && mainPanel.isFullscreen, 'Separate managers maximize independently');
+    const webBounds = web.shadowRoot.querySelector('.dock-fullscreen-overlay').getBoundingClientRect();
+    assert(equalRect(webBounds, web.getBoundingClientRect()) && webInput.getBoundingClientRect().width > 0, 'Slotted content fills its own container');
+    slotted.setFullscreen(false);
+    mainPanel.setFullscreen(false);
+    assert(web.querySelector('input') === webInput && webInput.value === 'Web component', 'Web component restores the same slotted input');
+    web.remove();
+    assert(!document.fullscreenElement, 'Browser fullscreen is never entered');
+    results.textContent += 'All checks passed.\n';
+    return results.textContent;
+};
+document.getElementById('run').onclick = () => window.runFullscreenChecks().catch(error => { results.textContent += 'FAIL ' + error.stack; });
+document.getElementById('toggle').onclick = () => manager.setFullscreenEnabled(!manager.config.enableFullscreen);
+manager.setFullscreenEnabled(true);
+</script>
+</html>

@@ -45,6 +45,18 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     undockInitiator: UndockInitiator;
     elementButtonClose: HTMLDivElement;
     elementButtonAutoHide: HTMLButtonElement;
+    elementButtonFullscreen: HTMLButtonElement;
+    _hideFullscreenButton = false;
+    private fullscreen?: {
+        overlay: HTMLDivElement;
+        parent: HTMLElement;
+        next: ChildNode;
+        style: string;
+        position: string;
+        observer: ResizeObserver;
+        focus: HTMLElement;
+        hiddenFloatingElements: { element: HTMLElement; visibility: string }[];
+    };
     closeButtonClickedHandler: EventHandler;
     closeButtonTouchedHandler: EventHandler;
     mouseDownHandler: EventHandler;
@@ -141,6 +153,10 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
             this.setAutoHide(!this.isAutoHidden);
         };
         this.elementTitle.appendChild(this.elementButtonAutoHide);
+        this.elementButtonFullscreen = this.createFullscreenButton();
+        this.elementButtonFullscreen.classList.add('panel-titlebar-button-fullscreen');
+        this.elementTitle.appendChild(this.elementButtonFullscreen);
+        this.updateFullscreenButton();
         this.elementButtonClose.classList.add('panel-titlebar-button-close');
         this.elementButtonClose.style.display = this._hideCloseButton ? 'none' : 'block';
 
@@ -308,6 +324,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         state.height = this.height;
         state.canUndock = this._canUndock;
         state.hideCloseButton = this._hideCloseButton;
+        state.hideFullscreenButton = this._hideFullscreenButton;
         state.panelType = this.panelType;
     }
 
@@ -317,6 +334,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this.state = { width: state.width, height: state.height };
         this.canUndock(state.canUndock)
         this.hideCloseButton(state.hideCloseButton);
+        this.hideFullscreenButton(!!state.hideFullscreenButton);
         this.panelType = state.panelType;
     }
 
@@ -328,6 +346,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     grayOut(show: boolean) {
+        if (show) this.setFullscreen(false);
         if (!show && this._grayOut) {
             this.elementContentWrapper.removeChild(this._grayOut);
             this.elementButtonClose.style.display = this._hideCloseButton ? 'none' : 'block';
@@ -350,6 +369,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
                 }
             });
         }
+        this.updateFullscreenButton();
     }
 
     onMouseDown() {
@@ -367,6 +387,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     destroy() {
+        this.setFullscreen(false);
         this.destroyed = true;
         this.undockInitiator.enabled = false;
         if (this.isAutoHidden) this.dockManager.autoHideManager.remove(this);
@@ -397,6 +418,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
      * Undocks the panel and and converts it to a dialog box
      */
     performUndockToDialog(e, dragOffset: Point) {
+        this.setFullscreen(false);
         this.isDialog = true;
         this.undockInitiator.enabled = false;
         this.elementContentWrapper.style.display = "block";
@@ -408,6 +430,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     * Closes the panel
     */
     private performClose() {
+        this.setFullscreen(false);
         this.isDialog = true;
         this.undockInitiator.enabled = false;
         this.elementContentWrapper.style.display = "block";
@@ -421,11 +444,13 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
      * The container would be removed from the DOM
      */
     performUndock() {
+        this.setFullscreen(false);
         this.undockInitiator.enabled = false;
         this.dockManager.requestUndock(this);
     };
 
     prepareForDocking() {
+        this.setFullscreen(false);
         if (this.isAutoHidden) this.dockManager.autoHideManager.remove(this);
         this.isDialog = false;
         this.undockInitiator.enabled = this._canUndock;
@@ -464,6 +489,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     private panelDocked() {
+        if (this.isFullscreen) return;
         if (this.elementContent.hidden)
             this.elementContent.hidden = false;
         if (this.elementContentContainer.parentElement !== this.dockManager.config.dialogRootElement)
@@ -472,6 +498,12 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
 
     async resize(width: number, height: number): Promise<void> {
         if (this.destroyed) return;
+        if (this.isFullscreen) {
+            this._cachedWidth = width;
+            this._cachedHeight = height;
+            this.resizeFullscreen();
+            return;
+        }
         // if (this._cachedWidth === width && this._cachedHeight === height)
         // {
         //     // Already in the desired size
@@ -483,7 +515,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         this._cachedWidth = width;
         this._cachedHeight = height;
         await resized;
-        if (this.destroyed) return;
+        if (this.destroyed || this.isFullscreen) return;
         try {
             if (this.elementContent != undefined && (typeof this.elementContent.resizeHandler == 'function'))
                 this.elementContent.resizeHandler(width, height - this.elementTitle.clientHeight);
@@ -493,6 +525,10 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     async _setPanelDimensions(width: number, height: number): Promise<void> {
+        if (this.isFullscreen) {
+            this.resizeFullscreen();
+            return;
+        }
         this.elementTitle.style.width = width + 'px';
         this.elementContentHost.style.width = width + 'px';
         this.elementContentContainer.style.width = width + 'px';
@@ -507,7 +543,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         //if (this.elementContentContainer.parentElement != this.dockManager.config.dialogRootElement)
         //    this.dockManager.config.dialogRootElement.appendChild(this.elementContentContainer);
         await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
-        if (this.destroyed) return;
+        if (this.destroyed || this.isFullscreen) return;
         const rect = this.elementContentWrapper.getBoundingClientRect();
         const rootRect = this.dockManager.config.dialogRootElement.getBoundingClientRect();
         this.elementContentContainer.style.left = (rect.x - rootRect.x) + 'px';
@@ -517,13 +553,123 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     setDialogPosition(x: number, y: number) {
+        if (this.isFullscreen) return;
         this.elementContentContainer.style.left = x + 'px';
         //todo, 25px if it is a dialog, is it always 25px? where do we know...
         this.elementContentContainer.style.top = (y + this.elementTitle.clientHeight) + 'px';
     }
 
     setVisible(isVisible: boolean) {
+        if (this.isFullscreen) return;
         this.elementContentContainer.style.display = isVisible ? '' : 'none';
+    }
+
+    get isFullscreen(): boolean { return !!this.fullscreen; }
+
+    /** Hide this panel's fullscreen controls independently of the global opt-in. */
+    hideFullscreenButton(hidden: boolean) {
+        this._hideFullscreenButton = hidden;
+        if (hidden) this.setFullscreen(false);
+        this.updateFullscreenButton();
+    }
+
+    createFullscreenButton(): HTMLButtonElement {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'dock-fullscreen-button';
+        button.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="9"/></svg>';
+        button.title = Localizer.getString('Fullscreen');
+        button.setAttribute('aria-label', button.title);
+        for (const event of ['pointerdown', 'mousedown', 'touchstart', 'dblclick'])
+            button.addEventListener(event, e => e.stopPropagation());
+        button.onclick = e => {
+            e.stopPropagation();
+            this.setFullscreen(!this.isFullscreen);
+        };
+        button.style.display = this.dockManager.config.enableFullscreen && !this._hideFullscreenButton && !this._grayOut ? '' : 'none';
+        return button;
+    }
+
+    updateFullscreenButton() {
+        const visible = !!this.dockManager.config.enableFullscreen && !this._hideFullscreenButton && !this._grayOut;
+        if (this.elementButtonFullscreen) this.elementButtonFullscreen.style.display = visible ? '' : 'none';
+        this.elementTitle?.classList.toggle('panel-titlebar-can-fullscreen', visible);
+        this.eventListeners.forEach(listener => listener.onFullscreenButtonChanged?.(visible));
+    }
+
+    /** Fill the manager's container without changing the dock tree or using browser fullscreen. */
+    setFullscreen(enabled: boolean) {
+        if (enabled === this.isFullscreen) return;
+        const manager = this.dockManager;
+        if (!enabled) {
+            const state = this.fullscreen;
+            this.fullscreen = undefined;
+            manager.fullscreenPanel = undefined;
+            state.observer?.disconnect();
+            for (const saved of state.hiddenFloatingElements)
+                saved.element.style.visibility = saved.visibility;
+            state.parent.insertBefore(this.elementContentContainer, state.next?.parentNode === state.parent ? state.next : null);
+            this.elementContentContainer.style.cssText = state.style;
+            state.overlay.remove();
+            manager.element.style.position = state.position;
+            if (this.isAutoHidden && !manager.autoHideManager.isOpen(this)) this.setVisible(false);
+            else if (this.tabPage && !this.tabPage.selected) this.setVisible(false);
+            else void this.resize(this.width, this.height);
+            if (state.focus?.isConnected) state.focus.focus();
+            return;
+        }
+        if (!manager.config.enableFullscreen || this._hideFullscreenButton || this._grayOut || this.destroyed || this.undockedToNewBrowserWindow) return;
+        manager.fullscreenPanel?.setFullscreen(false);
+        const overlay = document.createElement('div');
+        overlay.className = 'dock-fullscreen-overlay';
+        const header = document.createElement('div');
+        header.className = 'panel-titlebar dock-fullscreen-header';
+        const title = document.createElement('div');
+        title.className = 'panel-titlebar-text';
+        title.textContent = this.title;
+        const restore = this.createFullscreenButton();
+        restore.classList.add('panel-titlebar-button-fullscreen');
+        restore.title = Localizer.getString('RestorePanel');
+        restore.setAttribute('aria-label', restore.title);
+        restore.setAttribute('aria-pressed', 'true');
+        restore.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5V2.5h8.5V11H11"/><rect x="2.5" y="5.5" width="8" height="8"/></svg>';
+        header.append(title, restore);
+        overlay.appendChild(header);
+        overlay.addEventListener('keydown', e => manager.onKeyPress(e), true);
+        this.fullscreen = {
+            overlay, parent: this.elementContentContainer.parentElement,
+            next: this.elementContentContainer.nextSibling, style: this.elementContentContainer.style.cssText,
+            position: manager.element.style.position, observer: undefined,
+            focus: manager.element.ownerDocument.activeElement as HTMLElement,
+            hiddenFloatingElements: []
+        };
+        if (getComputedStyle(manager.element).position === 'static') manager.element.style.position = 'relative';
+        manager.element.appendChild(overlay);
+        overlay.appendChild(this.elementContentContainer);
+        // Floating frames and sibling content live outside the dock container.
+        // Keep their geometry for restoration, but hide the source window in fullscreen.
+        if (this.floatingDialog) {
+            const elements = [this.floatingDialog.elementDialog,
+                ...this.floatingDialog.panels.filter(panel => panel !== this).map(panel => panel.elementContentContainer)];
+            this.fullscreen.hiddenFloatingElements = elements.map(element => ({ element, visibility: element.style.visibility }));
+            elements.forEach(element => { element.style.visibility = 'hidden'; });
+        }
+        manager.fullscreenPanel = this;
+        this.elementContentContainer.style.cssText = 'position:absolute;left:0;top:25px;width:100%;height:calc(100% - 25px);display:block;z-index:1;pointer-events:auto';
+        this.fullscreen.observer = new ResizeObserver(() => this.resizeFullscreen());
+        this.fullscreen.observer.observe(overlay);
+        manager.activePanel = this;
+        this.resizeFullscreen();
+        restore.focus();
+    }
+
+    private resizeFullscreen() {
+        if (!this.fullscreen) return;
+        try {
+            this.elementContent.resizeHandler?.(this.fullscreen.overlay.clientWidth, Math.max(0, this.fullscreen.overlay.clientHeight - 25));
+        } catch (err) {
+            console.log('error calling resizeHandler:', err, ' elt:', this.elementContent);
+        }
     }
 
     get isAutoHidden(): boolean {
@@ -625,7 +771,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     private async closeInternal(runCallback: boolean) {
         let close = true;
 
-        if (this.elementContentContainer.parentElement === this.dockManager.config.dialogRootElement) {
+        if (this.isFullscreen || this.elementContentContainer.parentElement === this.dockManager.config.dialogRootElement) {
             if (!runCallback)
                 close = true;
             else if (this.closePanelContainerCallback)
@@ -634,6 +780,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
                 close = await this.dockManager.closePanelContainerCallback(this);
 
             if (close) {
+                this.setFullscreen(false);
                 this.dockManager.config.dialogRootElement.removeChild(this.elementContentContainer);
 
                 if (this.isDialog) {
