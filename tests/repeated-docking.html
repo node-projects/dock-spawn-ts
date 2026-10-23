@@ -92,6 +92,38 @@ document.getElementById('run').onclick = async event => {
             await settle();
             check();
         }
+        for (const side of ['left', 'right', 'top', 'down']) {
+            await reset();
+            const dialog = panel('pivot').performUndockToDialog(undefined);
+            await settle();
+            const oldRoot = manager.context.model.rootNode;
+            const vertical = side === 'top' || side === 'down';
+            const before = side === 'left' || side === 'top';
+            const preview = manager.layoutEngine.getDockBounds(oldRoot, dialog.panel,
+                vertical ? 'vertical' : 'horizontal', before, true);
+            manager.dockWheel.activeNode = oldRoot;
+            manager.dockWheel._handleDockRequest(manager.dockWheel.wheelItems[side + '-s'], dialog);
+            await settle();
+            check();
+            const root = manager.context.model.rootNode;
+            assert(root.children.length === (vertical ? 3 : 2), `${side}: correct number of direct siblings`);
+            const sizes = root.children.map(child => vertical ? child.container.height : child.container.width);
+            assert(Math.max(...sizes) - Math.min(...sizes) <= 1, `${side}: equal direct shares`);
+            assert(vertical ? root === oldRoot : root.children.includes(oldRoot), `${side}: preserve appropriate grouping`);
+            const actual = panel('pivot').elementPanel.getBoundingClientRect();
+            const origin = manager.element.getBoundingClientRect();
+            assert(Math.abs(preview.x - (actual.x - origin.x)) <= 1 && Math.abs(preview.y - (actual.y - origin.y)) <= 1
+                && preview.width === actual.width && preview.height === actual.height, `${side}: preview matches actual bounds`);
+            log(`PASS: equal outer ${side} guide and matching preview`);
+        }
+        await reset();
+        doc.getElementById('outer').click();
+        for (let i = 0; i < 60 && doc.getElementById('outer').disabled; i++) await settle();
+        await settle();
+        check();
+        const demoSizes = manager.context.model.rootNode.children.map(child => child.container.height);
+        assert(demoSizes.length === 3 && Math.max(...demoSizes) - Math.min(...demoSizes) <= 1, 'Demo button produces equal thirds');
+        log('PASS: demo outer-bottom action gives three equal panes');
         for (const source of ids) {
             await reset();
             await dock('pivot', 'list', 'Fill');

@@ -1,5 +1,5 @@
 export type TabStripMode = 'scroll' | 'wrap';
-export type DockingSizeStrategy = 'proportional' | 'split-reference';
+export type DockingSizeStrategy = 'proportional' | 'split-reference' | 'equal-distribution';
 
 export class DockConfig {
     public constructor() {
@@ -28,6 +28,6 @@ export class DockConfig {
     persistTabGroups?: boolean;
     /** Single scrollable row (default), or multiple rows of tabs. */
     tabStripMode?: TabStripMode;
-    /** In an existing splitter, optionally divide only the target pane when docking beside it. */
+    /** Equal-distribution balances outer drops; panel-relative drops use split-reference. */
     dockingSizeStrategy?: DockingSizeStrategy;
 }

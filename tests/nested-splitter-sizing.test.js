@@ -17,6 +17,7 @@ class Element {
     get clientWidth() { return parseFloat(this.style.width) || 5; }
     get clientHeight() { return parseFloat(this.style.height) || 5; }
     get nextSibling() { return this.parentNode?.children[this.parentNode.children.indexOf(this) + 1] ?? null; }
+    get parentElement() { return this.parentNode; }
     appendChild(child) { this.insertBefore(child, null); }
     insertBefore(child, before) {
         child.parentNode?.removeChild(child);
@@ -61,7 +62,7 @@ function fixture(t, vertical) {
     return { axis, leaf, split, resize, drag, manager };
 }
 
-for (const vertical of [false, true]) for (const before of [false, true]) for (const strategy of [undefined, 'proportional', 'split-reference']) {
+for (const vertical of [false, true]) for (const before of [false, true]) for (const strategy of [undefined, 'proportional', 'split-reference', 'equal-distribution']) {
     test(`${strategy ?? 'default'} docking ${before ? 'before' : 'after'} a ${vertical ? 'vertical' : 'horizontal'} target from a floating dialog`, async t => {
         const { axis, leaf, split, resize, manager } = fixture(t, vertical);
         assert.equal(new DockConfig().dockingSizeStrategy, 'proportional');
@@ -88,7 +89,7 @@ for (const vertical of [false, true]) for (const before of [false, true]) for (c
         const preview = engine.getDockBounds(target, pivot, direction, before);
         const dock = vertical ? (before ? engine.dockUp : engine.dockDown) : (before ? engine.dockLeft : engine.dockRight);
         DockManager.prototype._requestDockDialog.call(manager, target, dialog, dock.bind(engine));
-        if (strategy === 'split-reference') {
+        if (strategy === 'split-reference' || strategy === 'equal-distribution') {
             assert.deepEqual([list[axis], detail[axis], neighbor[axis], pivot[axis]], [300, 145, 195, 145]);
             assert.equal(preview[axis], pivot[axis], 'Preview matches the docked pane size');
             assert.equal(vertical ? preview.y : preview.x, before ? 0 : 150);
@@ -101,6 +102,100 @@ for (const vertical of [false, true]) for (const before of [false, true]) for (c
         }
         assert.equal(root.children.reduce((sum, child) => sum + child.container[axis], 0), 785);
     });
+}
+
+function dockingManager(manager, root, resize) {
+    Object.assign(manager, {
+        context: { model: { rootNode: root } },
+        element: { getBoundingClientRect: () => ({ left: 10, top: 20 }) },
+        setRootNode(node) { node.detachFromParent(); this.context.model.rootNode = node; },
+        rebuildLayout() {},
+        invalidate() { return resize(this.context.model.rootNode.container, 800); },
+        notifyOnDock() {}
+    });
+    root.container.containerElement.getBoundingClientRect = () => ({ left: 30, top: 40 });
+    return new DockLayoutEngine(manager);
+}
+
+for (const vertical of [false, true]) for (const before of [false, true]) for (const originalCount of [2, 3]) {
+    test(`equal outer ${vertical ? 'vertical' : 'horizontal'} ${before ? 'start' : 'end'} drop balances ${originalCount + 1} direct panes and preview`, async t => {
+        const { axis, leaf, split, resize, manager } = fixture(t, vertical);
+        manager.config.dockingSizeStrategy = 'equal-distribution';
+        const originalSizes = originalCount === 2 ? [300, 495] : [300, 295, 195];
+        const originals = originalSizes.map((size, i) => leaf(i === 0 ? 'fill' : 'panel', size));
+        const root = new DockNode(await split(originals, originalSizes));
+        originals.forEach(container => root.addChild(new DockNode(container)));
+        const engine = dockingManager(manager, root, resize);
+        const added = new DockNode(leaf('panel', 1800));
+        const direction = vertical ? 'vertical' : 'horizontal';
+        const preview = engine.getDockBounds(root, added.container, direction, before, true);
+        const method = vertical ? (before ? 'dockUp' : 'dockDown') : (before ? 'dockLeft' : 'dockRight');
+        engine[method](root, added, true);
+        assert.equal(manager.context.model.rootNode, root, 'Reuse the existing root instead of nesting the old group');
+        assert.deepEqual(root.children.filter(child => child !== added).map(child => child.container), originals);
+        assert.equal(root.children[before ? 0 : originalCount], added);
+        const sizes = root.children.map(child => child.container[axis]);
+        assert.equal(sizes.reduce((sum, size) => sum + size, 0), 800 - originalCount * 5);
+        assert.ok(Math.max(...sizes) - Math.min(...sizes) <= 1, 'Equal shares differ by at most one rounding pixel');
+        assert.equal(preview[axis], added.container[axis]);
+        assert.equal(vertical ? preview.y : preview.x, 20 + (before ? 0 : 800 - added.container[axis]));
+        await manager.invalidate();
+        assert.deepEqual(root.children.map(child => child.container[axis]), sizes, 'Later layout retains the equal allocation');
+    });
+}
+
+for (const vertical of [false, true]) for (const before of [false, true]) {
+    test(`equal outer ${vertical ? 'vertical' : 'horizontal'} drop creates two equal groups and preserves the nested tree`, async t => {
+        const { axis, leaf, resize, manager } = fixture(t, vertical);
+        manager.config.dockingSizeStrategy = 'equal-distribution';
+        const one = leaf('fill', 300), two = leaf('panel', 495);
+        const Opposite = vertical ? HorizontalDockContainer : VerticalDockContainer;
+        const nested = new Opposite(manager, [one, two]);
+        await resize(nested, 800);
+        const root = new DockNode(nested);
+        root.addChild(new DockNode(one)); root.addChild(new DockNode(two));
+        const engine = dockingManager(manager, root, resize);
+        const direction = vertical ? 'vertical' : 'horizontal';
+        const added = new DockNode(leaf('panel', 1200));
+        const preview = engine.getDockBounds(root, added.container, direction, before, true);
+        engine[vertical ? (before ? 'dockUp' : 'dockDown') : (before ? 'dockLeft' : 'dockRight')](root, added, true);
+        const outer = manager.context.model.rootNode;
+        assert.equal(outer.children.length, 2);
+        assert.equal(outer.children[before ? 1 : 0], root, 'The opposite-orientation group is not flattened');
+        assert.deepEqual(root.children.map(child => child.container), [one, two]);
+        assert.ok(Math.abs(nested[axis] - added.container[axis]) <= 1);
+        assert.equal(nested[axis] + added.container[axis], 795);
+        assert.equal(preview[axis], added.container[axis]);
+    });
+}
+
+for (const vertical of [false, true]) {
+    test(`equal-distribution retains an explicit programmatic ${vertical ? 'vertical' : 'horizontal'} ratio`, async t => {
+        const { axis, leaf, split, resize, manager } = fixture(t, vertical);
+        manager.config.dockingSizeStrategy = 'equal-distribution';
+        const document = leaf('fill', 300), reference = leaf('panel', 495);
+        const root = new DockNode(await split([document, reference], [300, 495]));
+        root.addChild(new DockNode(document)); root.addChild(new DockNode(reference));
+        const engine = dockingManager(manager, root, resize);
+        manager._checkShowBackgroundContext = () => {};
+        const added = leaf('fill', 1500);
+        DockManager.prototype._requestDockContainer.call(manager, root.children[1], added,
+            engine[vertical ? 'dockDown' : 'dockRight'].bind(engine), .25);
+        assert.deepEqual([document[axis], reference[axis], added[axis]], [300, 368, 122]);
+    });
+    for (const strategy of [undefined, 'proportional', 'split-reference']) {
+        test(`${strategy ?? 'default'} outer docking retains its existing root grouping (${vertical ? 'vertical' : 'horizontal'})`, async t => {
+            const { leaf, split, resize, manager } = fixture(t, vertical);
+            manager.config.dockingSizeStrategy = strategy;
+            const original = [leaf('fill', 300), leaf('panel', 495)];
+            const root = new DockNode(await split(original, [300, 495]));
+            original.forEach(container => root.addChild(new DockNode(container)));
+            const engine = dockingManager(manager, root, resize);
+            const added = new DockNode(leaf('panel', 400));
+            engine[vertical ? 'dockDown' : 'dockRight'](root, added, true);
+            assert.deepEqual(manager.context.model.rootNode.children, [root, added]);
+        });
+    }
 }
 
 for (const vertical of [false, true]) for (const groupFirst of [false, true]) {

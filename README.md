@@ -157,10 +157,29 @@ The default, `'proportional'`, retains the existing size distribution based on
 the panels' previous sizes. Explicit ratios passed to `dockLeft`, `dockRight`,
 `dockUp` or `dockDown` continue to take precedence. Tab docking is unchanged.
 
+For equal shares when dropping on the **outer DockManager indicators**, use:
+
+```js
+dockManager.config.dockingSizeStrategy = 'equal-distribution';
+```
+
+An outer drop balances the affected root splitter's direct children after allowing
+for splitter bars: three panes receive thirds, four receive quarters. An existing
+root splitter with the same orientation is reused; opposite-orientation nested
+groups remain intact and each count as one child. Equality is applied on docking,
+not continuously when the host resizes. Panel-relative indicators use
+`split-reference` behavior in this mode. Previews match the resulting allocation.
+The default remains `proportional`, and explicit programmatic ratios still apply.
+To trigger outer docking programmatically for a floating dialog, pass `true` as
+the third argument to `dockDialogLeft`, `dockDialogRight`, `dockDialogUp` or
+`dockDialogDown`, with `dockManager.context.model.rootNode` as the target.
+
 Try the cream-and-green **Fieldwork Workspace** demo at
 `http://127.0.0.1:8080/page/demo/demo_reference_sizing.html` after building and
-starting the server. Drag Pivot below Detail, or use **Stack panels**, to see
-List retain its height. **Reset layout** restores the starting arrangement.
+starting the server. It starts in `equal-distribution` mode. Use **Dock at bottom**
+for equal thirds, or reset and use **Split Detail** to preserve List's height.
+The sizing selector lets you compare all three strategies. **Reset layout**
+restores the starting arrangement without changing the selected strategy.
 The demo's docking host has an explicit width and height so replacing the root
 layout during docking cannot collapse it. Browser regression checks for moving
 document tabs into splits and resetting floating panels are available at

@@ -140,13 +140,13 @@ export class DockWheel {
         } else if (wheelItem.id === WheelTypes.fill) {
             bounds = this.dockManager.layoutEngine.getDockBounds(this.activeNode, this.activeDialog.panel, 'fill', false);
         } else if (wheelItem.id === WheelTypes["top-s"]) {
-            bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'vertical', true);
+            bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'vertical', true, true);
         } else if (wheelItem.id === WheelTypes["down-s"]) {
-            bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'vertical', false);
+            bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'vertical', false, true);
         } else if (wheelItem.id === WheelTypes["left-s"]) {
-            bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'horizontal', true);
+            bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'horizontal', true, true);
         } else if (wheelItem.id === WheelTypes["right-s"]) {
-            bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'horizontal', false);
+            bounds = this.dockManager.layoutEngine.getDockBounds(rootNode, this.activeDialog.panel, 'horizontal', false, true);
         }
 
         if (bounds) {
@@ -203,13 +203,13 @@ export class DockWheel {
         } else if (wheelItem.id === WheelTypes.fill) {
             this.dockManager.dockDialogFill(this.activeNode, dialog);
         } else if (wheelItem.id === WheelTypes["left-s"]) {
-            this.dockManager.dockDialogLeft(this.dockManager.context.model.rootNode, dialog);
+            this.dockManager.dockDialogLeft(this.dockManager.context.model.rootNode, dialog, true);
         } else if (wheelItem.id === WheelTypes["right-s"]) {
-            this.dockManager.dockDialogRight(this.dockManager.context.model.rootNode, dialog);
+            this.dockManager.dockDialogRight(this.dockManager.context.model.rootNode, dialog, true);
         } else if (wheelItem.id === WheelTypes["top-s"]) {
-            this.dockManager.dockDialogUp(this.dockManager.context.model.rootNode, dialog);
+            this.dockManager.dockDialogUp(this.dockManager.context.model.rootNode, dialog, true);
         } else if (wheelItem.id === WheelTypes["down-s"]) {
-            this.dockManager.dockDialogDown(this.dockManager.context.model.rootNode, dialog);
+            this.dockManager.dockDialogDown(this.dockManager.context.model.rootNode, dialog, true);
         }
     }
 }

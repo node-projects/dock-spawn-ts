@@ -17,28 +17,32 @@
         <section class="intro">
             <div><p class="eyebrow">DOCK SPAWN TS / INTERACTIVE DEMO</p><h1>A little room to rearrange.</h1>
                 <p class="lede">Move one panel. Keep the rest of your workspace in place.</p></div>
-            <span class="strategy-badge"><span></span> Split reference enabled</span>
+            <span class="strategy-badge"><span></span> <span id="strategy-label">Equal outer distribution</span></span>
         </section>
         <section class="workspace" aria-label="Interactive docking workspace">
             <div class="workspace-toolbar"><span><span class="workspace-dot"></span> Coastal field notes <span class="muted">/ Workspace 01</span></span>
-                <div class="actions"><button id="reset" type="button">Reset layout</button><button id="stack" type="button" class="primary">Stack panels ↓</button></div>
+                <div class="actions"><label for="strategy">Sizing</label><select id="strategy">
+                    <option value="equal-distribution" selected>Equal outer distribution</option>
+                    <option value="split-reference">Split reference</option>
+                    <option value="proportional">Proportional</option>
+                </select><button id="reset" type="button">Reset layout</button><button id="stack" type="button">Split Detail ↓</button><button id="outer" type="button" class="primary">Dock at bottom ↓</button></div>
             </div>
             <div id="dock-area"><div id="dock-manager"></div></div>
             <div class="workspace-footer"><span id="layout-status" role="status">Preparing workspace…</span><span>Drag title bars · Resize dividers</span></div>
         </section>
         <section class="guide" aria-label="How to use this demo">
-            <div><span class="step">01</span><h2>Pick up Pivot</h2><p>Drag the green panel by its title bar, then hover over Detail.</p></div>
-            <div><span class="step">02</span><h2>Drop below Detail</h2><p>Use the bottom docking indicator. Or select <strong>Stack panels</strong> to try the same move.</p></div>
-            <div><span class="step">03</span><h2>Watch List stay put</h2><p>Detail shares its space with Pivot. List keeps its height, leaving your notes in view.</p></div>
+            <div><span class="step">01</span><h2>Try the outer edge</h2><p>Drag Pivot to the indicator at the bottom edge of the entire workspace, or select <strong>Dock at bottom</strong>. All three panes receive equal height.</p></div>
+            <div><span class="step">02</span><h2>Or split one panel</h2><p>Reset, then use Detail's own bottom indicator or <strong>Split Detail</strong>. Detail shares its space with Pivot while List keeps its height.</p></div>
+            <div><span class="step">03</span><h2>Compare the strategies</h2><p>Choose a sizing strategy, reset, and repeat the same move. Equal distribution affects direct siblings at the outer edge; nested groups stay together.</p></div>
         </section>
-        <footer class="page-footer"><span>Built with Dock Spawn TS</span><code>dockingSizeStrategy: 'split-reference'</code></footer>
+        <footer class="page-footer"><span>Built with Dock Spawn TS</span><code id="config-code">dockingSizeStrategy: 'equal-distribution'</code></footer>
     </main>
     <section id="pivot" class="sheet pivot-sheet" data-panel-caption="Pivot">
         <div class="sheet-heading"><span class="eyebrow">01 / PIVOT</span><span class="pill">Field guide</span></div>
         <h2>Along the<br>waterline.</h2><p class="sheet-description">A collection of observations from the edge of land and sea.</p>
         <div class="landscape" aria-hidden="true"><span class="sun"></span><span class="ridge ridge-back"></span><span class="ridge ridge-front"></span><span class="waterline"></span></div>
         <div class="location"><span>North coast transect</span><span>54° N / 08° E</span></div>
-        <div class="pivot-note"><span>↗</span><p><strong>Make this space your own.</strong><br>Drag this panel below Detail. The notes above it will keep their room.</p></div>
+        <div class="pivot-note"><span>↗</span><p><strong>Two ways to make room.</strong><br>Drop at the outer bottom edge for equal heights, or below Detail to share just its space.</p></div>
     </section>
     <section id="list" class="sheet list-sheet" data-panel-caption="List">
         <div class="sheet-heading"><span class="eyebrow">02 / LIST</span><span class="pill">3 observations</span></div>

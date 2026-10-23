@@ -18,23 +18,23 @@ export class DockLayoutEngine {
     }
 
     /** docks the [newNode] to the left of [referenceNode] */
-    dockLeft(referenceNode: DockNode, newNode: DockNode) {
-        this._performDock(referenceNode, newNode, 'horizontal', true);
+    dockLeft(referenceNode: DockNode, newNode: DockNode, outerDock = false) {
+        this._performDock(referenceNode, newNode, 'horizontal', true, outerDock);
     }
 
     /** docks the [newNode] to the right of [referenceNode] */
-    dockRight(referenceNode: DockNode, newNode: DockNode) {
-        this._performDock(referenceNode, newNode, 'horizontal', false);
+    dockRight(referenceNode: DockNode, newNode: DockNode, outerDock = false) {
+        this._performDock(referenceNode, newNode, 'horizontal', false, outerDock);
     }
 
     /** docks the [newNode] to the top of [referenceNode] */
-    dockUp(referenceNode: DockNode, newNode: DockNode) {
-        this._performDock(referenceNode, newNode, 'vertical', true);
+    dockUp(referenceNode: DockNode, newNode: DockNode, outerDock = false) {
+        this._performDock(referenceNode, newNode, 'vertical', true, outerDock);
     }
 
     /** docks the [newNode] to the bottom of [referenceNode] */
-    dockDown(referenceNode: DockNode, newNode: DockNode) {
-        this._performDock(referenceNode, newNode, 'vertical', false);
+    dockDown(referenceNode: DockNode, newNode: DockNode, outerDock = false) {
+        this._performDock(referenceNode, newNode, 'vertical', false, outerDock);
     }
 
     /** docks the [newNode] by creating a new tab inside [referenceNode] */
@@ -171,7 +171,7 @@ export class DockLayoutEngine {
         this.dockManager.notifyOnTabsReorder(node);
     }
 
-    _performDock(referenceNode: DockNode, newNode: DockNode, direction: string, insertBeforeReference: boolean) {
+    _performDock(referenceNode: DockNode, newNode: DockNode, direction: string, insertBeforeReference: boolean, outerDock = false) {
         if (referenceNode.parent && referenceNode.parent.container.containerType === 'fill')
             referenceNode = referenceNode.parent;
 
@@ -191,6 +191,19 @@ export class DockLayoutEngine {
             referenceParent: DockNode;
 
         if (referenceNode === model.rootNode) {
+            const equal = outerDock && direction !== 'fill' && this.dockManager.config.dockingSizeStrategy === 'equal-distribution';
+            const width = referenceNode.container.width, height = referenceNode.container.height;
+            if (equal && referenceNode.container.containerType === direction) {
+                // Reuse the root's direct children so three panes receive thirds,
+                // rather than splitting an old two-pane group and the new pane in half.
+                if (insertBeforeReference) referenceNode.addChildBefore(referenceNode.children[0], newNode);
+                else referenceNode.addChild(newNode);
+                referenceNode.performLayout(false);
+                this.setEqualSizes(referenceNode);
+                this.dockManager.invalidate();
+                this.dockManager.notifyOnDock(newNode);
+                return;
+            }
             if (insertBeforeReference) {
                 compositeContainer = this._createDockContainer(direction, newNode, referenceNode);
                 compositeNode = new DockNode(compositeContainer);
@@ -207,6 +220,10 @@ export class DockLayoutEngine {
             // Attach the root node to the dock manager's DOM
             this.dockManager.setRootNode(compositeNode);
             this.dockManager.rebuildLayout(this.dockManager.context.model.rootNode);
+            if (equal) {
+                compositeNode.container.resize(width, height);
+                this.setEqualSizes(compositeNode);
+            }
             compositeNode.container.setActiveChild(newNode.container);
             this.dockManager.invalidate();
             this.dockManager.notifyOnDock(newNode);
@@ -252,7 +269,7 @@ export class DockLayoutEngine {
             // Add as a sibling, since the parent of the reference node is of the right composite type
             referenceParent = referenceNode.parent;
             const splitter = referenceParent.container as SplitterDockContainer;
-            const sizes = this.dockManager.config.dockingSizeStrategy === 'split-reference'
+            const sizes = this.usesReferenceSizes()
                 ? new Map(splitter.splitterPanel.childContainers.map(child =>
                     [child, this._getVaringDimension(child, direction)])) : null;
             if (insertBeforeReference)
@@ -288,6 +305,25 @@ export class DockLayoutEngine {
         container.resize(width, height);
     }
 
+    private usesReferenceSizes() {
+        return this.dockManager.config.dockingSizeStrategy === 'split-reference'
+            || this.dockManager.config.dockingSizeStrategy === 'equal-distribution';
+    }
+
+    private equalSizes(total: number, count: number, barSize: number): number[] {
+        const available = Math.max(0, total - (count - 1) * barSize);
+        // Round cumulative boundaries so every pixel is allocated and sizes differ by at most one.
+        return Array.from({ length: count }, (_, i) =>
+            Math.floor(available * (i + 1) / count) - Math.floor(available * i / count));
+    }
+
+    private setEqualSizes(node: DockNode) {
+        const splitter = node.container as SplitterDockContainer;
+        const bar = splitter.splitterPanel.spiltterBars[0].barElement;
+        splitter.setSizes(this.equalSizes(splitter.stackedVertical ? splitter.height : splitter.width,
+            node.children.length, splitter.stackedVertical ? bar.clientHeight : bar.clientWidth));
+    }
+
     _createDockContainer(containerType: string, newNode: DockNode, referenceNode: DockNode) {
         if (containerType === 'horizontal')
             return new HorizontalDockContainer(this.dockManager, [newNode.container, referenceNode.container]);
@@ -304,7 +340,7 @@ export class DockLayoutEngine {
      * The state is not modified in this function.  It is used for showing a preview of where
      * the panel would be docked when hovered over a dock wheel button
      */
-    getDockBounds(referenceNode: DockNode, containerToDock: IDockContainer, direction: string, insertBeforeReference: boolean): IRectangle {
+    getDockBounds(referenceNode: DockNode, containerToDock: IDockContainer, direction: string, insertBeforeReference: boolean, outerDock = false): IRectangle {
         let compositeNode; // The node that contains the splitter / fill node
         let childCount;
         let childPosition;
@@ -323,7 +359,27 @@ export class DockLayoutEngine {
             // Ignore the fill container's child and move one level up
             referenceNode = referenceNode.parent;
 
-        if (this.dockManager.config.dockingSizeStrategy === 'split-reference' && referenceNode.parent?.container.containerType === direction) {
+        if (outerDock && referenceNode === this.dockManager.context.model.rootNode
+            && this.dockManager.config.dockingSizeStrategy === 'equal-distribution') {
+            const sameDirection = referenceNode.container.containerType === direction;
+            const splitter = sameDirection ? referenceNode.container as SplitterDockContainer : null;
+            const bar = splitter?.splitterPanel.spiltterBars[0].barElement;
+            const barSize = bar ? (direction === 'vertical' ? bar.clientHeight : bar.clientWidth) : 5;
+            const total = this._getVaringDimension(referenceNode.container, direction);
+            const sizes = this.equalSizes(total, (sameDirection ? referenceNode.children.length : 1) + 1, barSize);
+            const size = insertBeforeReference ? sizes[0] : sizes[sizes.length - 1];
+            const offset = insertBeforeReference ? 0 : total - size;
+            const outerRect = this.dockManager.element.getBoundingClientRect();
+            const rect = referenceNode.container.containerElement.getBoundingClientRect();
+            return {
+                x: rect.left - outerRect.left + (direction === 'horizontal' ? offset : 0),
+                y: rect.top - outerRect.top + (direction === 'vertical' ? offset : 0),
+                width: direction === 'horizontal' ? size : referenceNode.container.width,
+                height: direction === 'vertical' ? size : referenceNode.container.height
+            };
+        }
+
+        if (this.usesReferenceSizes() && referenceNode.parent?.container.containerType === direction) {
             const splitter = referenceNode.parent.container as SplitterDockContainer;
             const bar = splitter.splitterPanel.spiltterBars[0].barElement;
             const barSize = direction === 'vertical' ? bar.clientHeight : bar.clientWidth;

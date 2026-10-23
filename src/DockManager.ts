@@ -438,23 +438,23 @@ export class DockManager {
     }
 
     /** Dock the [dialog] to the left of the [referenceNode] node */
-    dockDialogLeft(referenceNode: DockNode, dialog: Dialog) {
-        return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockLeft.bind(this.layoutEngine));
+    dockDialogLeft(referenceNode: DockNode, dialog: Dialog, outerDock = false) {
+        return this._requestDockDialog(referenceNode, dialog, (reference, node) => this.layoutEngine.dockLeft(reference, node, outerDock));
     }
 
     /** Dock the [dialog] to the right of the [referenceNode] node */
-    dockDialogRight(referenceNode: DockNode, dialog: Dialog) {
-        return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockRight.bind(this.layoutEngine));
+    dockDialogRight(referenceNode: DockNode, dialog: Dialog, outerDock = false) {
+        return this._requestDockDialog(referenceNode, dialog, (reference, node) => this.layoutEngine.dockRight(reference, node, outerDock));
     }
 
     /** Dock the [dialog] above the [referenceNode] node */
-    dockDialogUp(referenceNode: DockNode, dialog: Dialog) {
-        return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockUp.bind(this.layoutEngine));
+    dockDialogUp(referenceNode: DockNode, dialog: Dialog, outerDock = false) {
+        return this._requestDockDialog(referenceNode, dialog, (reference, node) => this.layoutEngine.dockUp(reference, node, outerDock));
     }
 
     /** Dock the [dialog] below the [referenceNode] node */
-    dockDialogDown(referenceNode: DockNode, dialog: Dialog) {
-        return this._requestDockDialog(referenceNode, dialog, this.layoutEngine.dockDown.bind(this.layoutEngine));
+    dockDialogDown(referenceNode: DockNode, dialog: Dialog, outerDock = false) {
+        return this._requestDockDialog(referenceNode, dialog, (reference, node) => this.layoutEngine.dockDown(reference, node, outerDock));
     }
 
     /** Dock the [dialog] as a tab inside the [referenceNode] node */

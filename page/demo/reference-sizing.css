@@ -17,7 +17,11 @@ h1 { font: 42px/1.15 Georgia, serif; letter-spacing: -1.4px; margin: 13px 0; }
 .workspace { border: 1px solid #d6dbce; border-radius: 10px; overflow: hidden; box-shadow: 0 12px 36px #30442f09; }
 .workspace-toolbar { min-height: 58px; padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fffdf7; font-size: 12px; }
 .muted { color: #8a9183; margin-left: 10px; }
-.actions { display: flex; gap: 8px; }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.actions label { font-size: 11px; color: #737d70; }
+.actions select { font: inherit; color: #3b5242; background: #fffdf7; border: 1px solid #d5dbcd; border-radius: 5px; padding: 8px; max-width: 100%; }
+.strategy-badge > #strategy-label { display: inline; width: auto; height: auto; border-radius: 0; background: transparent; margin: 0; }
+.workspace-toolbar { flex-wrap: wrap; }
 button { font: inherit; cursor: pointer; background: transparent; border: 1px solid #d5dbcd; border-radius: 5px; padding: 9px 13px; color: #3b5242; }
 button:hover { background: #e9eddf; }
 button.primary { background: #294e3d; color: #fffdf7; border-color: #294e3d; }
