@@ -619,7 +619,7 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
     }
 
     async close() {
-        this.closeInternal(true);
+        await this.closeInternal(true);
     }
 
     private async closeInternal(runCallback: boolean) {
