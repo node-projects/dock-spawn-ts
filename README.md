@@ -185,6 +185,12 @@ layout during docking cannot collapse it. Browser regression checks for moving
 document tabs into splits and resetting floating panels are available at
 `http://127.0.0.1:8080/tests/repeated-docking.html`.
 
+For a modern dark playground, open **Orbit Layout Studio** at
+`http://127.0.0.1:8080/page/demo/demo_layout_studio.html`. Compare all three
+strategies using outer-bottom, outer-right and panel-relative presets, each
+starting from the same layout. Live dimensions follow manual docking and resizing;
+you can also float Navigator and restore the layout with **Reset layout**.
+
 ```html
    dockspawn div container needs position absolute or relative 
 

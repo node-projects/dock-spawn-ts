@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Orbit Layout Studio · Dock Spawn TS</title>
+    <link rel="stylesheet" href="../../lib/css/dock-manager.css">
+    <link rel="stylesheet" href="../../lib/css/dock-manager-style.css">
+    <link rel="stylesheet" href="./layout-studio.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="../../index.html"><span class="orbit-mark" aria-hidden="true">◈</span> orbit<span class="brand-divider">/</span><span class="brand-subtitle">layout studio</span></a>
+        <a class="back-link" href="../../index.html#demos">All demos <span aria-hidden="true">↗</span></a>
+    </header>
+    <main>
+        <div class="intro"><div><p class="eyebrow">DOCK SPAWN TS · INTERACTIVE PLAYGROUND</p><h1>Your workspace. <span>Your rules.</span></h1></div><p>One canvas. Three ways to make room.<br> Choose a strategy, then put it in motion.</p></div>
+        <div class="studio">
+            <aside class="controls" aria-label="Layout controls">
+                <div class="control-heading"><span class="section-number">01</span><h2>Choose a strategy</h2></div>
+                <fieldset class="strategy-options"><legend class="sr-only">Docking size strategy</legend>
+                    <label class="strategy-card"><input type="radio" name="strategy" value="equal-distribution" checked><span class="strategy-icon" aria-hidden="true">▥</span><span><strong>Equal distribution</strong><small>Outer drops give every sibling a fair share.</small></span><span class="radio-mark" aria-hidden="true"></span></label>
+                    <label class="strategy-card"><input type="radio" name="strategy" value="split-reference"><span class="strategy-icon" aria-hidden="true">◧</span><span><strong>Split reference</strong><small>Share the target pane. Keep its neighbors.</small></span><span class="radio-mark" aria-hidden="true"></span></label>
+                    <label class="strategy-card"><input type="radio" name="strategy" value="proportional"><span class="strategy-icon" aria-hidden="true">▤</span><span><strong>Proportional</strong><small>Use previous pane sizes. The classic default.</small></span><span class="radio-mark" aria-hidden="true"></span></label>
+                </fieldset>
+                <div class="control-heading move-heading"><span class="section-number">02</span><h2>Pick a docking move</h2></div>
+                <fieldset class="move-options"><legend class="sr-only">Docking move</legend>
+                    <label><input type="radio" name="move" value="outer-bottom" checked><span>↓</span> Outer bottom <small>Whole workspace</small></label>
+                    <label><input type="radio" name="move" value="outer-right"><span>→</span> Outer right <small>Whole workspace</small></label>
+                    <label><input type="radio" name="move" value="panel-bottom"><span>↳</span> Below Inspector <small>One target pane</small></label>
+                </fieldset>
+                <button class="apply-button" id="apply" type="button">Apply docking move <span aria-hidden="true">↗</span></button>
+                <div class="secondary-actions"><button id="float" type="button">Float Navigator</button><button id="reset" type="button">Reset layout</button></div>
+                <p class="control-note">Presets start from the same layout.<br> Or drag a title bar and explore freely.</p>
+            </aside>
+            <section class="canvas-column" aria-label="Live docking workspace">
+                <div class="canvas-frame">
+                    <div class="canvas-toolbar"><span class="file-tab"><span aria-hidden="true">◈</span> mission-control.dock</span><span class="live-label"><span></span> LIVE CANVAS</span></div>
+                    <div id="orbit-area"><div id="orbit-dock"></div></div>
+                    <div class="canvas-status"><span class="status-dot" aria-hidden="true"></span><span id="status" role="status">Preparing canvas…</span></div>
+                </div>
+                <div class="readouts" aria-label="Live pane dimensions">
+                    <div class="readout navigator-readout"><span><i></i> Navigator <small>source</small></span><strong id="size-navigator">—</strong></div>
+                    <div class="readout activity-readout"><span><i></i> Activity <small>document</small></span><strong id="size-activity">—</strong></div>
+                    <div class="readout inspector-readout"><span><i></i> Inspector <small>target</small></span><strong id="size-inspector">—</strong></div>
+                </div>
+            </section>
+        </div>
+        <footer class="footer"><span><span class="footer-dot"></span> Powered by Dock Spawn TS</span><code id="config-code">dockingSizeStrategy: 'equal-distribution'</code><span>Drag. Dock. Make it yours.</span></footer>
+    </main>
+
+    <section class="sample-sheet navigator-sheet" id="navigator" data-panel-caption="Navigator">
+        <div class="sheet-kicker"><span class="tag violet">SOURCE PANEL</span><span class="tiny-label">01 / 03</span></div>
+        <h2>Mission control<span class="mint-dot">.</span></h2><p class="sheet-caption">A home for everything you're building.</p>
+        <div class="workspace-item selected"><span class="item-icon">◈</span><span><strong>Design system</strong><small>24 components · Updated just now</small></span><span class="item-arrow">↗</span></div>
+        <div class="workspace-item"><span class="item-icon">⌘</span><span><strong>Runtime</strong><small>Layout engine & interactions</small></span></div>
+        <div class="workspace-item"><span class="item-icon">▧</span><span><strong>Asset library</strong><small>Icons, tokens & foundations</small></span></div>
+        <div class="component-header"><span>COMPONENT SNAPSHOTS</span><span>06</span></div>
+        <div class="component-grid" aria-hidden="true"><div class="mini-card"><i></i><b></b><b></b></div><div class="mini-bars"><i></i><i></i><i></i><i></i></div><div class="mini-orbit"><i></i></div><div class="mini-toggle"><i></i></div><div class="mini-lines"><i></i><i></i><i></i></div><div class="mini-grid"><i></i><i></i><i></i><i></i></div></div>
+        <p class="panel-hint"><span>↗</span> This is the panel that moves.<br>Try an outer guide or a panel's own guide.</p>
+    </section>
+    <section class="sample-sheet activity-sheet" id="activity" data-panel-caption="Activity">
+        <div class="sheet-kicker"><span class="tag mint">DOCUMENT AREA</span><span class="tiny-label">02 / 03</span></div>
+        <div class="activity-heading"><h2>In the flow</h2><span class="quiet-pill">Sample workspace</span></div>
+        <div class="activity-summary"><div><span>Components</span><strong>24 <small>+4 this week</small></strong></div><div><span>Layout states</span><strong>08 <small>ready to explore</small></strong></div></div>
+        <svg class="flow-chart" viewBox="0 0 600 90" preserveAspectRatio="none" role="img" aria-label="Illustrative activity trend">
+            <defs><linearGradient id="flow-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9c8cff" stop-opacity=".3"/><stop offset="100%" stop-color="#9c8cff" stop-opacity="0"/></linearGradient></defs>
+            <path d="M0 72 L35 64 L70 68 L110 45 L150 51 L195 34 L235 46 L280 20 L320 32 L365 17 L410 27 L450 9 L495 22 L545 12 L600 3 V90 H0Z" fill="url(#flow-fill)"/>
+            <path d="M0 72 L35 64 L70 68 L110 45 L150 51 L195 34 L235 46 L280 20 L320 32 L365 17 L410 27 L450 9 L495 22 L545 12 L600 3" fill="none" stroke="#a99aff" stroke-width="2"/>
+        </svg>
+        <div class="event-row"><span class="event-dot mint-bg"></span><span>Workspace initialized</span><small>just now</small></div><div class="event-row"><span class="event-dot violet-bg"></span><span>Panels ready to rearrange</span><small>3 active</small></div>
+    </section>
+    <section class="sample-sheet inspector-sheet" id="inspector" data-panel-caption="Inspector">
+        <div class="sheet-kicker"><span class="tag amber">TARGET PANEL</span><span class="tiny-label">03 / 03</span></div>
+        <h2>Room to adapt.</h2><p class="sheet-caption">A small move can change the whole perspective.</p>
+        <div class="property-list"><div><span>Selection</span><strong>Workspace / Canvas</strong></div><div><span>Behavior</span><strong>Dockable · Resizable</strong></div><div><span>Drop here</span><strong>Split this pane ↓</strong></div></div>
+        <div class="inspector-callout"><span>↳</span><p><strong>Local or global?</strong><br>Panel guides share one pane. Outer guides make room across the workspace.</p></div>
+    </section>
+    <script type="module" src="./layout-studio.js"></script>
+</body>
+</html>
