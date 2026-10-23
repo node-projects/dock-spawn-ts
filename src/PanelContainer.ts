@@ -646,14 +646,12 @@ export class PanelContainer implements IDockContainerWithSize, IContextMenuProvi
         if (getComputedStyle(manager.element).position === 'static') manager.element.style.position = 'relative';
         manager.element.appendChild(overlay);
         overlay.appendChild(this.elementContentContainer);
-        // Floating frames and sibling content live outside the dock container.
-        // Keep their geometry for restoration, but hide the source window in fullscreen.
-        if (this.floatingDialog) {
-            const elements = [this.floatingDialog.elementDialog,
-                ...this.floatingDialog.panels.filter(panel => panel !== this).map(panel => panel.elementContentContainer)];
-            this.fullscreen.hiddenFloatingElements = elements.map(element => ({ element, visibility: element.style.visibility }));
-            elements.forEach(element => { element.style.visibility = 'hidden'; });
-        }
+        // Floating frames and content can extend outside the dock container.
+        // Hide every floating window owned by this manager while preserving its geometry.
+        const elements = manager.context.model.dialogs.flatMap(dialog => [dialog.elementDialog,
+            ...dialog.panels.filter(panel => panel !== this).map(panel => panel.elementContentContainer)]);
+        this.fullscreen.hiddenFloatingElements = elements.map(element => ({ element, visibility: element.style.visibility }));
+        elements.forEach(element => { element.style.visibility = 'hidden'; });
         manager.fullscreenPanel = this;
         this.elementContentContainer.style.cssText = 'position:absolute;left:0;top:25px;width:100%;height:calc(100% - 25px);display:block;z-index:1;pointer-events:auto';
         this.fullscreen.observer = new ResizeObserver(() => this.resizeFullscreen());

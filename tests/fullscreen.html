@@ -49,6 +49,9 @@ async function checkPanel(p) {
     const originalRect = p.elementContentContainer.getBoundingClientRect();
     const floatingFrame = p.floatingDialog?.elementDialog;
     const originalFrameVisibility = floatingFrame?.style.visibility;
+    const floatingElements = manager.context.model.dialogs.flatMap(dialog => [dialog.elementDialog,
+        ...dialog.panels.filter(member => member !== p).map(member => member.elementContentContainer)]);
+    const originalVisibilities = floatingElements.map(element => element.style.visibility);
     const state = manager.saveState();
     const sizes = [];
     p.elementContent.resizeHandler = (w, h) => sizes.push([w, h]);
@@ -56,6 +59,7 @@ async function checkPanel(p) {
     await frame();
     const overlay = dock.querySelector('.dock-fullscreen-overlay');
     assert(p.isFullscreen && equalRect(overlay.getBoundingClientRect(), dock.getBoundingClientRect()), p.title + ' fills just the dock container');
+    assert(floatingElements.every(element => getComputedStyle(element).visibility === 'hidden'), 'All floating frames and other floating content are hidden while any panel is maximized');
     if (floatingFrame) {
         assert(getComputedStyle(floatingFrame).visibility === 'hidden', 'Floating source frame is hidden outside the dock container');
         assert(p.floatingDialog.panels.filter(member => member !== p).every(member => getComputedStyle(member.elementContentContainer).visibility === 'hidden'), 'Other source group content is hidden');
@@ -73,6 +77,7 @@ async function checkPanel(p) {
     overlay.querySelector('button').click();
     await frame();
     assert(!p.isFullscreen && p.elementContentContainer.parentElement === originalParent, 'Restore returns content to original parent');
+    assert(floatingElements.every((element, index) => element.style.visibility === originalVisibilities[index]), 'Restore returns every floating window to its previous visibility');
     if (floatingFrame) assert(floatingFrame.style.visibility === originalFrameVisibility, 'Restore returns source frame visibility');
     assert(equalRect(p.elementContentContainer.getBoundingClientRect(), originalRect), 'Restore returns original content bounds');
     assert(p.elementContent.querySelector('input') === input && input.value === 'retained', 'Restore retains edited content');
@@ -97,11 +102,17 @@ window.runFullscreenChecks = async () => {
     await dialog.resize(300, 220);
     await frame();
     await checkPanel(floating);
+    await checkPanel(doc);
+    await checkPanel(tool);
     const groupMember = panel('Floating group member');
     const otherDialog = manager.floatDialog(groupMember, 150, 150);
     manager.mergeDialogs(otherDialog, dialog);
+    const unrelated = panel('Unrelated floating window');
+    const unrelatedDialog = manager.floatDialog(unrelated, 800, 120);
+    await unrelatedDialog.resize(240, 180);
     await frame();
     await checkPanel(groupMember);
+    await checkPanel(doc);
     floating.tabPage.onSelected();
     floating.setFullscreen(true);
     dock.querySelector('.dock-fullscreen-overlay button').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
